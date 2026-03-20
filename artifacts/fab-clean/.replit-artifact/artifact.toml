@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Fab Clean"
+version = "1.0.0"
+id = "artifacts/fab-clean"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 22446
+
+[services.development]
+run = "pnpm --filter @workspace/fab-clean run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/fab-clean", "run", "build" ]
+publicDir = "artifacts/fab-clean/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "22446"
+BASE_PATH = "/"

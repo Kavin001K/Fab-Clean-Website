@@ -1,0 +1,19 @@
+packages:
+  "framer-motion": "For premium page transitions, scroll animations, and interactive step wizards"
+  "clsx": "Utility for conditionally joining classNames"
+  "tailwind-merge": "Utility to cleanly merge Tailwind classes"
+  "lucide-react": "Beautiful consistent iconography"
+  "date-fns": "For elegant date formatting in the pickup scheduler and order tracking"
+  "react-hook-form": "For robust handling of the multi-step pickup and contact forms"
+
+images:
+  - path: "artifacts/fab-clean/public/images/hero-bg.png"
+    description: "Abstract premium dark navy fabric flowing fluidly with subtle glowing electric blue and cyan edge highlights, cinematic lighting, luxury 3D render background"
+    aspect_ratio: "16:9"
+  - path: "artifacts/fab-clean/public/images/pattern-bg.png"
+    description: "Minimalist geometric luxury pattern in deep dark blue and black with very subtle cyan glowing accents, high-end abstract background texture"
+    aspect_ratio: "16:9"
+
+notes:
+  - All generated API hooks are imported from @workspace/api-client-react as they were successfully scaffolded via OpenAPI
+  - The application defaults to Dark Mode as per the premium luxury brand requirement
