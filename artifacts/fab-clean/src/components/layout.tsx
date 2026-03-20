@@ -4,10 +4,33 @@ import { Button } from "./ui";
 import { useAuth } from "@/hooks/use-auth";
 import { 
   Menu, X, Home, List, 
-  User, MapPin, Phone, Mail, Instagram, Facebook, Twitter, Package, ArrowUpRight
+  User, MapPin, Phone, Mail, Instagram, Facebook, Twitter, Package, ArrowUpRight,
+  Sun, Moon
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTheme } from "next-themes";
+
+export function ThemeToggle() {
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
+
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      className="w-12 h-12 rounded-2xl bg-white/50 dark:bg-black/20 backdrop-blur-md border border-black/5 dark:border-white/5 hover:bg-primary/10 transition-all"
+    >
+      <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+      <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+      <span className="sr-only">Toggle theme</span>
+    </Button>
+  );
+}
 
 export function Navbar() {
   const [location] = useLocation();
@@ -33,7 +56,7 @@ export function Navbar() {
     <header className={cn(
       "fixed top-0 inset-x-0 z-50 transition-all duration-700 ease-in-out font-sans",
       isScrolled
-        ? "bg-white/80 backdrop-blur-2xl border-b border-black/5 py-4"
+        ? "bg-white/80 dark:bg-black/60 backdrop-blur-2xl border-b border-black/5 dark:border-white/5 py-4"
         : "bg-transparent py-8"
     )}>
       {/* Constrained navbar to match content width for alignment */}
@@ -56,7 +79,7 @@ export function Navbar() {
           </Link>
 
           {/* Nav Links - Focused/Centered */}
-          <nav className="hidden lg:flex items-center gap-1.5 p-1 rounded-[2rem] border border-black/5 bg-white/40 shadow-xl shadow-black/[0.03] z-10 mx-6">
+          <nav className="hidden lg:flex items-center gap-1.5 p-1 rounded-[2rem] border border-black/5 dark:border-white/10 bg-white/40 dark:bg-black/20 backdrop-blur-xl shadow-xl shadow-black/[0.03] z-10 mx-6">
             {navLinks.map((link) => {
               const isActive = location === link.path;
               return (
@@ -97,16 +120,19 @@ export function Navbar() {
                 Book Pickup
               </Button>
             </Link>
+            <ThemeToggle />
           </div>
 
-          {/* Hamburger Mobile */}
-          <button
-            className="lg:hidden p-3 text-foreground bg-white/80 backdrop-blur-md rounded-2xl border border-black/5 z-20"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle menu"
-          >
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          <div className="flex items-center gap-3 lg:hidden">
+            <ThemeToggle />
+            <button
+              className="p-3 text-foreground bg-white/80 dark:bg-black/40 backdrop-blur-md rounded-2xl border border-black/5 dark:border-white/5 z-20"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -117,7 +143,7 @@ export function Navbar() {
             initial={{ opacity: 0, scale: 0.95, y: -20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -20 }}
-            className="lg:hidden absolute top-[calc(100%+0.5rem)] inset-x-6 rounded-[3rem] border border-black/5 bg-white shadow-2xl p-10 z-50 overflow-hidden"
+            className="lg:hidden absolute top-[calc(100%+0.5rem)] inset-x-6 rounded-[3rem] border border-black/5 dark:border-white/5 bg-white dark:bg-black/90 backdrop-blur-3xl shadow-2xl p-10 z-50 overflow-hidden"
           >
             <div className="flex flex-col gap-3 relative z-10">
               {navLinks.map((link) => (

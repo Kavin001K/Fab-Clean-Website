@@ -16,10 +16,10 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const variants = {
       primary: "bg-lime-gradient text-primary-foreground shadow-xl shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-1 transition-all duration-300",
       secondary: "bg-foreground text-background hover:bg-foreground/90 shadow-lg",
-      outline: "border-2 border-border bg-white/50 backdrop-blur-sm hover:border-primary/50 hover:text-primary transition-all duration-300",
+      outline: "border-2 border-border bg-background/50 backdrop-blur-sm hover:border-primary/50 hover:text-primary transition-all duration-300",
       ghost: "hover:bg-primary/10 hover:text-primary",
       destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-      premium: "bg-foreground text-white hover:bg-primary hover:text-primary-foreground shadow-2xl transition-all duration-500",
+      premium: "bg-foreground text-background hover:bg-primary hover:text-primary-foreground shadow-2xl transition-all duration-500",
     };
 
     const sizes = {
@@ -62,7 +62,7 @@ export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttribute
       <input
         type={type}
         className={cn(
-          "flex h-16 w-full rounded-2xl border-2 border-border bg-white/50 backdrop-blur-sm px-6 py-4 text-lg font-medium placeholder:text-muted-foreground/50 focus-visible:outline-none focus-visible:border-primary focus-visible:ring-8 focus-visible:ring-primary/5 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-300",
+          "flex h-16 w-full rounded-2xl border-2 border-border bg-background/50 backdrop-blur-sm px-6 py-4 text-lg font-medium placeholder:text-muted-foreground/50 focus-visible:outline-none focus-visible:border-primary focus-visible:ring-8 focus-visible:ring-primary/5 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-300",
           className
         )}
         ref={ref}

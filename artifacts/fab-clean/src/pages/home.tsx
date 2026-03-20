@@ -40,7 +40,7 @@ export default function Home() {
             {/* HERO TEXT (7/12) */}
             <div className="lg:col-span-7 space-y-10 text-center lg:text-left order-2 lg:order-1 mt-10 lg:mt-0">
               <FadeIn>
-                <div className="inline-flex items-center gap-3 px-6 py-2.5 rounded-2xl bg-white border border-border shadow-2xl shadow-black/[0.03] text-primary text-[10px] font-black uppercase tracking-[0.3em] mb-4">
+                <div className="inline-flex items-center gap-3 px-6 py-2.5 rounded-2xl bg-background/50 backdrop-blur-md border border-border shadow-2xl shadow-black/[0.03] text-primary text-[10px] font-black uppercase tracking-[0.3em] mb-4">
                   <Sparkles className="w-4 h-4" />
                   Pollachi's Exclusive Artisan Hub
                 </div>
@@ -68,7 +68,7 @@ export default function Home() {
                   </Button>
                 </Link>
                 <Link href="/services">
-                  <Button size="lg" variant="outline" className="w-full sm:w-auto min-w-[220px] bg-white border-black/[0.03] text-muted-foreground h-20">
+                  <Button size="lg" variant="outline" className="w-full sm:w-auto min-w-[220px] bg-background/50 border-black/[0.03] text-muted-foreground h-20">
                     See All Services
                   </Button>
                 </Link>
@@ -93,7 +93,7 @@ export default function Home() {
               <FadeIn delay={0.2} className="relative aspect-[4/5] sm:aspect-[4/3] lg:aspect-[3.5/4] group px-4 lg:px-0 max-h-[500px] lg:max-h-none">
                 {/* Visual breathing room */}
                 <div className="absolute -inset-10 bg-primary/5 rounded-[4rem] blur-[5rem] group-hover:bg-primary/10 transition-colors duration-1000" />
-                <div className="absolute inset-0 bg-white border-[14px] border-white shadow-[0_50px_100px_-20px_rgba(0,0,0,0.1)] rounded-[4.5rem] overflow-hidden group-hover:shadow-[0_80px_160px_-40px_rgba(0,0,0,0.15)] transition-shadow">
+                <div className="absolute inset-0 bg-background border-[14px] border-background shadow-[0_50px_100px_-20px_rgba(0,0,0,0.1)] rounded-[4.5rem] overflow-hidden group-hover:shadow-[0_80px_160px_-40px_rgba(0,0,0,0.15)] transition-shadow">
                   <motion.img
                     src={`${import.meta.env.BASE_URL}images/premium-hero.png`}
                     alt="Premium Laundry Lifestyle"
@@ -107,7 +107,7 @@ export default function Home() {
                 
                 {/* Floating Metric */}
                 <motion.div 
-                  className="absolute -bottom-10 -left-6 lg:-left-20 bg-white shadow-2xl rounded-3xl p-6 border border-black/5 flex items-center gap-5 z-20 hover:scale-105 transition-transform"
+                  className="absolute -bottom-10 -left-6 lg:-left-20 bg-background shadow-2xl rounded-3xl p-6 border border-border/50 flex items-center gap-5 z-20 hover:scale-105 transition-transform"
                   animate={{ y: [0, -10, 0] }}
                   transition={{ duration: 5, repeat: Infinity }}
                 >
@@ -127,7 +127,7 @@ export default function Home() {
       </section>
 
       {/* ─── STATS STRIP ─────────────────────────────────── */}
-      <section className="py-24 bg-white border-y border-black/[0.03] relative z-20">
+      <section className="py-24 bg-card border-y border-border/10 relative z-20">
         <div className="container-wide">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-12 lg:gap-24">
             {[
@@ -146,7 +146,7 @@ export default function Home() {
       </section>
 
       {/* ─── ARTISAN SERVICES ────────────────────────────── */}
-      <section className="section-padding bg-[#fafbfc]">
+      <section className="section-padding bg-muted/30">
         <div className="container-wide">
           <SectionHeading
             title="Professional Care Science"
@@ -157,7 +157,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
             {mockServices.map((s, i) => (
               <FadeIn key={s.id} delay={0.1 * i}>
-                <Card className="p-10 h-full flex flex-col group bg-white shadow-xl shadow-black/[0.02] rounded-[3.5rem] border-transparent hover:border-black/5 transition-all">
+                <Card className="p-10 h-full flex flex-col group bg-background shadow-xl shadow-black/[0.02] rounded-[3.5rem] border-transparent hover:border-border/50 transition-all">
                   <div className="w-20 h-20 rounded-3xl bg-muted/30 flex items-center justify-center text-foreground mb-10 group-hover:bg-lime-gradient group-hover:text-white transition-all duration-700 shadow-sm">
                     <s.icon className="w-10 h-10" />
                   </div>
@@ -178,7 +178,7 @@ export default function Home() {
       </section>
 
       {/* ─── THE PIPELINE ───────────────────────────────── */}
-      <section className="section-padding relative overflow-hidden bg-white">
+      <section className="section-padding relative overflow-hidden bg-background">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-[1240px] border-[100px] border-primary/[0.012] rounded-full pointer-events-none" />
         
         <div className="container-wide relative z-10">
@@ -217,7 +217,7 @@ export default function Home() {
       </section>
 
       {/* ─── TESTIMONIALS ────────────────────────────────── */}
-      <section className="section-padding bg-[#fafbfc] overflow-hidden">
+      <section className="section-padding bg-muted/30 overflow-hidden">
         <div className="container-wide relative">
           <SectionHeading
             title="The Prime Community"
@@ -227,7 +227,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-16">
             {testimonials.map((t, i) => (
               <FadeIn key={i} delay={0.1 * i}>
-                <Card className="p-12 hover:shadow-[0_40px_100px_-20px_rgba(0,0,0,0.08)] transition-all h-full flex flex-col bg-white rounded-[4rem]">
+                <Card className="p-12 hover:shadow-[0_40px_100px_-20px_rgba(0,0,0,0.08)] transition-all h-full flex flex-col bg-background rounded-[4rem]">
                   <div className="flex mb-10 gap-1.5 underline decoration-primary decoration-4 underline-offset-8">
                     {[1, 2, 3, 4, 5].map(s => <Star key={s} className="w-5 h-5 fill-yellow-400 text-yellow-400" />)}
                   </div>

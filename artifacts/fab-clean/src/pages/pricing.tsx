@@ -49,7 +49,7 @@ export default function Pricing() {
                     </div>
                   </div>
                   
-                  <Card className="overflow-hidden border-border/30 bg-white/40 backdrop-blur-2xl shadow-[0_40px_100px_-20px_rgba(0,0,0,0.08)] rounded-[4.5rem] p-8 lg:p-16 group/table relative">
+                  <Card className="overflow-hidden border-border/30 bg-background/40 backdrop-blur-2xl shadow-[0_40px_100px_-20px_rgba(0,0,0,0.08)] rounded-[4.5rem] p-8 lg:p-16 group/table relative">
                     {/* Background accent */}
                     <div className="absolute top-0 right-0 w-80 h-80 bg-primary/[0.02] rounded-full blur-[100px] pointer-events-none" />
 

@@ -45,7 +45,7 @@ export default function Services() {
                 const IconComp = ICON_MAP[service.icon.toLowerCase()] || ICON_MAP.default;
                 return (
                   <FadeIn key={service.id} delay={i * 0.1}>
-                    <Card className="h-full flex flex-col p-12 hover:shadow-[0_40px_100px_-20px_rgba(0,0,0,0.08)] transition-all bg-white group relative overflow-hidden rounded-[4rem]">
+                    <Card className="h-full flex flex-col p-12 hover:shadow-[0_40px_100px_-20px_rgba(0,0,0,0.08)] transition-all bg-background group relative overflow-hidden rounded-[4rem]">
                       {/* Background accent */}
                       <div className="absolute top-0 right-0 w-44 h-44 bg-primary/[0.01] rounded-full blur-3xl translate-x-1/4 -translate-y-1/4 group-hover:bg-primary/5 transition-all duration-700" />
                       
