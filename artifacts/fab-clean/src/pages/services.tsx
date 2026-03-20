@@ -2,58 +2,114 @@ import { AppLayout } from "@/components/layout";
 import { SectionHeading, Card, FadeIn, Button } from "@/components/ui";
 import { useListServices } from "@workspace/api-client-react";
 import { Link } from "wouter";
-import { ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight, Loader2, Star, Briefcase, Shirt, Zap, Sparkles } from "lucide-react";
+
+// Fallback icons map for nicer visuals
+const ICON_MAP: Record<string, any> = {
+  "shirt": Shirt,
+  "briefcase": Briefcase,
+  "zap": Zap,
+  "default": Shirt
+};
 
 export default function Services() {
   const { data, isLoading } = useListServices();
 
   return (
     <AppLayout>
-      <div className="pt-32 pb-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <SectionHeading 
-          title="Our Services" 
-          subtitle="Premium Care Catalog"
-          className="mb-16"
-        />
+      {/* Background Decor */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/2 rounded-full blur-[160px] translate-x-1/2 -translate-y-1/2" />
+        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-secondary/5 rounded-full blur-[140px] -translate-x-1/2 translate-y-1/2" />
+      </div>
 
-        {isLoading ? (
-          <div className="flex justify-center py-20">
-            <Loader2 className="w-10 h-10 animate-spin text-primary" />
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {data?.data.map((service, i) => (
-              <FadeIn key={service.id} delay={i * 0.1}>
-                <Card className="h-full flex flex-col p-8 border-border hover:border-primary/40 hover:shadow-md transition-all group">
-                  <div className="flex justify-between items-start mb-6">
-                    <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all">
-                      <img src={`https://api.dicebear.com/7.x/icons/svg?seed=${service.icon}&backgroundColor=transparent`} alt="icon" className="w-8 h-8 opacity-80" />
-                    </div>
-                    <span className="text-sm font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">
-                      Starts ₹{service.startingPrice}
-                    </span>
-                  </div>
+      <div className="section-padding relative z-10 overflow-hidden pt-44">
+        <div className="container-wide">
+          <SectionHeading 
+            title="Artisan Care for Every Thread" 
+            subtitle="The Premium Ensemble"
+            className="mb-32"
+          />
 
-                  <h3 className="text-xl font-bold text-foreground mb-3">{service.name}</h3>
-                  <p className="text-muted-foreground text-sm mb-6 flex-grow leading-relaxed">{service.description}</p>
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-44 space-y-10">
+              <div className="relative">
+                 <Loader2 className="w-20 h-20 animate-spin text-primary opacity-20" />
+                 <Sparkles className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 text-primary animate-float" />
+              </div>
+              <p className="text-muted-foreground font-black uppercase tracking-[0.4em] text-[10px] animate-pulse">Initializing Catalog...</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 lg:gap-16">
+              {data?.data.map((service, i) => {
+                const IconComp = ICON_MAP[service.icon.toLowerCase()] || ICON_MAP.default;
+                return (
+                  <FadeIn key={service.id} delay={i * 0.1}>
+                    <Card className="h-full flex flex-col p-12 hover:shadow-[0_40px_100px_-20px_rgba(0,0,0,0.08)] transition-all bg-white group relative overflow-hidden rounded-[4rem]">
+                      {/* Background accent */}
+                      <div className="absolute top-0 right-0 w-44 h-44 bg-primary/[0.01] rounded-full blur-3xl translate-x-1/4 -translate-y-1/4 group-hover:bg-primary/5 transition-all duration-700" />
+                      
+                      <div className="flex justify-between items-start mb-16 relative z-10">
+                        <div className="w-24 h-24 rounded-[2.2rem] bg-muted/30 flex items-center justify-center text-foreground group-hover:bg-lime-gradient group-hover:text-primary-foreground group-hover:shadow-2xl transition-all duration-700 shadow-sm border border-border/50">
+                          <IconComp className="w-12 h-12" />
+                        </div>
+                        <div className="flex flex-col items-end pt-3">
+                          <span className="text-[10px] font-black uppercase tracking-widest text-primary/60 mb-1">Starting from</span>
+                          <span className="text-3xl font-black text-foreground font-display">
+                            ₹{service.startingPrice}
+                          </span>
+                        </div>
+                      </div>
 
-                  <ul className="space-y-2 mb-8">
-                    {service.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-center gap-2 text-sm text-foreground/70">
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
+                      <h3 className="text-4xl font-black font-display text-foreground mb-6 leading-tight group-hover:text-primary transition-colors tracking-tight">{service.name}</h3>
+                      <p className="text-muted-foreground text-xl mb-12 flex-grow leading-relaxed font-medium">{service.description}</p>
 
-                  <Link href="/schedule-pickup">
-                    <Button className="w-full bg-lime-gradient text-primary-foreground hover:opacity-90">Book Now</Button>
-                  </Link>
-                </Card>
-              </FadeIn>
-            ))}
-          </div>
-        )}
+                      <div className="space-y-6 mb-16">
+                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/40 mb-4 bg-muted/20 px-5 py-2 rounded-full w-fit">Key Highlights</p>
+                        {service.features.slice(0, 3).map((feature, idx) => (
+                          <div key={idx} className="flex items-center gap-4 text-base font-bold text-foreground/70 group-hover:translate-x-3 transition-transform">
+                            <div className="w-2.5 h-2.5 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+                               <div className="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_12px_rgba(180,197,36,0.6)]" />
+                            </div>
+                            {feature}
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="pt-10 border-t border-border/30 relative z-10">
+                        <Link href="/schedule-pickup">
+                          <Button className="w-full h-20 text-xs font-black rounded-[2rem] group-hover:scale-105 transition-all flex items-center justify-between px-10">
+                            Book This Service
+                            <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
+                          </Button>
+                        </Link>
+                      </div>
+                    </Card>
+                  </FadeIn>
+                );
+              })}
+            </div>
+          )}
+          
+          <FadeIn delay={0.4} className="mt-44 text-center p-20 lg:p-32 bg-foreground rounded-[6rem] shadow-[0_60px_120px_-20px_rgba(0,0,0,0.3)] relative overflow-hidden group">
+             {/* Background mesh texture */}
+             <div className="absolute inset-0 bg-premium-mesh opacity-5 grayscale invert pointer-events-none" />
+             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-primary/5 rounded-full blur-[160px] pointer-events-none" />
+             
+             <div className="relative z-10 max-w-3xl mx-auto space-y-10">
+               <div className="w-24 h-24 rounded-[2.5rem] bg-white/10 mx-auto flex items-center justify-center text-primary group-hover:rotate-12 transition-transform duration-700">
+                  <Star className="w-12 h-12 fill-primary" />
+               </div>
+               <h2 className="text-5xl md:text-7xl font-black font-display text-white leading-tight">Need Artisan Consultation?</h2>
+               <p className="text-white/40 text-2xl font-medium leading-relaxed">We specialize in luxury brands, wedding couture, and museum-grade fiber restoration with organic solvents.</p>
+               <div className="pt-10">
+                <Link href="/contact">
+                  <Button variant="premium" className="h-24 px-20 text-xs font-black tracking-[0.3em] shadow-2xl hover:scale-110 active:scale-95 transition-all">Talk to Our Experts</Button>
+                </Link>
+               </div>
+             </div>
+          </FadeIn>
+        </div>
       </div>
     </AppLayout>
   );

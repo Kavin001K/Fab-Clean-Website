@@ -4,28 +4,29 @@ import { motion, HTMLMotionProps } from "framer-motion";
 
 // --- Button ---
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "outline" | "ghost" | "destructive";
+  variant?: "primary" | "secondary" | "outline" | "ghost" | "destructive" | "premium";
   size?: "sm" | "md" | "lg" | "icon";
   isLoading?: boolean;
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "primary", size = "md", isLoading, children, ...props }, ref) => {
-    const baseStyles = "inline-flex items-center justify-center rounded-xl font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]";
+    const baseStyles = "inline-flex items-center justify-center rounded-2xl font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98] uppercase tracking-widest text-xs";
     
     const variants = {
-      primary: "bg-lime-gradient text-primary-foreground shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:opacity-90 hover:-translate-y-0.5",
-      secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-      outline: "border-2 border-border bg-transparent hover:border-primary hover:text-primary",
-      ghost: "hover:bg-muted hover:text-foreground",
+      primary: "bg-lime-gradient text-primary-foreground shadow-xl shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-1 transition-all duration-300",
+      secondary: "bg-foreground text-background hover:bg-foreground/90 shadow-lg",
+      outline: "border-2 border-border bg-white/50 backdrop-blur-sm hover:border-primary/50 hover:text-primary transition-all duration-300",
+      ghost: "hover:bg-primary/10 hover:text-primary",
       destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      premium: "bg-foreground text-white hover:bg-primary hover:text-primary-foreground shadow-2xl transition-all duration-500",
     };
 
     const sizes = {
-      sm: "h-9 px-4 text-sm",
-      md: "h-12 px-6 py-3",
-      lg: "h-14 px-8 text-lg",
-      icon: "h-12 w-12",
+      sm: "h-10 px-5",
+      md: "h-14 px-8",
+      lg: "h-16 px-10 text-sm",
+      icon: "h-14 w-14",
     };
 
     return (
@@ -36,7 +37,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       >
         {isLoading ? (
-          <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+          <span className="mr-3 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
         ) : null}
         {children}
       </button>
@@ -48,7 +49,7 @@ Button.displayName = "Button";
 // --- Card ---
 export function Card({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn("glass-panel rounded-2xl overflow-hidden", className)} {...props}>
+    <div className={cn("glass rounded-[2.5rem] overflow-hidden transition-all duration-500 hover:shadow-2xl hover:-translate-y-2", className)} {...props}>
       {children}
     </div>
   );
@@ -61,7 +62,7 @@ export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttribute
       <input
         type={type}
         className={cn(
-          "flex h-12 w-full rounded-xl border-2 border-border bg-background/50 px-4 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-primary/10 disabled:cursor-not-allowed disabled:opacity-50 transition-all",
+          "flex h-16 w-full rounded-2xl border-2 border-border bg-white/50 backdrop-blur-sm px-6 py-4 text-lg font-medium placeholder:text-muted-foreground/50 focus-visible:outline-none focus-visible:border-primary focus-visible:ring-8 focus-visible:ring-primary/5 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-300",
           className
         )}
         ref={ref}
@@ -81,16 +82,16 @@ export function Badge({ className, variant = "default", ...props }: React.HTMLAt
   };
   
   return (
-    <div className={cn("inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider transition-colors", variants[variant], className)} {...props} />
+    <div className={cn("inline-flex items-center rounded-xl px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] transition-colors", variants[variant], className)} {...props} />
   );
 }
 
 // --- Section Heading ---
 export function SectionHeading({ title, subtitle, align = "center", className }: { title: string, subtitle?: string, align?: "left" | "center", className?: string }) {
   return (
-    <div className={cn("flex flex-col gap-3", align === "center" ? "items-center text-center" : "items-start text-left", className)}>
-      {subtitle && <span className="text-primary font-semibold tracking-wider uppercase text-sm">{subtitle}</span>}
-      <h2 className="text-3xl md:text-5xl font-bold font-display text-foreground">{title}</h2>
+    <div className={cn("flex flex-col gap-4", align === "center" ? "items-center text-center" : "items-start text-left", className)}>
+      {subtitle && <span className="text-primary font-black tracking-[0.3em] uppercase text-[10px] bg-primary/5 px-4 py-1.5 rounded-full">{subtitle}</span>}
+      <h2 className="text-4xl md:text-7xl font-black font-display text-foreground leading-[1.1]">{title}</h2>
     </div>
   );
 }
@@ -99,10 +100,10 @@ export function SectionHeading({ title, subtitle, align = "center", className }:
 export function FadeIn({ children, delay = 0, className, ...props }: HTMLMotionProps<"div"> & { delay?: number }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.6, delay, ease: "easeOut" }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.8, delay, ease: [0.16, 1, 0.3, 1] }}
       className={className}
       {...props}
     >

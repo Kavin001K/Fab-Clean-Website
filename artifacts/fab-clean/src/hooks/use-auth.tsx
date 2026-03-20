@@ -1,6 +1,9 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useGetProfile } from "@workspace/api-client-react";
+import { useGetProfile, setBaseUrl, setAuthTokenGetter } from "@workspace/api-client-react";
+
+// Initialize API
+setBaseUrl(import.meta.env.VITE_API_URL || "http://localhost:3001");
 
 interface AuthContextType {
   token: string | null;
@@ -32,11 +35,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     window.location.href = "/";
   };
 
-  // Setup generic fetch options for Orval hooks if needed
-  // This is a simple implementation. In a real app, you'd integrate this into custom-fetch.ts
-  if (token) {
-    window.localStorage.setItem("fabclean_token", token);
-  }
+  // Setup API auth token
+  useEffect(() => {
+    setAuthTokenGetter(() => token);
+  }, [token]);
 
   return (
     <AuthContext.Provider value={{ token, setToken, isAuthenticated: !!token, logout }}>
@@ -59,7 +61,7 @@ export function useRequireAuth() {
     query: {
       enabled: isAuthenticated,
       retry: false
-    }
+    } as any
   });
 
   useEffect(() => {
@@ -70,6 +72,7 @@ export function useRequireAuth() {
       }, 100);
       return () => clearTimeout(t);
     }
+    return () => {};
   }, [isAuthenticated, profile, isLoading]);
 
   return { profile: profile?.data, isLoading };

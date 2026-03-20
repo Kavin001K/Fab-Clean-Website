@@ -3,8 +3,8 @@ import { cn } from "@/lib/utils";
 import { Button } from "./ui";
 import { useAuth } from "@/hooks/use-auth";
 import { 
-  Menu, X, Home, List, Calendar, 
-  User, MapPin, Phone, Mail, Instagram, Facebook, Twitter, Package
+  Menu, X, Home, List, 
+  User, MapPin, Phone, Mail, Instagram, Facebook, Twitter, Package, ArrowUpRight
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -17,121 +17,136 @@ export function Navbar() {
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const navLinks = [
     { name: "Home", path: "/" },
-    { name: "About", path: "/about" },
     { name: "Services", path: "/services" },
     { name: "Pricing", path: "/pricing" },
+    { name: "About", path: "/about" },
     { name: "Contact", path: "/contact" },
   ];
 
   return (
     <header className={cn(
-      "fixed top-0 inset-x-0 z-50 transition-all duration-300 border-b",
+      "fixed top-0 inset-x-0 z-50 transition-all duration-700 ease-in-out font-sans",
       isScrolled
-        ? "bg-white/95 backdrop-blur-xl border-border shadow-sm py-3"
-        : "bg-white border-border py-5"
+        ? "bg-white/80 backdrop-blur-2xl border-b border-black/5 py-4"
+        : "bg-transparent py-8"
     )}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Constrained navbar to match content width for alignment */}
+      <div className="container-wide">
         <div className="flex items-center justify-between">
 
-          <Link href="/" className="flex items-center group">
-            <img
-              src={`${import.meta.env.BASE_URL}logo.webp`}
-              alt="Fab Clean logo"
-              className="h-12 w-auto group-hover:opacity-90 transition-opacity"
-            />
+          {/* Logo - Aligned with the start of content */}
+          <Link href="/" className="flex items-center group relative overflow-hidden z-20 shrink-0">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="relative"
+            >
+              <img
+                src={`${import.meta.env.BASE_URL}logo.webp`}
+                alt="Fab Clean logo"
+                className="h-10 md:h-11 w-auto"
+              />
+            </motion.div>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-7">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.path}
-                className={cn(
-                  "text-sm font-medium transition-colors hover:text-primary relative py-2",
-                  location === link.path ? "text-foreground font-semibold" : "text-muted-foreground"
-                )}
-              >
-                {link.name}
-                {location === link.path && (
-                  <motion.div
-                    layoutId="nav-indicator"
-                    className="absolute bottom-0 inset-x-0 h-0.5 bg-primary rounded-full"
-                  />
-                )}
-              </Link>
-            ))}
+          {/* Nav Links - Focused/Centered */}
+          <nav className="hidden lg:flex items-center gap-1.5 p-1 rounded-[2rem] border border-black/5 bg-white/40 shadow-xl shadow-black/[0.03] z-10 mx-6">
+            {navLinks.map((link) => {
+              const isActive = location === link.path;
+              return (
+                <Link
+                  key={link.name}
+                  href={link.path}
+                  className={cn(
+                    "text-[10px] font-black uppercase tracking-[0.2em] transition-all px-6 py-2.5 rounded-full relative",
+                    isActive ? "text-primary-foreground" : "text-muted-foreground hover:text-foreground hover:bg-black/5"
+                  )}
+                >
+                  <span className="relative z-10">{link.name}</span>
+                  {isActive && (
+                    <motion.div
+                      layoutId="nav-pill"
+                      className="absolute inset-0 bg-lime-gradient rounded-full shadow-lg shadow-primary/20"
+                      transition={{ type: "spring", bounce: 0.2, duration: 0.8 }}
+                    />
+                  )}
+                </Link>
+              );
+            })}
           </nav>
 
-          <div className="hidden md:flex items-center gap-3">
+          {/* Desktop Tools - Constrained to gutters */}
+          <div className="hidden lg:flex items-center gap-6 z-20 shrink-0">
             {isAuthenticated ? (
               <Link href="/dashboard">
-                <Button variant="ghost" size="sm">Dashboard</Button>
+                <Button variant="ghost" size="sm" className="font-black text-[10px] uppercase tracking-widest text-muted-foreground hover:text-primary p-0 h-auto underline decoration-primary/20 decoration-2 underline-offset-4">Dashboard</Button>
               </Link>
             ) : (
               <Link href="/login">
-                <Button variant="ghost" size="sm" className="text-foreground">Sign In</Button>
+                <Button variant="ghost" size="sm" className="font-black text-[10px] uppercase tracking-widest text-muted-foreground hover:text-primary p-0 h-auto underline decoration-primary/20 decoration-2 underline-offset-4">Sign In</Button>
               </Link>
             )}
             <Link href="/schedule-pickup">
-              <Button size="sm" className="bg-lime-gradient text-primary-foreground shadow-md shadow-primary/20 hover:shadow-primary/40 hover:opacity-90">
-                Schedule Pickup
+              <Button size="sm" className="h-12 px-8 rounded-2xl shadow-2xl hover:scale-105 transition-all">
+                Book Pickup
               </Button>
             </Link>
           </div>
 
+          {/* Hamburger Mobile */}
           <button
-            className="md:hidden p-2 text-foreground"
+            className="lg:hidden p-3 text-foreground bg-white/80 backdrop-blur-md rounded-2xl border border-black/5 z-20"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle menu"
           >
-            {mobileMenuOpen ? <X /> : <Menu />}
+            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
       </div>
 
+      {/* Mobile Menu Overlay */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden border-t border-border bg-white"
+            initial={{ opacity: 0, scale: 0.95, y: -20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: -20 }}
+            className="lg:hidden absolute top-[calc(100%+0.5rem)] inset-x-6 rounded-[3rem] border border-black/5 bg-white shadow-2xl p-10 z-50 overflow-hidden"
           >
-            <div className="flex flex-col p-4 gap-1">
+            <div className="flex flex-col gap-3 relative z-10">
               {navLinks.map((link) => (
                 <Link
                   key={link.name}
                   href={link.path}
                   onClick={() => setMobileMenuOpen(false)}
                   className={cn(
-                    "px-4 py-3 rounded-xl text-base font-medium",
-                    location === link.path
-                      ? "bg-primary/10 text-primary"
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    "px-8 py-5 rounded-[2rem] text-3xl font-black font-display transition-all flex items-center justify-between group",
+                    location === link.path ? "bg-primary/5 text-primary" : "text-muted-foreground"
                   )}
                 >
                   {link.name}
+                  <ArrowUpRight className={cn("w-6 h-6 transition-all", location === link.path ? "opacity-100" : "opacity-0 group-hover:opacity-100")} />
                 </Link>
               ))}
-              <div className="h-px bg-border my-2" />
-              {isAuthenticated ? (
-                <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="outline" className="w-full justify-start">Dashboard</Button>
+              <div className="h-px bg-black/5 my-6 mx-4" />
+              <div className="grid grid-cols-2 gap-4">
+                <Link href={isAuthenticated ? "/dashboard" : "/login"} onClick={() => setMobileMenuOpen(false)}>
+                  <Button variant="outline" className="w-full rounded-[2rem] h-20 text-xs font-black">
+                    {isAuthenticated ? "Dashboard" : "Account"}
+                  </Button>
                 </Link>
-              ) : (
-                <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="outline" className="w-full justify-start">Sign In</Button>
+                <Link href="/schedule-pickup" onClick={() => setMobileMenuOpen(false)}>
+                  <Button className="w-full rounded-[2rem] h-20 text-xs font-black">
+                    Book Now
+                  </Button>
                 </Link>
-              )}
-              <Link href="/schedule-pickup" onClick={() => setMobileMenuOpen(false)}>
-                <Button className="w-full mt-2 bg-lime-gradient text-primary-foreground">Schedule Pickup</Button>
-              </Link>
+              </div>
             </div>
           </motion.div>
         )}
@@ -142,42 +157,49 @@ export function Navbar() {
 
 export function Footer() {
   return (
-    <footer className="bg-charcoal pt-16 pb-20 md:pb-8 relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
+    <footer className="bg-[#050505] text-white pt-44 pb-32 md:pb-24 relative overflow-hidden rounded-t-[5rem]">
+      {/* Texture overlay */}
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #fff 1.5px, transparent 1.5px)', backgroundSize: '48px 48px' }} />
+      
+      <div className="container-wide relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-20 lg:gap-32">
 
-          <div className="space-y-5">
-            <Link href="/" className="flex items-center">
+          <div className="lg:col-span-4 space-y-12">
+            <Link href="/" className="inline-block group">
               <img
                 src={`${import.meta.env.BASE_URL}logo.webp`}
                 alt="Fab Clean logo"
-                className="h-10 w-auto brightness-0 invert opacity-90"
+                className="h-11 w-auto brightness-0 invert opacity-100"
               />
             </Link>
-            <p className="text-white/60 text-sm leading-relaxed">
-              Your clothes deserve the best care — We deliver it. Premium dry cleaning and laundry services in Pollachi & Kinathukadavu.
+            <p className="text-white/40 text-2xl font-medium leading-relaxed max-w-sm">
+              Crafting a state-of-the-art cleaning science for your most cherished garments. 
             </p>
-            <div className="flex gap-3">
+            <div className="flex gap-5">
               {[Instagram, Facebook, Twitter].map((Icon, i) => (
-                <a key={i} href="#" className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-white/60 hover:bg-primary hover:text-white transition-colors">
-                  <Icon className="w-4 h-4" />
-                </a>
+                <motion.a 
+                  key={i} 
+                  href="#" 
+                  whileHover={{ y: -8, scale: 1.1 }}
+                  className="w-16 h-16 rounded-[1.5rem] bg-white/5 flex items-center justify-center text-white/30 hover:bg-lime-gradient hover:text-primary-foreground transition-all border border-white/5"
+                >
+                  <Icon className="w-7 h-7" />
+                </motion.a>
               ))}
             </div>
           </div>
 
-          <div>
-            <h4 className="text-white font-semibold mb-5 text-sm uppercase tracking-wider">Quick Links</h4>
-            <ul className="space-y-3">
+          <div className="lg:col-span-2">
+            <h4 className="text-primary font-black mb-10 text-[10px] uppercase tracking-[0.4em]">Explore</h4>
+            <ul className="space-y-6">
               {[
-                { label: "About Us", path: "/about" },
                 { label: "Our Services", path: "/services" },
-                { label: "Pricing", path: "/pricing" },
-                { label: "Schedule Pickup", path: "/schedule-pickup" },
-                { label: "Contact", path: "/contact" },
+                { label: "Pricing List", path: "/pricing" },
+                { label: "Book Pickup", path: "/schedule-pickup" },
+                { label: "Tech & Science", path: "/about" },
               ].map((item) => (
                 <li key={item.label}>
-                  <Link href={item.path} className="text-white/60 hover:text-primary transition-colors text-sm">
+                  <Link href={item.path} className="text-white/40 hover:text-white hover:translate-x-3 transition-all inline-block font-bold text-lg">
                     {item.label}
                   </Link>
                 </li>
@@ -185,56 +207,60 @@ export function Footer() {
             </ul>
           </div>
 
-          <div>
-            <h4 className="text-white font-semibold mb-5 text-sm uppercase tracking-wider">Contact</h4>
-            <ul className="space-y-4">
-              <li className="flex gap-3 text-sm text-white/60">
-                <Phone className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                <span>
-                  Pollachi: <a href="tel:9363059595" className="hover:text-primary transition-colors">93630 59595</a><br />
-                  Kinathukadavu: <a href="tel:9363719595" className="hover:text-primary transition-colors">93637 19595</a>
-                </span>
-              </li>
-              <li className="flex gap-3 text-sm text-white/60">
-                <Mail className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                <a href="mailto:info@myfabclean.in" className="hover:text-primary transition-colors">info@myfabclean.in</a>
-              </li>
-              <li className="flex gap-3 text-sm text-white/60">
-                <svg className="w-4 h-4 text-primary shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-                </svg>
-                <span>Mon–Sat: 10AM – 8PM<br />Sunday: Closed</span>
-              </li>
-            </ul>
+          <div className="lg:col-span-3">
+            <h4 className="text-primary font-black mb-10 text-[10px] uppercase tracking-[0.4em]">Get in Touch</h4>
+            <div className="space-y-10">
+              <div className="flex gap-6 items-center">
+                <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/5">
+                  <Phone size={24} className="text-primary" />
+                </div>
+                <div>
+                  <div className="text-[10px] text-white/30 font-black uppercase tracking-widest mb-1.5">Direct Line</div>
+                  <a href="tel:9363059595" className="text-xl font-black text-white hover:text-primary transition-colors block leading-none">93630 59595</a>
+                </div>
+              </div>
+              <div className="flex gap-6 items-center">
+                <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/5">
+                  <Mail size={24} className="text-primary" />
+                </div>
+                <div>
+                  <div className="text-[10px] text-white/30 font-black uppercase tracking-widest mb-1.5">Email Hub</div>
+                  <a href="mailto:info@myfabclean.in" className="text-xl font-black text-white hover:text-primary transition-colors block leading-none">info@myfabclean.in</a>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div>
-            <h4 className="text-white font-semibold mb-5 text-sm uppercase tracking-wider">Our Branches</h4>
-            <ul className="space-y-4">
-              <li className="flex gap-3 text-sm text-white/60">
-                <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                <span>
-                  <span className="text-white font-medium block mb-0.5">Pollachi</span>
-                  #16, Venkatramana Round Road, Opp Naturals/HDFC Bank, Mahalingapuram – 642002
-                </span>
-              </li>
-              <li className="flex gap-3 text-sm text-white/60">
-                <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                <span>
-                  <span className="text-white font-medium block mb-0.5">Kinathukadavu</span>
-                  #442/11, Opp MLA Office, Krishnasamypuram – 642109
-                </span>
-              </li>
-            </ul>
+          <div className="lg:col-span-3">
+            <h4 className="text-primary font-black mb-10 text-[10px] uppercase tracking-[0.4em]">Artisan Hubs</h4>
+            <div className="space-y-6">
+              {[
+                { name: "Pollachi", addr: "Mahalingapuram, Opp Naturals Salon" },
+                { name: "Kinathukadavu", addr: "MLA Office Rd, Krishnasampuram" }
+              ].map(branch => (
+                <div key={branch.name} className="bg-white/[0.03] p-8 rounded-[2rem] border border-white/5">
+                   <div className="flex gap-4">
+                     <MapPin size={24} className="text-primary shrink-0" />
+                     <div>
+                       <div className="text-lg font-black text-white mb-1">{branch.name}</div>
+                       <p className="text-sm text-white/40 leading-relaxed font-medium">{branch.addr}</p>
+                     </div>
+                   </div>
+                </div>
+              ))}
+            </div>
           </div>
 
         </div>
 
-        <div className="mt-14 pt-6 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-white/40 text-sm">© {new Date().getFullYear()} Fab Clean | Yadvik Traders. All rights reserved.</p>
-          <div className="flex gap-6 text-sm text-white/40">
-            <a href="#" className="hover:text-white/70 transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-white/70 transition-colors">Terms of Service</a>
+        <div className="mt-32 pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-10">
+          <p className="text-white/10 text-[10px] font-black uppercase tracking-[0.3em]">
+            © {new Date().getFullYear()} Fab Clean. High Fashion Preservation.
+          </p>
+          <div className="flex gap-12 text-[10px] font-black uppercase tracking-[0.3em] text-white/10">
+            <a href="#" className="hover:text-primary transition-colors">Privacy</a>
+            <a href="#" className="hover:text-primary transition-colors">Legal</a>
+            <a href="#" className="hover:text-primary transition-colors">Cookies</a>
           </div>
         </div>
       </div>
@@ -248,40 +274,56 @@ export function BottomTabBar() {
 
   const tabs = [
     { name: "Home", icon: Home, path: "/" },
-    { name: "Services", icon: List, path: "/services" },
+    { name: "Care", icon: List, path: "/services" },
     { name: "Pickup", icon: Package, path: "/schedule-pickup" },
-    { name: isAuthenticated ? "Orders" : "Login", icon: isAuthenticated ? Calendar : User, path: isAuthenticated ? "/dashboard/orders" : "/login" },
+    { name: "Me", icon: User, path: isAuthenticated ? "/dashboard" : "/login" },
   ];
 
   return (
-    <div className="md:hidden fixed bottom-0 inset-x-0 bg-white border-t border-border pb-safe z-50 shadow-lg">
-      <div className="flex justify-around items-center h-16 px-2">
-        {tabs.map((tab) => {
-          const isActive = location === tab.path || (tab.path !== "/" && location.startsWith(tab.path));
-          return (
-            <Link
-              key={tab.name}
-              href={tab.path}
-              className={cn(
-                "flex flex-col items-center justify-center w-full h-full gap-1 transition-colors",
-                isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              <tab.icon className={cn("w-5 h-5", isActive && "stroke-primary")} />
-              <span className="text-[10px] font-medium">{tab.name}</span>
-            </Link>
-          );
-        })}
-      </div>
+    <div className="lg:hidden fixed bottom-10 inset-x-8 z-50">
+      <div className="bg-black/95 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.4)] overflow-hidden px-6 h-20 flex justify-between items-center">
+          {tabs.map((tab) => {
+            const isActive = location === tab.path || (tab.path !== "/" && location.startsWith(tab.path));
+            return (
+              <Link
+                key={tab.name}
+                href={tab.path}
+                className={cn(
+                  "flex flex-col items-center justify-center flex-1 h-full gap-2 transition-all relative",
+                  isActive ? "text-primary" : "text-white/30"
+                )}
+              >
+                <div className="relative">
+                  <tab.icon className={cn("w-6 h-6", isActive && "stroke-[2.5px]")} />
+                  {isActive && (
+                    <motion.div
+                      layoutId="tab-active"
+                      className="absolute -top-3 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_12px_rgba(180,197,36,0.8)]"
+                    />
+                  )}
+                </div>
+                <span className={cn("text-[8px] font-black uppercase tracking-[0.2em] opacity-60")}>
+                  {tab.name}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
     </div>
   );
 }
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
+  const { pathname } = window.location;
+  
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-background font-sans overflow-x-hidden">
       <Navbar />
-      <main className="flex-1 w-full">{children}</main>
+      <main className="flex-1 w-full pt-0">{children}</main>
       <Footer />
       <BottomTabBar />
     </div>
