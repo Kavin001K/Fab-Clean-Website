@@ -9,8 +9,7 @@ import {
   Shirt, Briefcase, Zap, ArrowRight, Phone
 } from "lucide-react";
 
-import { LiquidText } from "@/components/ui/LiquidText";
-import { FoamContainer } from "@/components/ui/FoamEffect";
+import { LaundryText, LiquidTextResponsive } from "@/components/ui/LaundryText";
 
 const mockServices = [
   { id: "1", name: "Premium Dry Cleaning", short: "Artisan care for suits, sarees, and delicate couture.", icon: Briefcase, price: "₹150" },
@@ -199,14 +198,14 @@ export default function Home() {
 
               <FadeIn delay={0.1}>
                 {/* Scaled-down H1 for mobile-first balance */}
-                <FoamContainer>
+                <LaundryText className="flex flex-col items-center lg:items-start">
                   <h1 className="text-[2.6rem] sm:text-6xl lg:text-[5.5rem] xl:text-[6.5rem] font-black font-display text-white leading-[1.05] -tracking-tight">
-                    <LiquidText>Revive Your</LiquidText> <br/>
-                    <LiquidText>
-                      <span className="text-gradient drop-shadow-2xl font-serif italic liquid-hover">Wardrobe.</span>
-                    </LiquidText>
+                    <LiquidTextResponsive text="Revive Your" className="justify-center lg:justify-start" />
+                    <div className="text-gradient drop-shadow-2xl font-serif italic liquid-hover flex justify-center lg:justify-start">
+                      <LiquidTextResponsive text="Wardrobe." />
+                    </div>
                   </h1>
-                </FoamContainer>
+                </LaundryText>
               </FadeIn>
 
               <FadeIn delay={0.2}>
