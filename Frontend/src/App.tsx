@@ -16,6 +16,10 @@ const Register = lazy(() => import("@/pages/register"));
 const SchedulePickup = lazy(() => import("@/pages/schedule-pickup"));
 const Dashboard = lazy(() => import("@/pages/dashboard/index"));
 const Sitemap = lazy(() => import("@/pages/sitemap"));
+const Privacy = lazy(() => import("@/pages/privacy"));
+const Terms = lazy(() => import("@/pages/terms"));
+const Cookies = lazy(() => import("@/pages/cookies"));
+const Refund = lazy(() => import("@/pages/refund"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 
 const queryClient = new QueryClient({
@@ -44,6 +48,10 @@ function Router() {
         <Route path="/dashboard/*?" component={Dashboard} />
         
         <Route path="/sitemap" component={Sitemap} />
+        <Route path="/privacy" component={Privacy} />
+        <Route path="/terms" component={Terms} />
+        <Route path="/cookies" component={Cookies} />
+        <Route path="/refund" component={Refund} />
         <Route component={NotFound} />
       </Switch>
     </Suspense>

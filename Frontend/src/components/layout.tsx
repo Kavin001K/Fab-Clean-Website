@@ -290,11 +290,12 @@ export function Footer() {
           <p className="text-white/60 text-[10px] font-black uppercase tracking-[0.3em]">
             © {new Date().getFullYear()} Fab Clean. High Fashion Preservation.
           </p>
-          <div className="flex gap-12 text-[10px] font-black uppercase tracking-[0.3em] text-white/50">
+          <div className="flex gap-6 lg:gap-12 flex-wrap justify-center text-[10px] font-black uppercase tracking-[0.3em] text-white/50">
             <Link href="/sitemap" className="hover:text-white transition-colors">Sitemap</Link>
-            <a href="#" className="hover:text-white transition-colors">Privacy</a>
-            <a href="#" className="hover:text-white transition-colors">Legal</a>
-            <a href="#" className="hover:text-white transition-colors">Cookies</a>
+            <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
+            <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
+            <Link href="/refund" className="hover:text-white transition-colors">Refund</Link>
+            <Link href="/cookies" className="hover:text-white transition-colors">Cookies</Link>
           </div>
         </div>
       </div>
