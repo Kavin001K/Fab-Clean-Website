@@ -87,41 +87,62 @@ export default function Contact() {
             </FadeIn>
 
             <FadeIn delay={0.2} className="space-y-8">
-              <div className="flex gap-4">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                  <Phone className="w-6 h-6" />
-                </div>
-                <div>
-                  <h4 className="text-foreground font-bold text-lg mb-1">Call Us</h4>
-                  <p className="text-muted-foreground">Pollachi: 93630 59595</p>
-                  <p className="text-muted-foreground">Kinathukadavu: 93637 19595</p>
-                </div>
-              </div>
+              <Card className="p-8 border-border/70 bg-white/80">
+                <div className="space-y-8">
+                  <div className="flex gap-4">
+                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                      <Phone className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h4 className="text-foreground font-bold text-lg mb-1">Call Us</h4>
+                      <p className="text-muted-foreground">Pollachi: 93630 59595</p>
+                      <p className="text-muted-foreground">Kinathukadavu: 93637 19595</p>
+                    </div>
+                  </div>
 
-              <div className="flex gap-4">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                  <Mail className="w-6 h-6" />
-                </div>
-                <div>
-                  <h4 className="text-foreground font-bold text-lg mb-1">Email Us</h4>
-                  <p className="text-muted-foreground">info@myfabclean.in</p>
-                  <p className="text-muted-foreground">myfabclean@gmail.com</p>
-                </div>
-              </div>
+                  <div className="flex gap-4">
+                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                      <Mail className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h4 className="text-foreground font-bold text-lg mb-1">Email Us</h4>
+                      <p className="text-muted-foreground">info@myfabclean.in</p>
+                      <p className="text-muted-foreground">myfabclean@gmail.com</p>
+                    </div>
+                  </div>
 
-              <div className="flex gap-4">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                  <MapPin className="w-6 h-6" />
-                </div>
-                <div>
-                  <h4 className="text-foreground font-bold text-lg mb-1">Visit Us</h4>
-                  <p className="text-muted-foreground mb-4">Monday – Saturday: 10:00 AM – 8:00 PM<br/>Sunday: Closed</p>
-
-                  <div className="w-full h-48 bg-muted rounded-xl border border-border flex items-center justify-center text-muted-foreground text-sm">
-                    Google Maps — Pollachi Branch
+                  <div className="flex gap-4">
+                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                      <MapPin className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h4 className="text-foreground font-bold text-lg mb-1">Visit Us</h4>
+                      <p className="text-muted-foreground">Monday – Saturday: 10:00 AM – 8:00 PM</p>
+                      <p className="text-muted-foreground">Sunday: Closed</p>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </Card>
+
+              <Card className="overflow-hidden border-border/70 bg-white/90">
+                <div className="h-64 w-full">
+                  <iframe
+                    title="Fab Clean Pollachi Map"
+                    className="w-full h-full border-0"
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    src="https://www.google.com/maps?q=Pollachi%20Tamil%20Nadu&output=embed"
+                  />
+                </div>
+                <div className="p-6 space-y-4">
+                  <a href="https://wa.me/919363059595" target="_blank" rel="noopener noreferrer">
+                    <Button className="w-full h-14">WhatsApp Us</Button>
+                  </a>
+                  <a href="tel:+919363059595">
+                    <Button variant="outline" className="w-full h-14">Call the Team</Button>
+                  </a>
+                </div>
+              </Card>
             </FadeIn>
           </div>
         </div>

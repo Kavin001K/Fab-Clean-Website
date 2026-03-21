@@ -79,13 +79,22 @@ export default function Login() {
       
       {/* Immersive Background Image */}
       <div className="absolute inset-0 z-0">
-        <motion.img 
-            initial={{ scale: 1.1, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 2, ease: "easeOut" }}
-            src={`${import.meta.env.BASE_URL}images/auth-bg.png`} 
-            className="w-full h-full object-cover grayscale opacity-40 mix-blend-multiply"
-        />
+        <picture>
+          <source
+            srcSet={`${import.meta.env.BASE_URL}images/auth-bg.webp`}
+            type="image/webp"
+          />
+          <motion.img 
+              initial={{ scale: 1.1, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 2, ease: "easeOut" }}
+              src={`${import.meta.env.BASE_URL}images/auth-bg.png`} 
+              className="w-full h-full object-cover grayscale opacity-40 mix-blend-multiply"
+              loading="lazy"
+              decoding="async"
+              alt=""
+          />
+        </picture>
         <div className="absolute inset-0 bg-gradient-to-br from-white/80 via-white/40 to-primary/10 backdrop-blur-3xl" />
       </div>
 

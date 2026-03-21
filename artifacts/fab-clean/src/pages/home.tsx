@@ -2,6 +2,7 @@ import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { AppLayout } from "@/components/layout";
 import { Button, SectionHeading, FadeIn, Card } from "@/components/ui";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   CheckCircle2, Clock, MapPin, Star,
   Shirt, Briefcase, Zap, ArrowRight, Phone, Sparkles
@@ -21,6 +22,8 @@ const testimonials = [
 ];
 
 export default function Home() {
+  const isMobile = useIsMobile();
+
   return (
     <AppLayout>
 
@@ -29,24 +32,48 @@ export default function Home() {
       <section className="relative min-h-[90vh] lg:min-h-screen flex flex-col lg:flex-row items-center justify-center overflow-hidden pt-36 pb-32 lg:pt-56 lg:pb-44">
         {/* Optimized Video Background */}
         <div className="absolute inset-0 z-0">
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="w-full h-full object-cover"
-            poster={`${import.meta.env.BASE_URL}images/premium-hero.png`}
-          >
-            <source src={`${import.meta.env.BASE_URL}home-background.mp4`} type="video/mp4" />
-          </video>
+          {!isMobile ? (
+            <video
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="none"
+              className="w-full h-full object-cover"
+              poster={`${import.meta.env.BASE_URL}images/premium-hero.webp`}
+            >
+              <source src={`${import.meta.env.BASE_URL}home-background.webm`} type="video/webm" />
+              <source src={`${import.meta.env.BASE_URL}home-background.mp4`} type="video/mp4" />
+            </video>
+          ) : (
+            <picture>
+              <source
+                srcSet={`${import.meta.env.BASE_URL}images/premium-hero.webp`}
+                type="image/webp"
+              />
+              <img
+                src={`${import.meta.env.BASE_URL}images/premium-hero.png`}
+                alt=""
+                className="w-full h-full object-cover"
+                fetchPriority="high"
+                loading="eager"
+              />
+            </picture>
+          )}
           {/* High-End Glassmorphism Overlay - Optimized for maximum legibility */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80 backdrop-blur-[3px]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/65 via-black/45 to-black/85" />
           <div className="absolute inset-0 bg-background/10" />
         </div>
 
-        {/* Animated Background Blobs for extra depth */}
-        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[160px] translate-x-1/2 -translate-y-1/2 animate-pulse-soft pointer-events-none z-[1]" />
-        <div className="absolute bottom-0 left-0 w-[700px] h-[700px] bg-secondary/10 rounded-full blur-[180px] -translate-x-1/2 translate-y-1/2 animate-pulse-soft pointer-events-none z-[1] delay-700" />
+        {/* Static gradient wash to replace animated blur blobs */}
+        <div
+          className="absolute inset-0 pointer-events-none hidden sm:block"
+          style={{
+            background:
+              "radial-gradient(ellipse 60% 50% at 90% 10%, hsla(87,54%,51%,0.12) 0%, transparent 60%)," +
+              "radial-gradient(ellipse 50% 40% at 10% 90%, hsla(215,91%,54%,0.10) 0%, transparent 60%)",
+          }}
+        />
         
         {/* Subtle grid for texture */}
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none z-[1]" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
@@ -65,9 +92,9 @@ export default function Home() {
 
               <FadeIn delay={0.1}>
                 {/* Scaled-down H1 for mobile-first balance */}
-                <h1 className="text-[2.6rem] sm:text-6xl lg:text-[5.5rem] xl:text-[6.5rem] font-black font-display text-white leading-[1.05] -tracking-[0.03em]">
+                <h1 className="text-[2.6rem] sm:text-6xl lg:text-[5.5rem] xl:text-[6.5rem] font-black font-display text-white leading-[1.05] -tracking-tight">
                   Revive Your <br/>
-                  <span className="text-gradient drop-shadow-2xl">Wardrobe.</span>
+                  <span className="text-gradient drop-shadow-2xl font-serif italic">Wardrobe.</span>
                 </h1>
               </FadeIn>
 
@@ -112,20 +139,26 @@ export default function Home() {
                 <div className="absolute -inset-10 bg-primary/10 rounded-full blur-[6rem] group-hover:bg-primary/20 transition-colors duration-[2s] pointer-events-none" />
                 
                 <div className="absolute inset-0 bg-background border-[10px] sm:border-[16px] border-background/5 shadow-[0_60px_120px_-30px_rgba(0,0,0,0.4)] rounded-[4.5rem] sm:rounded-[5rem] overflow-hidden group-hover:shadow-[0_80px_160px_-40px_rgba(0,0,0,0.5)] transition-all duration-[1s] backdrop-blur-3xl animate-float">
-                  <img
-                    src={`${import.meta.env.BASE_URL}images/hero-v2.png`}
-                    alt="Premium Laundry Lifestyle"
-                    className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110 brightness-110 contrast-110"
-                    loading="eager"
-                  />
+                  <picture>
+                    <source
+                      srcSet={`${import.meta.env.BASE_URL}images/hero-v2.webp`}
+                      type="image/webp"
+                    />
+                    <img
+                      src={`${import.meta.env.BASE_URL}images/hero-v2.png`}
+                      alt="Premium Laundry Lifestyle"
+                      className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110 brightness-110 contrast-110"
+                      loading="eager"
+                      fetchPriority="high"
+                    />
+                  </picture>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
                 </div>
                 
                 {/* Floating Metric - Balanced position */}
-                <motion.div 
+                <div
                   className="absolute -bottom-10 -left-6 lg:-left-20 bg-white/92 backdrop-blur-2xl shadow-4xl rounded-[2.5rem] p-8 border border-white/50 flex items-center gap-6 z-20 hover:scale-105 transition-transform cursor-pointer"
-                  animate={{ y: [0, -10, 0] }}
-                  transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                  style={{ animation: "float-badge 6s ease-in-out infinite", willChange: "transform" }}
                 >
                   <div className="w-14 h-14 rounded-[1.2rem] bg-lime-gradient flex items-center justify-center shadow-lg shadow-primary/30">
                     <CheckCircle2 className="w-6 h-6 text-white" />
@@ -134,7 +167,7 @@ export default function Home() {
                     <div className="text-[9px] uppercase font-black tracking-[0.4em] text-muted-foreground/60 mb-1 leading-none">Delivered</div>
                     <div className="text-3xl font-black text-foreground tabular-nums tracking-tighter leading-none">50,000<span className="text-primary text-xs ml-0.5">+</span></div>
                   </div>
-                </motion.div>
+                </div>
               </FadeIn>
             </div>
 
@@ -271,19 +304,17 @@ export default function Home() {
             initial={{ opacity: 0, scale: 0.98 }}
             whileInView={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1 }}
-            className="relative rounded-[5rem] overflow-hidden bg-[#F7F7F5] p-16 md:p-32 text-center text-[#1E1E1E] border border-border shadow-3xl shadow-black/10 group"
+            className="relative rounded-[5rem] overflow-hidden bg-white/90 p-16 md:p-32 text-center text-foreground border border-border shadow-3xl shadow-black/10 group"
           >
             {/* Texture/Bloom */}
             <div className="absolute inset-0 bg-premium-mesh opacity-10 pointer-events-none" />
-            <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[160px] pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-secondary/10 rounded-full blur-[140px] pointer-events-none" />
             
             <div className="relative z-10 space-y-12 max-w-4xl mx-auto">
               <h2 className="text-[2.6rem] md:text-[5rem] lg:text-[6.5rem] font-black font-display leading-[1] mb-8">
                 The Luxury of <br/>
                 <span className="text-primary italic font-serif tracking-normal">Extra Time.</span>
               </h2>
-              <p className="text-[#3D3D3D]/70 text-xl md:text-2xl font-medium max-w-2xl mx-auto leading-relaxed">
+              <p className="text-muted-foreground text-xl md:text-2xl font-medium max-w-2xl mx-auto leading-relaxed">
                 Join 1,200+ premium households in Pollachi who've upgraded their life with Fab Clean.
               </p>
               <div className="flex flex-col sm:flex-row gap-6 justify-center pt-10">
@@ -293,7 +324,7 @@ export default function Home() {
                   </Button>
                 </Link>
                 <a href="tel:+919363059595">
-                  <Button size="lg" variant="outline" className="h-24 px-16 border-primary/20 text-[#1E1E1E] hover:bg-[#F2FAE8] hover:border-primary/40 text-xs font-black w-full sm:w-auto">
+                  <Button size="lg" variant="outline" className="h-24 px-16 border-primary/20 text-foreground hover:bg-[#D6EBF7]/60 hover:border-primary/40 text-xs font-black w-full sm:w-auto">
                     <Phone className="mr-3 w-5 h-5 text-primary/70" />
                     Talk to Us
                   </Button>

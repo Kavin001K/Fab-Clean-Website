@@ -1,11 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&family=Nunito:wght@400;500;600;700;800&display=swap');
-
 @import "tailwindcss";
 
 @theme {
   /* Font Family Definitions */
-  --font-display: "Fraunces", serif;
-  --font-serif: "Fraunces", serif;
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
+  --font-serif: "Fraunces", ui-serif, Georgia, serif;
   --font-sans: "Nunito", ui-sans-serif, system-ui, sans-serif;
 
   /* Color Definitions mapping to CSS variables (Shadcn style) */
@@ -35,37 +33,42 @@
 
 @layer base {
   :root {
-    --background: 45 30% 98%; /* Luxurious Yellowish-white (Ivory/Cream) */
-    --foreground: 0 0% 18%;
-    --card: 45 20% 99%;
-    --card-foreground: 0 0% 18%;
-    --popover: 45 30% 99%;
-    --popover-foreground: 0 0% 18%;
-    --primary: 87 54% 51%;
-    --primary-foreground: 0 0% 12%;
-    --secondary: 215 91% 54%; /* Premium Blue Tone */
+    --background: 216 100% 98%; /* Surface #F5F9FF */
+    --foreground: 219 69% 14%; /* Navy #0B1C3B */
+    --card: 0 0% 100%;
+    --card-foreground: 219 69% 14%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 219 69% 14%;
+    --primary: 202 75% 45%; /* Sky Blue #1C88C7 */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 219 69% 14%; /* Deep Navy */
     --secondary-foreground: 0 0% 100%;
-    --muted: 50 20% 96%;
-    --muted-foreground: 0 0% 40%;
-    --accent: 87 100% 97%;
-    --accent-foreground: 87 89% 31%;
+    --muted: 210 60% 96%;
+    --muted-foreground: 219 22% 42%;
+    --accent: 40 89% 61%; /* Warm Gold #F4B942 */
+    --accent-foreground: 219 69% 14%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 20% 98%;
-    --border: 50 15% 90%;
-    --input: 50 15% 90%;
-    --ring: 87 54% 51%;
+    --border: 210 35% 90%;
+    --input: 210 35% 90%;
+    --ring: 202 75% 45%;
     --radius: 2rem;
+
+    --brand-navy: 219 69% 14%;
+    --brand-blue: 202 75% 45%;
+    --brand-ice: 202 67% 90%;
+    --brand-gold: 40 89% 61%;
+    --brand-eco: 155 63% 49%;
   }
 }
 
 @layer base {
   body {
     @apply bg-background text-foreground font-sans antialiased selection:bg-primary/20;
-    line-height: 1.6;
-    background-image: 
-      radial-gradient(at 0% 0%, hsla(87, 54%, 51%, 0.03) 0px, transparent 50%),
-      radial-gradient(at 100% 100%, hsla(215, 91%, 54%, 0.03) 0px, transparent 50%);
-    background-attachment: fixed;
+    line-height: 1.7;
+    letter-spacing: 0.01em;
+    text-rendering: optimizeLegibility;
+    /* Removed: background-attachment: fixed breaks GPU scroll compositing on mobile */
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -85,31 +88,80 @@
   }
 
   .glass {
-    @apply bg-white/40 backdrop-blur-xl border border-white/40 shadow-sm;
+    @apply bg-white/75 backdrop-blur-2xl border border-white/60 shadow-[0_16px_40px_rgba(11,28,59,0.08)];
   }
 
   .bg-premium-mesh {
     background-color: hsl(var(--background));
     background-image:
-      radial-gradient(at 0% 0%, hsla(87, 54%, 51%, 0.05) 0px, transparent 50%),
-      radial-gradient(at 100% 0%, hsla(215, 91%, 54%, 0.05) 0px, transparent 50%),
-      radial-gradient(at 50% 50%, hsla(45, 30%, 98%, 1) 0px, transparent 100%);
+      radial-gradient(at 0% 0%, hsla(var(--brand-blue), 0.10) 0px, transparent 55%),
+      radial-gradient(at 100% 0%, hsla(var(--brand-eco), 0.10) 0px, transparent 55%),
+      radial-gradient(at 50% 60%, hsla(var(--brand-ice), 0.85) 0px, transparent 100%);
   }
 
   .bg-lime-gradient {
-    @apply bg-gradient-to-br from-[#8DC63F] to-[#5E9E1A];
+    @apply bg-gradient-to-br from-[#1C88C7] via-[#2ECC8B] to-[#1C88C7];
   }
 
   .bg-blue-gradient {
-    @apply bg-gradient-to-br from-[#3B82F6] to-[#1D4ED8];
+    @apply bg-gradient-to-br from-[#0B1C3B] to-[#1C88C7];
   }
 
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#8DC63F] to-[#5E9E1A];
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#0B1C3B] via-[#1C88C7] to-[#2ECC8B];
   }
 
   .section-padding {
-    @apply py-32 sm:py-44 md:py-56;
+    @apply py-28 sm:py-36 md:py-44;
+  }
+
+  .bg-brand-gradient {
+    background: linear-gradient(135deg, #0B1C3B 0%, #1C88C7 55%, #2ECC8B 100%);
+  }
+
+  .bg-gold-gradient {
+    background: linear-gradient(135deg, #F4B942 0%, #FAD98A 100%);
+  }
+
+  .page-backdrop {
+    background-color: hsl(var(--background));
+    background-image:
+      radial-gradient(1200px 900px at 8% -10%, rgba(28, 136, 199, 0.18), transparent 60%),
+      radial-gradient(900px 700px at 100% 0%, rgba(46, 204, 139, 0.16), transparent 55%),
+      radial-gradient(700px 700px at 0% 100%, rgba(244, 185, 66, 0.16), transparent 50%),
+      linear-gradient(180deg, rgba(214, 235, 247, 0.85) 0%, rgba(245, 249, 255, 0.9) 40%, rgba(255, 255, 255, 1) 100%);
+  }
+
+  .page-fabric {
+    background-image:
+      linear-gradient(120deg, rgba(11, 28, 59, 0.05) 0%, transparent 45%),
+      radial-gradient(circle, rgba(11, 28, 59, 0.08) 1px, transparent 1px);
+    background-size: 420px 420px, 72px 72px;
+  }
+
+  .page-aurora {
+    background:
+      radial-gradient(800px 600px at 20% 20%, rgba(28, 136, 199, 0.18), transparent 60%),
+      radial-gradient(700px 600px at 80% 10%, rgba(46, 204, 139, 0.14), transparent 55%),
+      radial-gradient(600px 600px at 60% 80%, rgba(244, 185, 66, 0.12), transparent 60%);
+    filter: blur(40px);
+  }
+
+  .mobile-cta-bar {
+    @apply fixed bottom-0 inset-x-0 z-40 flex gap-3 bg-white/95 backdrop-blur-xl border-t border-border/60 px-5 pb-6 pt-3;
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
+  }
+
+  .mobile-cta-bar a {
+    @apply flex-1 text-center py-3 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] shadow-lg;
+  }
+
+  .mobile-cta-call {
+    @apply bg-[#0B1C3B] text-white;
+  }
+
+  .mobile-cta-wa {
+    @apply bg-[#25D366] text-white;
   }
 }
 
@@ -118,9 +170,23 @@
     animation: float 6s ease-in-out infinite;
   }
 
+  .animate-float-slow {
+    animation: float-slow 14s ease-in-out infinite;
+  }
+
   @keyframes float {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-20px); }
+  }
+
+  @keyframes float-badge {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+
+  @keyframes float-slow {
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    50% { transform: translate3d(0, -28px, 0); }
   }
 
   .animate-pulse-soft {
@@ -129,6 +195,10 @@
 
   .animate-whatsapp-pulse {
     animation: whatsapp-pulse 2.2s ease-out infinite;
+  }
+
+  .animate-aurora {
+    animation: aurora-shift 18s ease-in-out infinite;
   }
 
   @keyframes pulse-soft {
@@ -141,13 +211,57 @@
     70% { box-shadow: 0 0 0 16px rgba(37, 211, 102, 0); }
     100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
   }
+
+  @keyframes aurora-shift {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.8; }
+    50% { transform: translate3d(40px, -30px, 0) scale(1.05); opacity: 1; }
+  }
+
+  .tooltip-delay {
+    animation: tooltip-delay 7s ease-in-out infinite;
+  }
+
+  .animate-float,
+  .animate-whatsapp-pulse {
+    will-change: transform;
+    contain: layout style;
+  }
+
+  video {
+    will-change: transform;
+  }
+
+  @keyframes tooltip-delay {
+    0%, 65% { opacity: 0; transform: translateY(6px); }
+    70%, 90% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(6px); }
+  }
+
+  .fade-in {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16,1,0.3,1);
+  }
+
+  .fade-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .animate-float,
   .animate-pulse-soft,
-  .animate-whatsapp-pulse {
+  .animate-whatsapp-pulse,
+  .animate-float-slow,
+  .animate-aurora,
+  .tooltip-delay {
     animation: none !important;
+  }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 

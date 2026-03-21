@@ -14,8 +14,9 @@ const basePath = process.env.BASE_PATH ?? "/";
 
 export default defineConfig({
   base: basePath,
+  logLevel: "error",
   plugins: [
-    react(),
+    react({ babel: { sourceMaps: false } }),
     tailwindcss(),
     runtimeErrorOverlay(),
     ...(process.env.NODE_ENV !== "production" &&
@@ -39,10 +40,34 @@ export default defineConfig({
     },
     dedupe: ["react", "react-dom"],
   },
+  esbuild: {
+    sourcemap: false,
+  },
   root: path.resolve(import.meta.dirname),
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        sourcemap: false,
+        manualChunks: {
+          "vendor-react": ["react", "react-dom"],
+          "vendor-motion": ["framer-motion"],
+          "vendor-query": ["@tanstack/react-query"],
+          "vendor-recharts": ["recharts"],
+          "vendor-radix": [
+            "@radix-ui/react-dialog",
+            "@radix-ui/react-dropdown-menu",
+            "@radix-ui/react-accordion",
+            "@radix-ui/react-tooltip",
+            "@radix-ui/react-select",
+            "@radix-ui/react-tabs",
+          ],
+        },
+      },
+    },
+    reportCompressedSize: true,
   },
   server: {
     port,

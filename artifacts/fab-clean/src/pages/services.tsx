@@ -3,6 +3,7 @@ import { SectionHeading, Card, FadeIn, Button } from "@/components/ui";
 import { useListServices } from "@workspace/api-client-react";
 import { Link } from "wouter";
 import { ArrowRight, Loader2, Star, Briefcase, Shirt, Zap, Sparkles } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // Fallback icons map for nicer visuals
 const ICON_MAP: Record<string, any> = {
@@ -14,22 +15,42 @@ const ICON_MAP: Record<string, any> = {
 
 export default function Services() {
   const { data, isLoading } = useListServices();
+  const isMobile = useIsMobile();
 
   return (
     <AppLayout>
       {/* ─── OPTIMIZED VIDEO BACKGROUND ─────────────────────────── */}
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="w-full h-full object-cover opacity-20 grayscale-[30%]"
-        >
-          <source src={`${import.meta.env.BASE_URL}service-background.mp4`} type="video/mp4" />
-        </video>
+        {!isMobile ? (
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="none"
+            className="w-full h-full object-cover opacity-40 grayscale-[20%]"
+            poster={`${import.meta.env.BASE_URL}images/hero-bg.webp`}
+          >
+            <source src={`${import.meta.env.BASE_URL}service-background.webm`} type="video/webm" />
+            <source src={`${import.meta.env.BASE_URL}service-background.mp4`} type="video/mp4" />
+          </video>
+        ) : (
+          <picture>
+            <source
+              srcSet={`${import.meta.env.BASE_URL}images/hero-bg.webp`}
+              type="image/webp"
+            />
+            <img
+              src={`${import.meta.env.BASE_URL}images/hero-bg.png`}
+              alt=""
+              className="w-full h-full object-cover opacity-40 grayscale-[20%]"
+              loading="lazy"
+              decoding="async"
+            />
+          </picture>
+        )}
         {/* High-End Glassmorphism & Atmospheric Overlays */}
-        <div className="absolute inset-0 bg-background/80 backdrop-blur-[3px]" />
+        <div className="absolute inset-0 bg-background/60 backdrop-blur-[2px]" />
         <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-transparent to-background/90" />
         
         {/* Dynamic accent blobs for depth */}

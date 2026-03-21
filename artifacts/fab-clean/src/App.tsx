@@ -3,18 +3,19 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/use-auth";
+import { lazy, Suspense } from "react";
 
 // Pages
-import Home from "@/pages/home";
-import Services from "@/pages/services";
-import Pricing from "@/pages/pricing";
-import About from "@/pages/about";
-import Contact from "@/pages/contact";
-import Login from "@/pages/login";
-import Register from "@/pages/register";
-import SchedulePickup from "@/pages/schedule-pickup";
-import Dashboard from "@/pages/dashboard/index";
-import NotFound from "@/pages/not-found";
+const Home = lazy(() => import("@/pages/home"));
+const Services = lazy(() => import("@/pages/services"));
+const Pricing = lazy(() => import("@/pages/pricing"));
+const About = lazy(() => import("@/pages/about"));
+const Contact = lazy(() => import("@/pages/contact"));
+const Login = lazy(() => import("@/pages/login"));
+const Register = lazy(() => import("@/pages/register"));
+const SchedulePickup = lazy(() => import("@/pages/schedule-pickup"));
+const Dashboard = lazy(() => import("@/pages/dashboard/index"));
+const NotFound = lazy(() => import("@/pages/not-found"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,21 +28,23 @@ const queryClient = new QueryClient({
 
 function Router() {
   return (
-    <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/services" component={Services} />
-      <Route path="/pricing" component={Pricing} />
-      <Route path="/about" component={About} />
-      <Route path="/contact" component={Contact} />
-      <Route path="/login" component={Login} />
-      <Route path="/register" component={Register} />
-      <Route path="/schedule-pickup" component={SchedulePickup} />
-      
-      {/* Dashboard routes use nested routing inside the component, but we declare the base prefix here */}
-      <Route path="/dashboard/*?" component={Dashboard} />
-      
-      <Route component={NotFound} />
-    </Switch>
+    <Suspense fallback={<div className="min-h-screen bg-background" />}>
+      <Switch>
+        <Route path="/" component={Home} />
+        <Route path="/services" component={Services} />
+        <Route path="/pricing" component={Pricing} />
+        <Route path="/about" component={About} />
+        <Route path="/contact" component={Contact} />
+        <Route path="/login" component={Login} />
+        <Route path="/register" component={Register} />
+        <Route path="/schedule-pickup" component={SchedulePickup} />
+        
+        {/* Dashboard routes use nested routing inside the component, but we declare the base prefix here */}
+        <Route path="/dashboard/*?" component={Dashboard} />
+        
+        <Route component={NotFound} />
+      </Switch>
+    </Suspense>
   );
 }
 

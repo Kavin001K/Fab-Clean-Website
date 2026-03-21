@@ -77,7 +77,7 @@ export default function Pricing() {
                       className={`h-12 rounded-xl text-xs font-extrabold uppercase tracking-[0.18em] transition-all ${
                         activeTab === tab
                           ? "bg-lime-gradient text-primary-foreground shadow-md"
-                          : "text-[#3D3D3D] hover:bg-[#F2FAE8]"
+                          : "text-foreground/80 hover:bg-[#D6EBF7]/60"
                       }`}
                     >
                       {tab}
@@ -142,7 +142,7 @@ export default function Pricing() {
               ))}
               
               {/* Extra Pricing Note */}
-              <FadeIn className="bg-[#1E1E1E] text-white p-20 lg:p-32 rounded-[6rem] shadow-[0_80px_160px_-40px_rgba(0,0,0,0.4)] flex flex-col items-center justify-between gap-20 relative overflow-hidden group mb-32">
+              <FadeIn className="bg-[#0B1C3B] text-white p-20 lg:p-32 rounded-[6rem] shadow-[0_80px_160px_-40px_rgba(11,28,59,0.5)] flex flex-col items-center justify-between gap-20 relative overflow-hidden group mb-32">
                 <div className="absolute inset-0 bg-premium-mesh opacity-5 grayscale invert pointer-events-none" />
                 <div className="absolute top-1/2 left-0 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[140px] -translate-x-1/2 pointer-events-none" />
                 <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-secondary/10 rounded-full blur-[120px] translate-x-1/4 pointer-events-none" />
