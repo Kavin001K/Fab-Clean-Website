@@ -1,1 +1,0 @@
-{"version":3,"file":"orderDetailResponse.d.ts","sourceRoot":"","sources":["../../../src/generated/types/orderDetailResponse.ts"],"names":[],"mappings":"AAAA;;;;;;GAMG;AACH,OAAO,KAAK,EAAE,KAAK,EAAE,MAAM,SAAS,CAAC;AAErC,MAAM,WAAW,mBAAmB;IAClC,OAAO,EAAE,OAAO,CAAC;IACjB,IAAI,EAAE,KAAK,CAAC;CACb"}

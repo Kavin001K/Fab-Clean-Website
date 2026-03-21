@@ -3,17 +3,11 @@
   "compileOnSave": false,
   "files": [],
   "references": [
-    {
-      "path": "./Backend/lib/db"
-    },
-    {
-      "path": "./Frontend/lib/api-client-react"
-    },
-    {
-      "path": "./Backend/lib/api-zod"
-    },
-    {
-      "path": "./Backend/lib/api-spec"
-    }
+    { "path": "./lib/db" },
+    { "path": "./lib/api-client-react" },
+    { "path": "./lib/api-zod" },
+    { "path": "./lib/api-spec" },
+    { "path": "./frontend" },
+    { "path": "./backend" }
   ]
 }

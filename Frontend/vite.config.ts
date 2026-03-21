@@ -2,50 +2,28 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
-import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
+import { fileURLToPath } from "url";
 
-// Vite build should not hard-fail when env vars are missing.
-// Defaults keep local builds and static deployments working.
-const rawPort = process.env.PORT ?? "3001";
-const portNum = Number(rawPort);
-const port = Number.isNaN(portNum) || portNum <= 0 ? 3001 : portNum;
-
-const basePath = process.env.BASE_PATH ?? "/";
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
-  base: basePath,
   logLevel: "error",
   plugins: [
     react(),
     tailwindcss(),
-    runtimeErrorOverlay(),
-    ...(process.env.NODE_ENV !== "production" &&
-    process.env.REPL_ID !== undefined
-      ? [
-          await import("@replit/vite-plugin-cartographer").then((m) =>
-            m.cartographer({
-              root: path.resolve(import.meta.dirname, ".."),
-            }),
-          ),
-          await import("@replit/vite-plugin-dev-banner").then((m) =>
-            m.devBanner(),
-          ),
-        ]
-      : []),
   ],
   resolve: {
     alias: {
-      "@": path.resolve(import.meta.dirname, "src"),
-      "@assets": path.resolve(import.meta.dirname, "..", "..", "attached_assets"),
+      "@": path.resolve(__dirname, "src"),
     },
     dedupe: ["react", "react-dom"],
   },
   esbuild: {
     sourcemap: false,
   },
-  root: path.resolve(import.meta.dirname),
+  root: path.resolve(__dirname),
   build: {
-    outDir: path.resolve(import.meta.dirname, "dist-build"),
+    outDir: path.resolve(__dirname, "dist-build"),
     emptyOutDir: true,
     sourcemap: false,
     rollupOptions: {
@@ -70,7 +48,7 @@ export default defineConfig({
     reportCompressedSize: true,
   },
   server: {
-    port,
+    port: 3001,
     host: "0.0.0.0",
     allowedHosts: true,
     proxy: {
@@ -85,7 +63,7 @@ export default defineConfig({
     },
   },
   preview: {
-    port,
+    port: 3001,
     host: "0.0.0.0",
     allowedHosts: true,
   },

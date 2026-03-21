@@ -1,1 +1,9 @@
 node_modules
+.pnpm-store
+.replit-artifact
+dist
+dist-build
+.env
+.DS_Store
+*.log
+node_modules
