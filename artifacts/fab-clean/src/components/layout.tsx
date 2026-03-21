@@ -10,6 +10,7 @@ import {
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "next-themes";
+import { FaWhatsapp } from "react-icons/fa";
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
@@ -183,9 +184,9 @@ export function Navbar() {
 
 export function Footer() {
   return (
-    <footer className="bg-[#050505] text-white pt-44 pb-32 md:pb-24 relative overflow-hidden rounded-t-[5rem]">
+    <footer className="bg-[#F7F7F5] text-foreground pt-44 pb-32 md:pb-24 relative overflow-hidden border-t border-border rounded-t-[5rem]">
       {/* Texture overlay */}
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #fff 1.5px, transparent 1.5px)', backgroundSize: '48px 48px' }} />
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #3D3D3D 1.5px, transparent 1.5px)', backgroundSize: '48px 48px' }} />
       
       <div className="container-wide relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-20 lg:gap-32">
@@ -195,10 +196,10 @@ export function Footer() {
               <img
                 src={`${import.meta.env.BASE_URL}logo.webp`}
                 alt="Fab Clean logo"
-                className="h-11 w-auto brightness-0 invert opacity-100"
+                className="h-11 w-auto"
               />
             </Link>
-            <p className="text-white/40 text-2xl font-medium leading-relaxed max-w-sm">
+            <p className="text-[#3D3D3D] text-2xl font-medium leading-relaxed max-w-sm">
               Crafting a state-of-the-art cleaning science for your most cherished garments. 
             </p>
             <div className="flex gap-5">
@@ -207,7 +208,7 @@ export function Footer() {
                   key={i} 
                   href="#" 
                   whileHover={{ y: -8, scale: 1.1 }}
-                  className="w-16 h-16 rounded-[1.5rem] bg-white/5 flex items-center justify-center text-white/30 hover:bg-lime-gradient hover:text-primary-foreground transition-all border border-white/5"
+                  className="w-16 h-16 rounded-[1.5rem] bg-white flex items-center justify-center text-[#3D3D3D] hover:bg-lime-gradient hover:text-primary-foreground transition-all border border-border"
                 >
                   <Icon className="w-7 h-7" />
                 </motion.a>
@@ -225,7 +226,7 @@ export function Footer() {
                 { label: "Tech & Science", path: "/about" },
               ].map((item) => (
                 <li key={item.label}>
-                  <Link href={item.path} className="text-white/40 hover:text-white hover:translate-x-3 transition-all inline-block font-bold text-lg">
+                  <Link href={item.path} className="text-[#3D3D3D] hover:text-[#1E1E1E] hover:translate-x-3 transition-all inline-block font-bold text-lg">
                     {item.label}
                   </Link>
                 </li>
@@ -237,21 +238,21 @@ export function Footer() {
             <h4 className="text-primary font-black mb-10 text-[10px] uppercase tracking-[0.4em]">Get in Touch</h4>
             <div className="space-y-10">
               <div className="flex gap-6 items-center">
-                <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/5">
+                <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center border border-border">
                   <Phone size={24} className="text-primary" />
                 </div>
                 <div>
-                  <div className="text-[10px] text-white/30 font-black uppercase tracking-widest mb-1.5">Direct Line</div>
-                  <a href="tel:9363059595" className="text-xl font-black text-white hover:text-primary transition-colors block leading-none">93630 59595</a>
+                  <div className="text-[10px] text-[#3D3D3D]/60 font-black uppercase tracking-widest mb-1.5">Direct Line</div>
+                  <a href="tel:9363059595" className="text-xl font-black text-[#1E1E1E] hover:text-primary transition-colors block leading-none">93630 59595</a>
                 </div>
               </div>
               <div className="flex gap-6 items-center">
-                <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/5">
+                <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center border border-border">
                   <Mail size={24} className="text-primary" />
                 </div>
                 <div>
-                  <div className="text-[10px] text-white/30 font-black uppercase tracking-widest mb-1.5">Email Hub</div>
-                  <a href="mailto:info@myfabclean.in" className="text-xl font-black text-white hover:text-primary transition-colors block leading-none">info@myfabclean.in</a>
+                  <div className="text-[10px] text-[#3D3D3D]/60 font-black uppercase tracking-widest mb-1.5">Email Hub</div>
+                  <a href="mailto:info@myfabclean.in" className="text-xl font-black text-[#1E1E1E] hover:text-primary transition-colors block leading-none">info@myfabclean.in</a>
                 </div>
               </div>
             </div>
@@ -264,12 +265,12 @@ export function Footer() {
                 { name: "Pollachi", addr: "Mahalingapuram, Opp Naturals Salon" },
                 { name: "Kinathukadavu", addr: "MLA Office Rd, Krishnasampuram" }
               ].map(branch => (
-                <div key={branch.name} className="bg-white/[0.03] p-8 rounded-[2rem] border border-white/5">
+                <div key={branch.name} className="bg-white p-8 rounded-[2rem] border border-border">
                    <div className="flex gap-4">
                      <MapPin size={24} className="text-primary shrink-0" />
                      <div>
-                       <div className="text-lg font-black text-white mb-1">{branch.name}</div>
-                       <p className="text-sm text-white/40 leading-relaxed font-medium">{branch.addr}</p>
+                       <div className="text-lg font-black text-[#1E1E1E] mb-1">{branch.name}</div>
+                       <p className="text-sm text-[#3D3D3D] leading-relaxed font-medium">{branch.addr}</p>
                      </div>
                    </div>
                 </div>
@@ -279,11 +280,11 @@ export function Footer() {
 
         </div>
 
-        <div className="mt-32 pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-10">
-          <p className="text-white/10 text-[10px] font-black uppercase tracking-[0.3em]">
+        <div className="mt-32 pt-12 border-t border-border flex flex-col md:flex-row justify-between items-center gap-10">
+          <p className="text-[#3D3D3D]/70 text-[10px] font-black uppercase tracking-[0.3em]">
             © {new Date().getFullYear()} Fab Clean. High Fashion Preservation.
           </p>
-          <div className="flex gap-12 text-[10px] font-black uppercase tracking-[0.3em] text-white/10">
+          <div className="flex gap-12 text-[10px] font-black uppercase tracking-[0.3em] text-[#3D3D3D]/70">
             <a href="#" className="hover:text-primary transition-colors">Privacy</a>
             <a href="#" className="hover:text-primary transition-colors">Legal</a>
             <a href="#" className="hover:text-primary transition-colors">Cookies</a>
@@ -351,6 +352,15 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       <Navbar />
       <main className="flex-1 w-full pt-0">{children}</main>
       <Footer />
+      <a
+        href="https://wa.me/919363059595"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Chat on WhatsApp"
+        className="fixed right-4 bottom-28 z-50 lg:bottom-8 w-14 h-14 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-xl animate-whatsapp-pulse hover:scale-105 transition-transform"
+      >
+        <FaWhatsapp className="w-7 h-7" />
+      </a>
       <BottomTabBar />
     </div>
   );

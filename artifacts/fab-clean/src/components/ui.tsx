@@ -14,12 +14,12 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const baseStyles = "inline-flex items-center justify-center rounded-2xl font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98] uppercase tracking-widest text-xs";
     
     const variants = {
-      primary: "bg-lime-gradient text-primary-foreground shadow-xl shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-1 transition-all duration-300",
-      secondary: "bg-foreground text-background hover:bg-foreground/90 shadow-lg",
-      outline: "border-2 border-border bg-background/50 backdrop-blur-sm hover:border-primary/50 hover:text-primary transition-all duration-300",
+      primary: "bg-lime-gradient text-primary-foreground shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-1 transition-all duration-300",
+      secondary: "bg-orange-gradient text-white shadow-lg hover:brightness-95",
+      outline: "border-2 border-border bg-white hover:border-primary/50 hover:text-primary transition-all duration-300",
       ghost: "hover:bg-primary/10 hover:text-primary",
       destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-      premium: "bg-foreground text-background hover:bg-primary hover:text-primary-foreground shadow-2xl transition-all duration-500",
+      premium: "bg-[#1E1E1E] text-white hover:bg-[#3D3D3D] shadow-2xl transition-all duration-500",
     };
 
     const sizes = {
@@ -76,9 +76,9 @@ Input.displayName = "Input";
 // --- Badge ---
 export function Badge({ className, variant = "default", ...props }: React.HTMLAttributes<HTMLDivElement> & { variant?: "default" | "outline" | "accent" }) {
   const variants = {
-    default: "bg-primary/10 text-primary border border-primary/20",
+    default: "bg-primary/12 text-primary border border-primary/20",
     outline: "border border-border text-foreground",
-    accent: "bg-accent/10 text-accent border border-accent/20",
+    accent: "bg-accent text-[#C45D0E] border border-[#F47B20]/20",
   };
   
   return (
@@ -90,7 +90,7 @@ export function Badge({ className, variant = "default", ...props }: React.HTMLAt
 export function SectionHeading({ title, subtitle, align = "center", className }: { title: string, subtitle?: string, align?: "left" | "center", className?: string }) {
   return (
     <div className={cn("flex flex-col gap-4", align === "center" ? "items-center text-center" : "items-start text-left", className)}>
-      {subtitle && <span className="text-primary font-black tracking-[0.3em] uppercase text-[10px] bg-primary/5 px-4 py-1.5 rounded-full">{subtitle}</span>}
+      {subtitle && <span className="text-primary font-black tracking-[0.3em] uppercase text-[10px] bg-[#F2FAE8] px-4 py-1.5 rounded-full">{subtitle}</span>}
       <h2 className="text-4xl md:text-7xl font-black font-display text-foreground leading-[1.1]">{title}</h2>
     </div>
   );

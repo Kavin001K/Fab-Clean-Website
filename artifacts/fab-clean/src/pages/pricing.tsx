@@ -4,9 +4,42 @@ import { useListPricing } from "@workspace/api-client-react";
 import { Loader2, ArrowRight, CheckCircle2, Star, Sparkles, Phone } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { Link } from "wouter";
+import { useMemo, useState } from "react";
+
+type PricingCategory = {
+  category: string;
+  items: Array<{ item: string; price: number; type?: string | null; unit?: string | null }>;
+};
 
 export default function Pricing() {
   const { data, isLoading } = useListPricing();
+  const categories = (data?.data ?? []) as PricingCategory[];
+  const [activeTab, setActiveTab] = useState("Laundry");
+
+  const groupedCategories = useMemo(() => {
+    const groups = {
+      Laundry: [] as PricingCategory[],
+      "Dry Clean": [] as PricingCategory[],
+      "Shoes & Bags": [] as PricingCategory[],
+    };
+
+    for (const category of categories) {
+      const name = category.category.toLowerCase();
+      if (name.includes("shoe") || name.includes("bag")) {
+        groups["Shoes & Bags"].push(category);
+      } else if (name.includes("dry")) {
+        groups["Dry Clean"].push(category);
+      } else {
+        groups.Laundry.push(category);
+      }
+    }
+
+    return groups;
+  }, [categories]);
+
+  const tabs = Object.keys(groupedCategories) as Array<keyof typeof groupedCategories>;
+  const activeCategories = groupedCategories[activeTab as keyof typeof groupedCategories] ?? [];
+  const visibleCategories = activeCategories.length > 0 ? activeCategories : categories;
 
   return (
     <AppLayout>
@@ -34,7 +67,26 @@ export default function Pricing() {
             </div>
           ) : (
             <div className="max-w-5xl mx-auto space-y-44">
-              {data?.data.map((category, i) => (
+              <FadeIn className="sticky top-24 z-20">
+                <div className="bg-white/95 backdrop-blur-md rounded-2xl border border-border p-2 grid grid-cols-3 gap-2">
+                  {tabs.map((tab) => (
+                    <button
+                      key={tab}
+                      type="button"
+                      onClick={() => setActiveTab(tab)}
+                      className={`h-12 rounded-xl text-xs font-extrabold uppercase tracking-[0.18em] transition-all ${
+                        activeTab === tab
+                          ? "bg-lime-gradient text-primary-foreground shadow-md"
+                          : "text-[#3D3D3D] hover:bg-[#F2FAE8]"
+                      }`}
+                    >
+                      {tab}
+                    </button>
+                  ))}
+                </div>
+              </FadeIn>
+
+              {visibleCategories.map((category, i) => (
                 <FadeIn key={category.category} delay={i * 0.1}>
                   <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-10 px-6 lg:px-0">
                     <div>
@@ -90,7 +142,7 @@ export default function Pricing() {
               ))}
               
               {/* Extra Pricing Note */}
-              <FadeIn className="bg-foreground text-white p-20 lg:p-32 rounded-[6rem] shadow-[0_80px_160px_-40px_rgba(0,0,0,0.4)] flex flex-col items-center justify-between gap-20 relative overflow-hidden group mb-32">
+              <FadeIn className="bg-[#1E1E1E] text-white p-20 lg:p-32 rounded-[6rem] shadow-[0_80px_160px_-40px_rgba(0,0,0,0.4)] flex flex-col items-center justify-between gap-20 relative overflow-hidden group mb-32">
                 <div className="absolute inset-0 bg-premium-mesh opacity-5 grayscale invert pointer-events-none" />
                 <div className="absolute top-1/2 left-0 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[140px] -translate-x-1/2 pointer-events-none" />
                 
