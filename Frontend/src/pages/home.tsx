@@ -191,6 +191,7 @@ export default function Home() {
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none z-[1]" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
 
         <div className="container-wide w-full relative z-20">
+          <LaundryText className="w-full block">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 lg:gap-32 items-center">
             
             {/* HERO TEXT (1/2) */}
@@ -198,32 +199,34 @@ export default function Home() {
 
               <FadeIn delay={0.1}>
                 {/* Scaled-down H1 for mobile-first balance */}
-                <LaundryText className="flex flex-col items-center lg:items-start">
+                <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
                   <h1 className="text-[2.6rem] sm:text-6xl lg:text-[5.5rem] xl:text-[6.5rem] font-black font-display text-white leading-[1.05] -tracking-tight">
                     <LiquidTextResponsive text="Revive Your" className="justify-center lg:justify-start" />
                     <div className="text-gradient drop-shadow-2xl font-serif italic liquid-hover flex justify-center lg:justify-start">
                       <LiquidTextResponsive text="Wardrobe." />
                     </div>
                   </h1>
-                </LaundryText>
+                </div>
               </FadeIn>
 
               <FadeIn delay={0.2}>
-                <p className="text-lg sm:text-xl lg:text-2xl text-white/90 max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed drop-shadow-md">
-                  We don't just wash clothes; we preserve them. Pollachi's only scientific precision dry cleaning with premium eco-solvents.
-                </p>
+                <div className="text-lg sm:text-xl lg:text-2xl text-white/90 max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed drop-shadow-md liquid-hover flex justify-center lg:justify-start">
+                  <LiquidTextResponsive text="We don't just wash clothes; we preserve them. Pollachi's only scientific precision dry cleaning with premium eco-solvents." className="justify-center lg:justify-start" />
+                </div>
               </FadeIn>
 
               <FadeIn delay={0.3} className="flex flex-col sm:flex-row gap-6 items-center lg:items-start justify-center lg:justify-start pt-8" role="group" aria-label="Primary actions">
                 <Link href="/schedule-pickup">
-                  <Button size="lg" className="w-full sm:w-auto min-w-[300px] shadow-3xl group transition-all h-24 bg-primary text-primary-foreground hover:scale-105 rounded-[2rem] text-xs font-black">
-                    Schedule Free Pickup
-                    <ArrowRight className="ml-3 w-6 h-6 group-hover:translate-x-2 transition-transform" />
+                  <Button size="lg" className="w-full sm:w-auto min-w-[300px] shadow-3xl group transition-all h-24 bg-primary text-primary-foreground hover:scale-105 rounded-[2rem] text-xs font-black liquid-hover">
+                    <span className="flex items-center">
+                      <LiquidTextResponsive text="Schedule Free Pickup" />
+                      <ArrowRight className="ml-3 w-6 h-6 group-hover:translate-x-2 transition-transform" />
+                    </span>
                   </Button>
                 </Link>
                 <Link href="/services">
-                  <Button size="lg" variant="outline" className="w-full sm:w-auto min-w-[240px] bg-white/5 border-white/20 text-white/90 h-24 backdrop-blur-md hover:bg-white/10 rounded-[2rem] text-xs font-black">
-                    See All Services
+                  <Button size="lg" variant="outline" className="w-full sm:w-auto min-w-[240px] bg-white/5 border-white/20 text-white/90 h-24 backdrop-blur-md hover:bg-white/10 rounded-[2rem] text-xs font-black liquid-hover">
+                    <LiquidTextResponsive text="See All Services" />
                   </Button>
                 </Link>
               </FadeIn>
@@ -248,7 +251,7 @@ export default function Home() {
                 {/* Visual breathing room */}
                 <div className="absolute -inset-10 bg-primary/10 rounded-full blur-[6rem] group-hover:bg-primary/20 transition-colors duration-[2s] pointer-events-none" />
                 
-                <div className="absolute inset-0 bg-background border-[10px] sm:border-[16px] border-background/5 shadow-[0_60px_120px_-30px_rgba(0,0,0,0.4)] rounded-[2.5rem] sm:rounded-[4rem] lg:rounded-[5rem] overflow-hidden group-hover:shadow-[0_80px_160px_-40px_rgba(0,0,0,0.5)] transition-all duration-[1s] backdrop-blur-3xl animate-float">
+                <div className="absolute inset-0 bg-background border-[10px] sm:border-[16px] border-background/5 shadow-[0_60px_120px_-30px_rgba(0,0,0,0.4)] rounded-[2.5rem] sm:rounded-[4rem] lg:rounded-[5rem] overflow-hidden group-hover:shadow-[0_80px_160px_-40px_rgba(0,0,0,0.5)] transition-all duration-[1s] backdrop-blur-3xl animate-float liquid-hover">
                   <picture>
                     <source
                       srcSet={`${import.meta.env.BASE_URL}images/hero-v2.webp`}
@@ -282,6 +285,7 @@ export default function Home() {
             </div>
 
           </div>
+          </LaundryText>
         </div>
       </section>
 

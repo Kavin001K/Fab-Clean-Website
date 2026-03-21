@@ -48,8 +48,19 @@ interface LiquidTextResponsiveProps {
 export const LiquidTextResponsive: React.FC<LiquidTextResponsiveProps> = ({ text, className, letterClassName }) => {
   return (
     <div className={`flex flex-wrap ${className || ""}`}>
-      {text.split("").map((char, i) => (
-        <LiquidLetter key={i} char={char} className={letterClassName} />
+      {text.split(" ").map((word, wIdx, arr) => (
+        <React.Fragment key={wIdx}>
+          <div className="flex whitespace-nowrap">
+            {word.split("").map((char, i) => (
+              <LiquidLetter key={i} char={char} className={letterClassName} />
+            ))}
+          </div>
+          {wIdx < arr.length - 1 && (
+            <div className="flex whitespace-nowrap">
+              <LiquidLetter char=" " className={letterClassName} />
+            </div>
+          )}
+        </React.Fragment>
       ))}
     </div>
   );
