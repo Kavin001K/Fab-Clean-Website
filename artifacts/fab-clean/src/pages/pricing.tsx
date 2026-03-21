@@ -66,7 +66,7 @@ export default function Pricing() {
               <p className="text-muted-foreground font-black uppercase tracking-[0.4em] text-[10px] animate-pulse">Fetching Rates...</p>
             </div>
           ) : (
-            <div className="max-w-5xl mx-auto space-y-44">
+            <div className="container-tight space-y-44">
               <FadeIn className="sticky top-24 z-20">
                 <div className="bg-white/95 backdrop-blur-md rounded-2xl border border-border p-2 grid grid-cols-3 gap-2">
                   {tabs.map((tab) => (
@@ -145,6 +145,7 @@ export default function Pricing() {
               <FadeIn className="bg-[#1E1E1E] text-white p-20 lg:p-32 rounded-[6rem] shadow-[0_80px_160px_-40px_rgba(0,0,0,0.4)] flex flex-col items-center justify-between gap-20 relative overflow-hidden group mb-32">
                 <div className="absolute inset-0 bg-premium-mesh opacity-5 grayscale invert pointer-events-none" />
                 <div className="absolute top-1/2 left-0 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[140px] -translate-x-1/2 pointer-events-none" />
+                <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-secondary/10 rounded-full blur-[120px] translate-x-1/4 pointer-events-none" />
                 
                 <div className="max-w-xl text-center relative z-10 space-y-10">
                   <div className="inline-flex items-center gap-4 px-6 py-3 rounded-full bg-white/5 border border-white/5 text-primary text-[10px] font-black uppercase tracking-[0.4em]">

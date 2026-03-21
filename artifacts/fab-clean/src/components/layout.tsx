@@ -5,33 +5,10 @@ import { useAuth } from "@/hooks/use-auth";
 import { 
   Menu, X, Home, List, 
   User, MapPin, Phone, Mail, Instagram, Facebook, Twitter, Package, ArrowUpRight,
-  Sun, Moon
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useTheme } from "next-themes";
 import { FaWhatsapp } from "react-icons/fa";
-
-export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
-  if (!mounted) return null;
-
-  return (
-    <Button
-      variant="ghost"
-      size="icon"
-      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="w-12 h-12 rounded-2xl bg-white/50 dark:bg-black/20 backdrop-blur-md border border-black/5 dark:border-white/5 hover:bg-primary/10 transition-all"
-    >
-      <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-      <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-      <span className="sr-only">Toggle theme</span>
-    </Button>
-  );
-}
 
 export function Navbar() {
   const [location] = useLocation();
@@ -74,7 +51,10 @@ export function Navbar() {
               <img
                 src={`${import.meta.env.BASE_URL}logo.webp`}
                 alt="Fab Clean logo"
-                className="h-10 md:h-11 w-auto"
+                className={cn(
+                  "h-10 md:h-11 w-auto transition-all duration-700",
+                  !isScrolled && "brightness-0 invert opacity-90"
+                )}
               />
             </motion.div>
           </Link>
@@ -89,7 +69,11 @@ export function Navbar() {
                   href={link.path}
                   className={cn(
                     "text-[10px] font-black uppercase tracking-[0.2em] transition-all px-6 py-2.5 rounded-full relative",
-                    isActive ? "text-primary-foreground" : "text-muted-foreground hover:text-foreground hover:bg-black/5"
+                    isActive 
+                      ? "text-white" 
+                      : isScrolled
+                        ? "text-muted-foreground hover:text-foreground hover:bg-black/5"
+                        : "text-white/70 hover:text-white hover:bg-white/10"
                   )}
                 >
                   <span className="relative z-10">{link.name}</span>
@@ -109,11 +93,29 @@ export function Navbar() {
           <div className="hidden lg:flex items-center gap-6 z-20 shrink-0">
             {isAuthenticated ? (
               <Link href="/dashboard">
-                <Button variant="ghost" size="sm" className="font-black text-[10px] uppercase tracking-widest text-muted-foreground hover:text-primary p-0 h-auto underline decoration-primary/20 decoration-2 underline-offset-4">Dashboard</Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className={cn(
+                    "font-black text-[10px] uppercase tracking-widest p-0 h-auto underline decoration-primary/20 decoration-2 underline-offset-4",
+                    isScrolled ? "text-muted-foreground hover:text-primary" : "text-white/70 hover:text-white"
+                  )}
+                >
+                  Dashboard
+                </Button>
               </Link>
             ) : (
               <Link href="/login">
-                <Button variant="ghost" size="sm" className="font-black text-[10px] uppercase tracking-widest text-muted-foreground hover:text-primary p-0 h-auto underline decoration-primary/20 decoration-2 underline-offset-4">Sign In</Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className={cn(
+                    "font-black text-[10px] uppercase tracking-widest p-0 h-auto underline decoration-primary/20 decoration-2 underline-offset-4",
+                    isScrolled ? "text-muted-foreground hover:text-primary" : "text-white/70 hover:text-white"
+                  )}
+                >
+                  Sign In
+                </Button>
               </Link>
             )}
             <Link href="/schedule-pickup">
@@ -121,11 +123,9 @@ export function Navbar() {
                 Book Pickup
               </Button>
             </Link>
-            <ThemeToggle />
           </div>
 
           <div className="flex items-center gap-3 lg:hidden">
-            <ThemeToggle />
             <button
               className="p-3 text-foreground bg-white/80 dark:bg-black/40 backdrop-blur-md rounded-2xl border border-black/5 dark:border-white/5 z-20"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -259,7 +259,7 @@ export function Footer() {
           </div>
 
           <div className="lg:col-span-3">
-            <h4 className="text-primary font-black mb-10 text-[10px] uppercase tracking-[0.4em]">Artisan Hubs</h4>
+            <h4 className="text-primary font-black mb-10 text-[10px] uppercase tracking-[0.4em]">Pickup Locations</h4>
             <div className="space-y-6">
               {[
                 { name: "Pollachi", addr: "Mahalingapuram, Opp Naturals Salon" },
@@ -307,8 +307,8 @@ export function BottomTabBar() {
   ];
 
   return (
-    <div className="lg:hidden fixed bottom-10 inset-x-8 z-50">
-      <div className="bg-black/95 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.4)] overflow-hidden px-6 h-20 flex justify-between items-center">
+    <div className="lg:hidden fixed bottom-10 inset-x-8 z-50 max-w-md mx-auto left-0 right-0">
+      <div className="bg-white/92 backdrop-blur-2xl border border-border rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.12)] overflow-hidden px-6 h-20 flex justify-between items-center">
           {tabs.map((tab) => {
             const isActive = location === tab.path || (tab.path !== "/" && location.startsWith(tab.path));
             return (
@@ -317,7 +317,7 @@ export function BottomTabBar() {
                 href={tab.path}
                 className={cn(
                   "flex flex-col items-center justify-center flex-1 h-full gap-2 transition-all relative",
-                  isActive ? "text-primary" : "text-white/30"
+                  isActive ? "text-primary" : "text-[#3D3D3D]/60 hover:text-primary"
                 )}
               >
                 <div className="relative">
@@ -353,7 +353,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       <main className="flex-1 w-full pt-0">{children}</main>
       <Footer />
       <a
-        href="https://wa.me/919363059595"
+        href="https://wa.me/919363059595?text=Hi%2C%20I%27d%20like%20to%20book%20a%20laundry%20pickup."
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Chat on WhatsApp"

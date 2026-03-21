@@ -26,97 +26,115 @@ export default function Home() {
 
       {/* ─── HERO SECTION ─────────────────────────────────── */}
       {/* Updated with a more robust mobile-first flex layout and increased spacing */}
-      <section className="relative min-h-[90vh] flex flex-col lg:flex-row items-center justify-center overflow-hidden bg-premium-mesh pt-36 pb-32 lg:pt-56 lg:pb-44">
-        {/* Animated Background Blobs */}
-        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[160px] translate-x-1/2 -translate-y-1/2 animate-pulse-soft pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-secondary/10 rounded-full blur-[140px] -translate-x-1/2 translate-y-1/2 pointer-events-none" />
+      <section className="relative min-h-[90vh] lg:min-h-screen flex flex-col lg:flex-row items-center justify-center overflow-hidden pt-36 pb-32 lg:pt-56 lg:pb-44">
+        {/* Optimized Video Background */}
+        <div className="absolute inset-0 z-0">
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="w-full h-full object-cover"
+            poster={`${import.meta.env.BASE_URL}images/premium-hero.png`}
+          >
+            <source src={`${import.meta.env.BASE_URL}background.mp4`} type="video/mp4" />
+          </video>
+          {/* High-End Glassmorphism Overlay - Optimized for maximum legibility */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80 backdrop-blur-[3px]" />
+          <div className="absolute inset-0 bg-background/10" />
+        </div>
+
+        {/* Animated Background Blobs for extra depth */}
+        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[160px] translate-x-1/2 -translate-y-1/2 animate-pulse-soft pointer-events-none z-[1]" />
+        <div className="absolute bottom-0 left-0 w-[700px] h-[700px] bg-secondary/10 rounded-full blur-[180px] -translate-x-1/2 translate-y-1/2 animate-pulse-soft pointer-events-none z-[1] delay-700" />
         
         {/* Subtle grid for texture */}
-        <div className="absolute inset-0 opacity-[0.02] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #000 1.5px, transparent 1.5px)', backgroundSize: '40px 40px' }} />
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none z-[1]" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
 
-        <div className="container-wide w-full relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-32 items-center">
+        <div className="container-wide w-full relative z-20">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 lg:gap-32 items-center">
             
-            {/* HERO TEXT (7/12) */}
-            <div className="lg:col-span-7 space-y-10 text-center lg:text-left order-2 lg:order-1 mt-10 lg:mt-0">
+            {/* HERO TEXT (1/2) */}
+            <div className="space-y-12 text-center lg:text-left order-2 lg:order-1 mt-12 lg:mt-0 xl:pr-10">
               <FadeIn>
-                <div className="inline-flex items-center gap-3 px-6 py-2.5 rounded-2xl bg-background/50 backdrop-blur-md border border-border shadow-2xl shadow-black/[0.03] text-primary text-[10px] font-black uppercase tracking-[0.3em] mb-4">
-                  <Sparkles className="w-4 h-4" />
-                  Pollachi's Exclusive Artisan Hub
+                <div className="inline-flex items-center gap-3 px-8 py-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 shadow-3xl text-white text-[10px] font-black uppercase tracking-[0.4em] mb-4">
+                  <Sparkles className="w-5 h-5 text-primary" />
+                  Pollachi's Premium Dry Cleaning & Laundry
                 </div>
               </FadeIn>
 
               <FadeIn delay={0.1}>
-                {/* Scaled-down H1 for mobile-first balance (2.6rem on mobile as recommended) */}
-                <h1 className="text-[2.6rem] sm:text-6xl lg:text-[5.5rem] font-black font-display text-foreground leading-[1.05] -tracking-[0.03em]">
+                {/* Scaled-down H1 for mobile-first balance */}
+                <h1 className="text-[2.6rem] sm:text-6xl lg:text-[5.5rem] xl:text-[6.5rem] font-black font-display text-white leading-[1.05] -tracking-[0.03em]">
                   Revive Your <br/>
-                  <span className="text-gradient">Wardrobe.</span>
+                  <span className="text-gradient drop-shadow-2xl">Wardrobe.</span>
                 </h1>
               </FadeIn>
 
               <FadeIn delay={0.2}>
-                <p className="text-lg sm:text-xl lg:text-2xl text-muted-foreground max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed">
+                <p className="text-lg sm:text-xl lg:text-2xl text-white/90 max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed drop-shadow-md">
                   We don't just wash clothes; we preserve them. Pollachi's only scientific artisan dry cleaning with premium eco-solvents.
                 </p>
               </FadeIn>
 
-              <FadeIn delay={0.3} className="flex flex-col sm:flex-row gap-5 items-center lg:items-start justify-center lg:justify-start pt-6">
+              <FadeIn delay={0.3} className="flex flex-col sm:flex-row gap-6 items-center lg:items-start justify-center lg:justify-start pt-8">
                 <Link href="/schedule-pickup">
-                  <Button size="lg" className="w-full sm:w-auto min-w-[280px] shadow-2xl group transition-all h-20">
+                  <Button size="lg" className="w-full sm:w-auto min-w-[300px] shadow-3xl group transition-all h-24 bg-primary text-primary-foreground hover:scale-105 rounded-[2rem] text-xs font-black">
                     Schedule Free Pickup
-                    <ArrowRight className="ml-3 w-5 h-5 group-hover:translate-x-2 transition-transform" />
+                    <ArrowRight className="ml-3 w-6 h-6 group-hover:translate-x-2 transition-transform" />
                   </Button>
                 </Link>
                 <Link href="/services">
-                  <Button size="lg" variant="outline" className="w-full sm:w-auto min-w-[220px] bg-background/50 border-black/[0.03] text-muted-foreground h-20">
+                  <Button size="lg" variant="outline" className="w-full sm:w-auto min-w-[240px] bg-white/5 border-white/20 text-white/90 h-24 backdrop-blur-md hover:bg-white/10 rounded-[2rem] text-xs font-black">
                     See All Services
                   </Button>
                 </Link>
               </FadeIn>
 
-              <FadeIn delay={0.4} className="flex flex-wrap items-center justify-center lg:justify-start gap-10 mt-16 opacity-40">
+              <FadeIn delay={0.4} className="flex flex-wrap items-center justify-center lg:justify-start gap-12 mt-20 opacity-60">
                 {[
                   { icon: MapPin, label: "Free 3km Hub" },
                   { icon: Clock, label: "48h Promised" },
                   { icon: CheckCircle2, label: "Eco-Solvent" },
                 ].map(({ icon: Icon, label }) => (
-                  <div key={label} className="flex items-center gap-2.5 text-[9px] font-black uppercase tracking-[0.2em] text-foreground">
-                    <Icon className="w-5 h-5 text-primary" />
+                  <div key={label} className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-white/80">
+                    <Icon className="w-6 h-6 text-primary" />
                     {label}
                   </div>
                 ))}
               </FadeIn>
             </div>
 
-            {/* HERO VISUAL (5/12) - Balanced with gutters as requested */}
-            <div className="lg:col-span-5 relative order-1 lg:order-2">
-              <FadeIn delay={0.2} className="relative aspect-[4/5] sm:aspect-[4/3] lg:aspect-[3.5/4] group px-4 lg:px-0 max-h-[500px] lg:max-h-none">
+            {/* HERO VISUAL (1/2) - Optimized and balanced */}
+            <div className="relative order-1 lg:order-2 flex justify-center lg:justify-end">
+              <FadeIn delay={0.2} className="relative aspect-[4/5] sm:aspect-[1.1] lg:aspect-[1] group w-full max-w-[500px] xl:max-w-[580px] origin-center">
                 {/* Visual breathing room */}
-                <div className="absolute -inset-10 bg-primary/5 rounded-[4rem] blur-[5rem] group-hover:bg-primary/10 transition-colors duration-1000" />
-                <div className="absolute inset-0 bg-background border-[14px] border-background shadow-[0_50px_100px_-20px_rgba(0,0,0,0.1)] rounded-[4.5rem] overflow-hidden group-hover:shadow-[0_80px_160px_-40px_rgba(0,0,0,0.15)] transition-shadow">
+                <div className="absolute -inset-10 bg-primary/10 rounded-full blur-[6rem] group-hover:bg-primary/20 transition-colors duration-[2s] pointer-events-none" />
+                
+                <div className="absolute inset-0 bg-background border-[10px] sm:border-[16px] border-background/5 shadow-[0_60px_120px_-30px_rgba(0,0,0,0.4)] rounded-[4.5rem] sm:rounded-[5rem] overflow-hidden group-hover:shadow-[0_80px_160px_-40px_rgba(0,0,0,0.5)] transition-all duration-[1s] backdrop-blur-3xl animate-float">
                   <motion.img
                     src={`${import.meta.env.BASE_URL}images/premium-hero.png`}
                     alt="Premium Laundry Lifestyle"
-                    className="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-105"
-                    initial={{ scale: 1.1, opacity: 0 }}
+                    className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110 brightness-110 contrast-110"
+                    initial={{ scale: 1.2, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    transition={{ duration: 1.2, ease: "easeOut" }}
+                    transition={{ duration: 1.5, ease: "easeOut" }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
                 </div>
                 
-                {/* Floating Metric */}
+                {/* Floating Metric - Balanced position */}
                 <motion.div 
-                  className="absolute -bottom-10 -left-6 lg:-left-20 bg-background shadow-2xl rounded-3xl p-6 border border-border/50 flex items-center gap-5 z-20 hover:scale-105 transition-transform"
+                  className="absolute -bottom-10 -left-6 lg:-left-20 bg-white/92 backdrop-blur-2xl shadow-4xl rounded-[2.5rem] p-8 border border-white/50 flex items-center gap-6 z-20 hover:scale-105 transition-transform cursor-pointer"
                   animate={{ y: [0, -10, 0] }}
-                  transition={{ duration: 5, repeat: Infinity }}
+                  transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
                 >
-                  <div className="w-14 h-14 rounded-2xl bg-lime-gradient flex items-center justify-center shadow-lg shadow-primary/20">
-                    <CheckCircle2 className="w-7 h-7 text-white" />
+                  <div className="w-14 h-14 rounded-[1.2rem] bg-lime-gradient flex items-center justify-center shadow-lg shadow-primary/30">
+                    <CheckCircle2 className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <div className="text-[9px] uppercase font-black tracking-widest text-muted-foreground mb-0.5">Delivered</div>
-                    <div className="text-2xl font-black text-foreground tabular-nums tracking-tighter">50,000<span className="text-primary text-xs ml-0.5">+</span></div>
+                    <div className="text-[9px] uppercase font-black tracking-[0.4em] text-muted-foreground/60 mb-1 leading-none">Delivered</div>
+                    <div className="text-3xl font-black text-foreground tabular-nums tracking-tighter leading-none">50,000<span className="text-primary text-xs ml-0.5">+</span></div>
                   </div>
                 </motion.div>
               </FadeIn>
@@ -127,9 +145,9 @@ export default function Home() {
       </section>
 
       {/* ─── STATS STRIP ─────────────────────────────────── */}
-      <section className="py-24 bg-card border-y border-border/10 relative z-20">
+      <section className="py-32 bg-card border-y border-border/10 relative z-20">
         <div className="container-wide">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-12 lg:gap-24">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-16 lg:gap-32">
             {[
               { val: "2,000+", label: "Clothes Weekly" },
               { val: "2", label: "Smart Hubs" },
@@ -137,8 +155,8 @@ export default function Home() {
               { val: "48h", label: "Guaranteed Turn" },
             ].map((m, i) => (
               <FadeIn key={i} delay={0.1 * i} className="text-center group">
-                <div className="text-4xl md:text-5xl lg:text-6xl font-black font-display text-foreground mb-2 group-hover:text-primary transition-colors tracking-tight tabular-nums">{m.val}</div>
-                <div className="text-[9px] font-black uppercase tracking-[0.4em] text-muted-foreground/40">{m.label}</div>
+                <div className="text-5xl md:text-6xl lg:text-7xl font-black font-display text-foreground mb-4 group-hover:text-primary transition-colors tracking-tighter tabular-nums">{m.val}</div>
+                <div className="text-[10px] font-black uppercase tracking-[0.5em] text-muted-foreground/40">{m.label}</div>
               </FadeIn>
             ))}
           </div>
@@ -154,20 +172,20 @@ export default function Home() {
             className="mb-32"
           />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-16">
             {mockServices.map((s, i) => (
               <FadeIn key={s.id} delay={0.1 * i}>
-                <Card className="p-10 h-full flex flex-col group bg-background shadow-xl shadow-black/[0.02] rounded-[3.5rem] border-transparent hover:border-border/50 transition-all">
-                  <div className="w-20 h-20 rounded-3xl bg-muted/30 flex items-center justify-center text-foreground mb-10 group-hover:bg-lime-gradient group-hover:text-white transition-all duration-700 shadow-sm">
-                    <s.icon className="w-10 h-10" />
+                <Card className="p-12 h-full flex flex-col group bg-background shadow-2xl shadow-black/[0.02] rounded-[4rem] border-transparent hover:border-border/50 transition-all hover:-translate-y-2 duration-500">
+                  <div className="w-24 h-24 rounded-[2rem] bg-muted/30 flex items-center justify-center text-foreground mb-12 group-hover:bg-lime-gradient group-hover:text-white transition-all duration-700 shadow-sm border border-border/30">
+                    <s.icon className="w-12 h-12" />
                   </div>
-                  <h3 className="text-2xl font-black font-display text-foreground mb-4 leading-tight group-hover:text-primary transition-colors tracking-tight">{s.name}</h3>
-                  <p className="text-muted-foreground text-lg mb-12 flex-grow leading-relaxed font-medium">{s.short}</p>
+                  <h3 className="text-3xl font-black font-display text-foreground mb-6 leading-tight group-hover:text-primary transition-colors tracking-tight">{s.name}</h3>
+                  <p className="text-muted-foreground text-xl mb-12 flex-grow leading-relaxed font-medium">{s.short}</p>
                   
-                  <div className="flex items-center justify-between mt-auto pt-8 border-t border-black/5">
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60">Starts {s.price}</span>
-                    <div className="w-12 h-12 rounded-full border border-black/5 flex items-center justify-center group-hover:bg-foreground group-hover:text-white transition-all duration-500">
-                      <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                  <div className="flex items-center justify-between mt-auto pt-10 border-t border-black/5">
+                    <span className="text-[11px] font-black uppercase tracking-[0.3em] text-primary/60">Starts {s.price}</span>
+                    <div className="w-14 h-14 rounded-full border border-black/5 flex items-center justify-center group-hover:bg-foreground group-hover:text-white transition-all duration-500">
+                      <ArrowRight className="w-6 h-6 transition-transform group-hover:translate-x-2" />
                     </div>
                   </div>
                 </Card>
@@ -195,7 +213,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-24">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-24 lg:gap-32">
             {[
               { n: "01", t: "Assessment", d: "Microscopic inspection of fibers and hidden stain analysis." },
               { n: "02", t: "Sorting", d: "Segregation based on PH balance and fabric weight." },
@@ -205,10 +223,10 @@ export default function Home() {
               { n: "06", t: "Sanitation", d: "UVC-safe packaging ensuring clinical garment hygiene." },
             ].map((step, i) => (
               <FadeIn key={step.n} delay={0.1 * i} className="relative group text-center md:text-left">
-                <span className="text-[90px] font-black font-display text-primary/[0.05] absolute -top-12 -left-4 lg:-left-6 transition-colors group-hover:text-primary/[0.1] leading-none -z-10">{step.n}</span>
-                <div className="pt-8 px-4 md:px-0">
-                  <h4 className="text-2xl font-black text-foreground mb-4 group-hover:translate-x-3 transition-transform tracking-tight">{step.t}</h4>
-                  <p className="text-lg text-muted-foreground leading-relaxed font-medium">{step.d}</p>
+                <span className="text-[120px] font-black font-display text-primary/[0.05] absolute -top-16 -left-6 lg:-left-10 transition-colors group-hover:text-primary/[0.1] leading-none -z-10">{step.n}</span>
+                <div className="pt-12 px-6 md:px-0">
+                  <h4 className="text-3xl font-black text-foreground mb-6 group-hover:translate-x-4 transition-transform tracking-tight">{step.t}</h4>
+                  <p className="text-xl text-muted-foreground leading-relaxed font-medium">{step.d}</p>
                 </div>
               </FadeIn>
             ))}
@@ -255,18 +273,19 @@ export default function Home() {
             initial={{ opacity: 0, scale: 0.98 }}
             whileInView={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1 }}
-            className="relative rounded-[5rem] overflow-hidden bg-[#0a0a0a] p-16 md:p-32 text-center text-white shadow-3xl shadow-black/20 group"
+            className="relative rounded-[5rem] overflow-hidden bg-[#F7F7F5] p-16 md:p-32 text-center text-[#1E1E1E] border border-border shadow-3xl shadow-black/10 group"
           >
             {/* Texture/Bloom */}
-            <div className="absolute inset-0 bg-premium-mesh opacity-5 grayscale invert pointer-events-none" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[160px] pointer-events-none" />
+            <div className="absolute inset-0 bg-premium-mesh opacity-10 pointer-events-none" />
+            <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[160px] pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-secondary/10 rounded-full blur-[140px] pointer-events-none" />
             
             <div className="relative z-10 space-y-12 max-w-4xl mx-auto">
               <h2 className="text-[2.6rem] md:text-[5rem] lg:text-[6.5rem] font-black font-display leading-[1] mb-8">
                 The Luxury of <br/>
                 <span className="text-primary italic font-serif tracking-normal">Extra Time.</span>
               </h2>
-              <p className="text-white/40 text-xl md:text-2xl font-medium max-w-2xl mx-auto leading-relaxed">
+              <p className="text-[#3D3D3D]/70 text-xl md:text-2xl font-medium max-w-2xl mx-auto leading-relaxed">
                 Join 1,200+ premium households in Pollachi who've upgraded their life with Fab Clean.
               </p>
               <div className="flex flex-col sm:flex-row gap-6 justify-center pt-10">
@@ -276,8 +295,8 @@ export default function Home() {
                   </Button>
                 </Link>
                 <a href="tel:+919363059595">
-                  <Button size="lg" variant="outline" className="h-24 px-16 border-white/10 text-white hover:bg-white/5 hover:border-white/20 text-xs font-black w-full sm:w-auto">
-                    <Phone className="mr-3 w-5 h-5 opacity-40" />
+                  <Button size="lg" variant="outline" className="h-24 px-16 border-primary/20 text-[#1E1E1E] hover:bg-[#F2FAE8] hover:border-primary/40 text-xs font-black w-full sm:w-auto">
+                    <Phone className="mr-3 w-5 h-5 text-primary/70" />
                     Talk to Us
                   </Button>
                 </a>

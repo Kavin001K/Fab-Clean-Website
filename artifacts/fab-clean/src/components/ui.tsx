@@ -49,7 +49,7 @@ Button.displayName = "Button";
 // --- Card ---
 export function Card({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn("glass rounded-[2.5rem] overflow-hidden transition-all duration-500 hover:shadow-2xl hover:-translate-y-2", className)} {...props}>
+    <div className={cn("glass rounded-[4rem] overflow-hidden transition-all duration-[1s] hover:shadow-[0_80px_160px_-40px_rgba(0,0,0,0.12)] hover:-translate-y-4", className)} {...props}>
       {children}
     </div>
   );
@@ -89,9 +89,13 @@ export function Badge({ className, variant = "default", ...props }: React.HTMLAt
 // --- Section Heading ---
 export function SectionHeading({ title, subtitle, align = "center", className }: { title: string, subtitle?: string, align?: "left" | "center", className?: string }) {
   return (
-    <div className={cn("flex flex-col gap-4", align === "center" ? "items-center text-center" : "items-start text-left", className)}>
-      {subtitle && <span className="text-primary font-black tracking-[0.3em] uppercase text-[10px] bg-[#F2FAE8] px-4 py-1.5 rounded-full">{subtitle}</span>}
-      <h2 className="text-4xl md:text-7xl font-black font-display text-foreground leading-[1.1]">{title}</h2>
+    <div className={cn(
+      "flex flex-col gap-8", 
+      align === "center" ? "items-center text-center mx-auto max-w-5xl" : "items-start text-left", 
+      className
+    )}>
+      {subtitle && <span className="text-primary font-black tracking-[0.4em] uppercase text-[10px] bg-[#F2FAE8] px-8 py-3 rounded-full shadow-sm">{subtitle}</span>}
+      <h2 className="text-5xl md:text-8xl font-black font-display text-foreground leading-[1.05] -tracking-[0.03em]">{title}</h2>
     </div>
   );
 }

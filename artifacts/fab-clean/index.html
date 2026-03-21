@@ -4,9 +4,38 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
-    
-    <title>Fab Clean — Pollachi's Exclusive Artisan Hub</title>
-    <meta name="description" content="State-of-the-art scientific artisan cleaning in Pollachi. Experience premium eco-solvent dry cleaning and high-fashion preservation.">
+
+    <!-- Primary SEO -->
+    <title>Fab Clean — Pollachi's Premium Dry Cleaning & Laundry</title>
+    <meta
+      name="description"
+      content="Pollachi premium dry cleaning & laundry with doorstep pickup and eco-solvent care. Fresh clothes delivered every time."
+    />
+    <link rel="canonical" href="https://myfabclean.com/" />
+    <meta name="robots" content="index,follow" />
+    <meta name="theme-color" content="#8DC63F" />
+
+    <!-- Open Graph / Social -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Fab Clean" />
+    <meta property="og:url" content="https://myfabclean.com/" />
+    <meta property="og:title" content="Fab Clean — Pollachi's Premium Dry Cleaning & Laundry" />
+    <meta
+      property="og:description"
+      content="Pollachi premium dry cleaning & laundry with doorstep pickup and eco-solvent care. Fresh clothes delivered every time."
+    />
+    <meta property="og:image" content="https://myfabclean.com/opengraph.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Fab Clean — Pollachi's Premium Dry Cleaning & Laundry" />
+    <meta
+      name="twitter:description"
+      content="Pollachi premium dry cleaning & laundry with doorstep pickup and eco-solvent care. Fresh clothes delivered every time."
+    />
+    <meta name="twitter:image" content="https://myfabclean.com/opengraph.jpg" />
     
     <!-- Facebook Domain Verification -->
     <meta name="facebook-domain-verification" content="unwe8kuz0lpjb9bf6yrwdxloxiyrlo" />
@@ -15,7 +44,218 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   </head>
   <body>
-    <div id="root"></div>
+    <!--
+      Static no-JS fallback:
+      Firebase rewrites all routes to this index.html, so crawlers and slow clients must see real HTML content immediately.
+    -->
+    <div id="root">
+      <style>
+        :root{
+          --fab-green:#8DC63F;
+          --fab-orange:#F47B20;
+          --fab-charcoal:#3D3D3D;
+          --fab-offwhite:#F7F7F5;
+          --fab-whatsapp:#25D366;
+        }
+        body{
+          margin:0;
+          background:var(--fab-offwhite);
+          color:var(--fab-charcoal);
+          font-family: "Nunito", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+        }
+        .fab-fallback{
+          min-height:100vh;
+          display:flex;
+          flex-direction:column;
+        }
+        .fab-fallback-hero{
+          flex:1;
+          padding:88px 18px 120px;
+          position:relative;
+          overflow:hidden;
+        }
+        .fab-fallback-mesh{
+          position:absolute; inset:-40px;
+          background:
+            radial-gradient(circle at 15% 20%, rgba(141,198,63,0.22) 0px, transparent 45%),
+            radial-gradient(circle at 85% 25%, rgba(244,123,32,0.18) 0px, transparent 48%),
+            radial-gradient(circle, rgba(0,0,0,0.12) 1.5px, transparent 1.5px);
+          background-size: auto, auto, 40px 40px;
+          opacity:0.7;
+          pointer-events:none;
+        }
+        .fab-fallback-container{
+          position:relative;
+          max-width:980px;
+          margin:0 auto;
+          text-align:center;
+        }
+        .fab-badge{
+          display:inline-flex;
+          align-items:center;
+          gap:10px;
+          padding:10px 16px;
+          background:rgba(141,198,63,0.12);
+          border:1px solid rgba(141,198,63,0.25);
+          border-radius:999px;
+          font-weight:900;
+          letter-spacing:0.14em;
+          text-transform:uppercase;
+          font-size:12px;
+        }
+        .fab-title{
+          margin:18px 0 10px;
+          font-size:40px;
+          line-height:1.05;
+          letter-spacing:-0.02em;
+          font-weight:900;
+        }
+        .fab-title em{
+          font-style:normal;
+          color:var(--fab-green);
+        }
+        .fab-sub{
+          margin:0 auto 26px;
+          max-width:720px;
+          font-size:18px;
+          line-height:1.6;
+          color:rgba(61,61,61,0.75);
+          font-weight:600;
+        }
+        .fab-actions{
+          display:flex;
+          flex-direction:column;
+          gap:12px;
+          align-items:center;
+        }
+        .fab-btn{
+          text-decoration:none;
+          display:inline-flex;
+          align-items:center;
+          justify-content:center;
+          gap:10px;
+          padding:16px 18px;
+          border-radius:16px;
+          font-weight:900;
+          text-transform:uppercase;
+          letter-spacing:0.12em;
+          font-size:12px;
+          min-width:280px;
+          border:1px solid rgba(61,61,61,0.12);
+          background:#fff;
+        }
+        .fab-btn-primary{
+          background:linear-gradient(135deg, var(--fab-green), #5E9E1A);
+          color:#fff;
+          border-color:transparent;
+          box-shadow:0 10px 30px rgba(141,198,63,0.22);
+        }
+        .fab-btn-outline{
+          background:rgba(255,255,255,0.7);
+          color:var(--fab-charcoal);
+          border-color:rgba(141,198,63,0.25);
+        }
+        .fab-header{
+          position:fixed;
+          top:0; left:0; right:0;
+          background:rgba(247,247,245,0.85);
+          backdrop-filter: blur(10px);
+          border-bottom:1px solid rgba(61,61,61,0.08);
+          padding:14px 18px;
+          z-index:10;
+        }
+        .fab-header-inner{
+          max-width:980px;
+          margin:0 auto;
+          display:flex;
+          align-items:center;
+          justify-content:space-between;
+          gap:16px;
+        }
+        .fab-logo{
+          height:34px;
+          width:auto;
+        }
+        .fab-nav a{
+          color:rgba(61,61,61,0.75);
+          text-decoration:none;
+          font-weight:900;
+          text-transform:uppercase;
+          letter-spacing:0.12em;
+          font-size:11px;
+          margin-left:12px;
+        }
+        .fab-nav a:first-child{ margin-left:0; }
+        .fab-whatsapp-float{
+          position:fixed;
+          right:16px;
+          bottom:90px;
+          width:56px;
+          height:56px;
+          border-radius:999px;
+          background:var(--fab-whatsapp);
+          color:#fff;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          text-decoration:none;
+          box-shadow:0 18px 40px rgba(37,211,102,0.28);
+          z-index:20;
+          font-weight:900;
+        }
+        .fab-whatsapp-float:focus{ outline: 3px solid rgba(37,211,102,0.35); outline-offset: 3px; }
+      </style>
+
+      <div class="fab-fallback">
+        <header class="fab-header" aria-label="Site navigation">
+          <div class="fab-header-inner">
+            <a href="/" aria-label="Fab Clean home">
+              <img class="fab-logo" src="/logo.webp" alt="Fab Clean logo" />
+            </a>
+            <nav class="fab-nav" aria-label="Primary">
+              <a href="/">Home</a>
+              <a href="/services">Services</a>
+              <a href="/pricing">Pricing</a>
+              <a href="/contact">Contact</a>
+            </nav>
+          </div>
+        </header>
+
+        <main class="fab-fallback-hero">
+          <div class="fab-fallback-mesh"></div>
+          <div class="fab-fallback-container">
+            <div class="fab-badge">Pollachi's Premium Dry Cleaning & Laundry</div>
+            <h1 class="fab-title">Fresh Clothes. <em>Doorstep Delivery.</em> Every Time.</h1>
+            <p class="fab-sub">
+              Eco-solvent dry cleaning and careful laundry for sarees, suits, shoes, and daily wear.
+              Pickup in Pollachi, delivered fresh.
+            </p>
+            <div class="fab-actions" role="group" aria-label="Primary actions">
+              <a class="fab-btn fab-btn-primary" href="/schedule-pickup">Schedule Free Pickup</a>
+              <a
+                class="fab-btn fab-btn-outline"
+                href="https://wa.me/919363059595?text=Hi%2C%20I%27d%20like%20to%20book%20a%20laundry%20pickup."
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Order via WhatsApp
+              </a>
+              <a class="fab-btn" href="tel:+919363059595">Call 93630 59595</a>
+            </div>
+          </div>
+        </main>
+
+        <a
+          class="fab-whatsapp-float"
+          href="https://wa.me/919363059595?text=Hi%2C%20I%27d%20like%20to%20book%20a%20laundry%20pickup."
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Chat on WhatsApp"
+        >
+          WA
+        </a>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

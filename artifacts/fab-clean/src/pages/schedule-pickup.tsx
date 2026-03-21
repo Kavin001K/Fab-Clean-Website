@@ -58,9 +58,14 @@ export default function SchedulePickup() {
   if (successData) {
     return (
       <AppLayout>
-        <div className="min-h-[80vh] flex items-center justify-center pt-20 px-4">
-          <FadeIn className="text-center max-w-md">
-            <div className="w-20 h-20 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+        <div className="relative min-h-[80vh] flex items-center justify-center pt-20 px-4 overflow-hidden">
+          <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+            <div className="absolute top-0 left-0 w-[820px] h-[820px] bg-primary/10 rounded-full blur-[220px] -translate-x-1/2 -translate-y-1/2" />
+            <div className="absolute bottom-0 right-0 w-[650px] h-[650px] bg-secondary/7 rounded-full blur-[190px] translate-x-1/2 translate-y-1/2" />
+          </div>
+
+          <FadeIn className="relative z-10 text-center max-w-md">
+            <div className="w-20 h-20 bg-primary/15 text-primary rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle2 className="w-10 h-10" />
             </div>
             <h2 className="text-3xl font-display font-bold text-foreground mb-4">Pickup Scheduled!</h2>
@@ -80,7 +85,13 @@ export default function SchedulePickup() {
 
   return (
     <AppLayout>
-      <div className="pt-32 pb-24 max-w-3xl mx-auto px-4">
+      <div className="relative pt-32 pb-24 max-w-3xl mx-auto px-4 overflow-hidden">
+        <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+          <div className="absolute top-0 right-0 w-[900px] h-[900px] bg-primary/10 rounded-full blur-[220px] translate-x-1/2 -translate-y-1/2" />
+          <div className="absolute bottom-0 left-0 w-[680px] h-[680px] bg-secondary/6 rounded-full blur-[190px] -translate-x-1/2 translate-y-1/2" />
+        </div>
+
+        <div className="relative z-10">
         <SectionHeading title="Schedule Pickup" subtitle="Fast & Free within 3km" className="mb-12" />
 
         {/* Progress Bar */}
@@ -245,6 +256,7 @@ export default function SchedulePickup() {
             )}
           </form>
         </Card>
+        </div>
       </div>
     </AppLayout>
   );

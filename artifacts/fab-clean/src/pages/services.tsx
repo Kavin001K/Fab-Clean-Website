@@ -41,8 +41,8 @@ export default function Services() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 lg:gap-16">
-              {data?.data.map((service, i) => {
-                const IconComp = ICON_MAP[service.icon.toLowerCase()] || ICON_MAP.default;
+              {data?.data?.map((service, i) => {
+                const IconComp = ICON_MAP[service.icon?.toLowerCase()] || ICON_MAP.default;
                 return (
                   <FadeIn key={service.id} delay={i * 0.1}>
                     <Card className="h-full flex flex-col p-12 hover:shadow-[0_40px_100px_-20px_rgba(0,0,0,0.08)] transition-all bg-background group relative overflow-hidden rounded-[4rem]">
@@ -66,7 +66,7 @@ export default function Services() {
 
                       <div className="space-y-6 mb-16">
                         <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/40 mb-4 bg-muted/20 px-5 py-2 rounded-full w-fit">Key Highlights</p>
-                        {service.features.slice(0, 3).map((feature, idx) => (
+                        {service.features?.slice(0, 3).map((feature, idx) => (
                           <div key={idx} className="flex items-center gap-4 text-base font-bold text-foreground/70 group-hover:translate-x-3 transition-transform">
                             <div className="w-2.5 h-2.5 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
                                <div className="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_12px_rgba(180,197,36,0.6)]" />
