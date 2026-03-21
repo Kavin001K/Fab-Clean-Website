@@ -1,6 +1,6 @@
 {
   "projects": {
-    "default": "sakthi-sai-biotech",
+    "default": "fab-clean-official",
     "artifacts/fab-clean/dist/public": "fab-clean-official"
   },
   "targets": {},

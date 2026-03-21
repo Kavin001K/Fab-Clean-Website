@@ -112,13 +112,11 @@ export default function Home() {
                 <div className="absolute -inset-10 bg-primary/10 rounded-full blur-[6rem] group-hover:bg-primary/20 transition-colors duration-[2s] pointer-events-none" />
                 
                 <div className="absolute inset-0 bg-background border-[10px] sm:border-[16px] border-background/5 shadow-[0_60px_120px_-30px_rgba(0,0,0,0.4)] rounded-[4.5rem] sm:rounded-[5rem] overflow-hidden group-hover:shadow-[0_80px_160px_-40px_rgba(0,0,0,0.5)] transition-all duration-[1s] backdrop-blur-3xl animate-float">
-                  <motion.img
-                    src={`${import.meta.env.BASE_URL}images/premium-hero.png`}
+                  <img
+                    src={`${import.meta.env.BASE_URL}images/hero-v2.png`}
                     alt="Premium Laundry Lifestyle"
                     className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110 brightness-110 contrast-110"
-                    initial={{ scale: 1.2, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ duration: 1.5, ease: "easeOut" }}
+                    loading="eager"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
                 </div>
