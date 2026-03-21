@@ -29,7 +29,7 @@ export default function Home() {
 
       {/* ─── HERO SECTION ─────────────────────────────────── */}
       {/* Updated with a more robust mobile-first flex layout and increased spacing */}
-      <section className="relative min-h-[90vh] lg:min-h-screen flex flex-col lg:flex-row items-center justify-center overflow-hidden pt-36 pb-32 lg:pt-56 lg:pb-44">
+      <section className="relative min-h-[100svh] flex flex-col items-center justify-start overflow-hidden pt-24 pb-40 lg:pt-56 lg:pb-44">
         {/* Optimized Video Background */}
         <div className="absolute inset-0 z-0">
           {!isMobile ? (
@@ -65,6 +65,8 @@ export default function Home() {
           <div className="absolute inset-0 bg-background/10" />
         </div>
 
+        <div className="absolute top-0 inset-x-0 h-32 z-10 bg-gradient-to-b from-black/50 to-transparent pointer-events-none" />
+
         {/* Static gradient wash to replace animated blur blobs */}
         <div
           className="absolute inset-0 pointer-events-none hidden sm:block"
@@ -82,11 +84,11 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 lg:gap-32 items-center">
             
             {/* HERO TEXT (1/2) */}
-            <div className="space-y-12 text-center lg:text-left order-2 lg:order-1 mt-12 lg:mt-0 xl:pr-10">
+            <div className="space-y-12 text-center lg:text-left order-1 lg:order-1 mt-12 lg:mt-0 xl:pr-10">
               <FadeIn>
                 <div className="inline-flex items-center gap-3 px-8 py-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 shadow-3xl text-white text-[10px] font-black uppercase tracking-[0.4em] mb-4">
                   <Sparkles className="w-5 h-5 text-primary" />
-                  Pollachi's Premium Dry Cleaning & Laundry
+                  Pollachi's Scientific Fabric Care
                 </div>
               </FadeIn>
 
@@ -100,7 +102,7 @@ export default function Home() {
 
               <FadeIn delay={0.2}>
                 <p className="text-lg sm:text-xl lg:text-2xl text-white/90 max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed drop-shadow-md">
-                  We don't just wash clothes; we preserve them. Pollachi's only scientific artisan dry cleaning with premium eco-solvents.
+                  We don't just wash clothes; we preserve them. Pollachi's only scientific precision dry cleaning with premium eco-solvents.
                 </p>
               </FadeIn>
 
@@ -133,12 +135,12 @@ export default function Home() {
             </div>
 
             {/* HERO VISUAL (1/2) - Optimized and balanced */}
-            <div className="relative order-1 lg:order-2 flex justify-center lg:justify-end">
-              <FadeIn delay={0.2} className="relative aspect-[4/5] sm:aspect-[1.1] lg:aspect-[1] group w-full max-w-[500px] xl:max-w-[580px] origin-center">
+            <div className="relative order-2 lg:order-2 w-full max-w-[340px] mx-auto mt-8 lg:mt-0 lg:max-w-[580px]">
+              <FadeIn delay={0.2} className="relative aspect-[4/3] sm:aspect-[4/5] lg:aspect-[1] group w-full origin-center">
                 {/* Visual breathing room */}
                 <div className="absolute -inset-10 bg-primary/10 rounded-full blur-[6rem] group-hover:bg-primary/20 transition-colors duration-[2s] pointer-events-none" />
                 
-                <div className="absolute inset-0 bg-background border-[10px] sm:border-[16px] border-background/5 shadow-[0_60px_120px_-30px_rgba(0,0,0,0.4)] rounded-[4.5rem] sm:rounded-[5rem] overflow-hidden group-hover:shadow-[0_80px_160px_-40px_rgba(0,0,0,0.5)] transition-all duration-[1s] backdrop-blur-3xl animate-float">
+                <div className="absolute inset-0 bg-background border-[10px] sm:border-[16px] border-background/5 shadow-[0_60px_120px_-30px_rgba(0,0,0,0.4)] rounded-[2.5rem] sm:rounded-[4rem] lg:rounded-[5rem] overflow-hidden group-hover:shadow-[0_80px_160px_-40px_rgba(0,0,0,0.5)] transition-all duration-[1s] backdrop-blur-3xl animate-float">
                   <picture>
                     <source
                       srcSet={`${import.meta.env.BASE_URL}images/hero-v2.webp`}
@@ -157,7 +159,7 @@ export default function Home() {
                 
                 {/* Floating Metric - Balanced position */}
                 <div
-                  className="absolute -bottom-10 -left-6 lg:-left-20 bg-white/92 backdrop-blur-2xl shadow-4xl rounded-[2.5rem] p-8 border border-white/50 flex items-center gap-6 z-20 hover:scale-105 transition-transform cursor-pointer"
+                  className="absolute -bottom-4 -left-8 lg:-left-20 bg-white/92 backdrop-blur-2xl shadow-4xl rounded-[2.5rem] p-8 border border-white/50 flex items-center gap-6 z-20 hover:scale-105 transition-transform cursor-pointer"
                   style={{ animation: "float-badge 6s ease-in-out infinite", willChange: "transform" }}
                 >
                   <div className="w-14 h-14 rounded-[1.2rem] bg-lime-gradient flex items-center justify-center shadow-lg shadow-primary/30">

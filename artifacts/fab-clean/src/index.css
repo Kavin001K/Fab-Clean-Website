@@ -148,8 +148,8 @@
   }
 
   .mobile-cta-bar {
-    @apply fixed bottom-0 inset-x-0 z-40 flex gap-3 bg-white/95 backdrop-blur-xl border-t border-border/60 px-5 pb-6 pt-3;
-    padding-bottom: max(20px, env(safe-area-inset-bottom));
+    @apply fixed bottom-0 inset-x-0 z-40 flex gap-3 bg-white/95 backdrop-blur-xl border-t border-border/60 px-5 pb-4 pt-3;
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
   }
 
   .mobile-cta-bar a {
@@ -271,4 +271,64 @@
 
 ::-webkit-scrollbar-thumb {
   @apply bg-muted-foreground/10 rounded-full hover:bg-muted-foreground/20;
+}
+
+/* ── Steam cursor ──────────────────────────────────────── */
+@media (pointer: fine) {
+  * { cursor: none !important; }
+}
+
+/* Particle base */
+.fc-steam-particle {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99998;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+/* Particle rise animation */
+@keyframes fc-steam-rise {
+  0%   { transform: translate(calc(-50% + 0px), -50%) scale(1); opacity: 0.9; }
+  40%  { transform: translate(calc(-50% + var(--drift-x)), calc(-50% - 18px)) scale(1.4); opacity: 0.6; }
+  100% { transform: translate(calc(-50% + var(--drift-x)), calc(-50% - 40px)) scale(0.2); opacity: 0; }
+}
+
+/* Ring hover state — grows larger, turns gold */
+#fc-cursor-ring.fc-cursor-hover {
+  width: 52px !important;
+  height: 52px !important;
+  border-color: #F4B942 !important;
+  mix-blend-mode: normal !important;
+  background: rgba(244, 185, 66, 0.06);
+}
+
+/* Dot hover state */
+#fc-cursor-dot.fc-cursor-hover {
+  background: #F4B942 !important;
+  box-shadow: 0 0 8px #F4B94288;
+}
+
+/* Click state — ring shrinks */
+#fc-cursor-ring.fc-cursor-click {
+  width: 24px !important;
+  height: 24px !important;
+  border-color: #ffffff !important;
+  background: rgba(255,255,255,0.1);
+  transition-duration: 0.1s !important;
+}
+
+#fc-cursor-dot.fc-cursor-click {
+  transform-origin: center;
+  background: #ffffff !important;
+}
+
+/* Reduced motion — disable all cursor animations */
+@media (prefers-reduced-motion: reduce) {
+  .fc-steam-particle { display: none !important; }
+  #fc-cursor-ring,
+  #fc-cursor-dot { display: none !important; }
+  * { cursor: auto !important; }
 }

@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { SteamCursor } from "@/components/cursor";
 
 export function Navbar() {
   const [location] = useLocation();
@@ -130,7 +131,7 @@ export function Navbar() {
 
           <div className="flex items-center gap-3 lg:hidden">
             <button
-              className="p-3 text-foreground bg-white/80 dark:bg-black/40 backdrop-blur-md rounded-2xl border border-black/5 dark:border-white/5 z-20"
+              className="p-3 bg-white/60 backdrop-blur-md rounded-2xl border border-white/30 shadow-sm text-white lg:hidden z-20"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle menu"
             >
@@ -311,7 +312,7 @@ export function BottomTabBar() {
   ];
 
   return (
-    <div className="lg:hidden fixed bottom-24 inset-x-6 z-40 max-w-md mx-auto left-0 right-0">
+    <div className="lg:hidden fixed bottom-[88px] inset-x-8 z-50 max-w-md mx-auto left-0 right-0">
       <div className="bg-white/95 backdrop-blur-2xl border border-border/70 rounded-[2.5rem] shadow-[0_20px_50px_rgba(11,28,59,0.18)] overflow-hidden px-6 h-20 flex justify-between items-center">
           {tabs.map((tab) => {
             const isActive = location === tab.path || (tab.path !== "/" && location.startsWith(tab.path));
@@ -353,6 +354,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen flex flex-col bg-background font-sans overflow-x-hidden relative isolate">
+      <SteamCursor />
       <div className="fixed inset-0 -z-10">
         <div className="absolute inset-0 page-backdrop" />
         <div className="absolute inset-0 page-aurora animate-aurora opacity-70" />
@@ -366,7 +368,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Chat on WhatsApp"
-        className="fixed right-4 bottom-28 z-50 lg:bottom-8 w-16 h-16 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-2xl animate-whatsapp-pulse hover:scale-105 transition-transform"
+        className="hidden lg:flex fixed right-4 bottom-8 z-50 w-14 h-14 rounded-full bg-[#25D366] text-white items-center justify-center shadow-2xl animate-whatsapp-pulse hover:scale-105 transition-transform"
       >
         <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28" aria-hidden="true">
           <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
