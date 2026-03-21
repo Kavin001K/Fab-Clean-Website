@@ -15,7 +15,7 @@ export function SEO({
   description, 
   canonical, 
   type = "website", 
-  image = "https://myfabclean.com/opengraph.jpg",
+  image = "https://myfabclean.com/logo-og.jpg",
   schema
 }: SEOProps) {
   const [location] = useLocation();

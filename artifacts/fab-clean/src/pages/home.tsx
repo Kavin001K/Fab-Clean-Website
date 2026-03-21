@@ -34,7 +34,7 @@ export default function Home() {
           "@context": "https://schema.org",
           "@type": "LocalBusiness",
           "name": "Fab Clean",
-          "image": "https://myfabclean.com/logo.webp",
+          "image": "https://myfabclean.com/logo-og.jpg",
           "@id": "https://myfabclean.com",
           "url": "https://myfabclean.com",
           "telephone": "+919363059595",
