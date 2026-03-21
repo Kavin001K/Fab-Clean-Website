@@ -1,4 +1,5 @@
 import { AppLayout } from "@/components/layout";
+import { SEO } from "@/components/seo";
 import { SectionHeading, Card, FadeIn, Button } from "@/components/ui";
 import { useListPricing } from "@workspace/api-client-react";
 import { Loader2, ArrowRight, CheckCircle2, Star, Sparkles, Phone } from "lucide-react";
@@ -43,6 +44,10 @@ export default function Pricing() {
 
   return (
     <AppLayout>
+      <SEO 
+        title="Transparent Pricing"
+        description="Affordable and transparent pricing for premium dry cleaning, laundry, and shoe care in Pollachi. Check our rates for sarees, suits, and daily wear."
+      />
       {/* Background Decor */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         <div className="absolute top-0 right-0 w-[1000px] h-[1000px] bg-primary/2 rounded-full blur-[200px] translate-x-1/2 -translate-y-1/2" />

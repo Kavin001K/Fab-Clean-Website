@@ -1,4 +1,5 @@
 import { AppLayout } from "@/components/layout";
+import { SEO } from "@/components/seo";
 import { SectionHeading, Card, FadeIn, Button } from "@/components/ui";
 import { useListServices } from "@workspace/api-client-react";
 import { Link } from "wouter";
@@ -19,6 +20,10 @@ export default function Services() {
 
   return (
     <AppLayout>
+      <SEO 
+        title="Professional Services"
+        description="Explore our range of premium fabric care: Precision Dry Cleaning, Luxury Laundry, Artisanal Shoe SPA, and House Linen Care in Pollachi. Certified eco-solvent technology."
+      />
       {/* ─── OPTIMIZED VIDEO BACKGROUND ─────────────────────────── */}
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
         {!isMobile ? (
@@ -42,7 +47,7 @@ export default function Services() {
             />
             <img
               src={`${import.meta.env.BASE_URL}images/hero-bg.png`}
-              alt=""
+              alt="Clean and fresh garments after professional treatment"
               className="w-full h-full object-cover opacity-40 grayscale-[20%]"
               loading="lazy"
               decoding="async"

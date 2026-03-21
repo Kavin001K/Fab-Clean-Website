@@ -1,4 +1,5 @@
 import { AppLayout } from "@/components/layout";
+import { SEO } from "@/components/seo";
 import { SectionHeading, FadeIn, Card, Input, Button } from "@/components/ui";
 import { useSubmitContact } from "@workspace/api-client-react";
 import { useForm } from "react-hook-form";
@@ -41,6 +42,10 @@ export default function Contact() {
 
   return (
     <AppLayout>
+      <SEO 
+        title="Get in Touch"
+        description="Contact Fab Clean Pollachi for premium dry cleaning and laundry services. Book a free doorstep pickup or visit our branches in Mahalingapuram and Kinathukadavu."
+      />
       <div className="relative pt-32 pb-24 container-wide overflow-hidden">
         <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
           <div className="absolute top-0 right-0 w-[900px] h-[900px] bg-primary/10 rounded-full blur-[200px] translate-x-1/2 -translate-y-1/2" />

@@ -1,9 +1,14 @@
 import { AppLayout } from "@/components/layout";
+import { SEO } from "@/components/seo";
 import { SectionHeading, FadeIn } from "@/components/ui";
 
 export default function About() {
   return (
     <AppLayout>
+      <SEO 
+        title="Our Story"
+        description="Learn about Fab Clean, Pollachi's premier scientific fabric care service. Founded in 2023, we provide artisan dry cleaning and luxury laundry with eco-solvent technology."
+      />
       <div className="relative pt-32 pb-24 overflow-hidden bg-premium-mesh">
         <div className="absolute inset-0 z-0 opacity-10">
           <picture>
@@ -13,7 +18,7 @@ export default function About() {
             />
             <img
               src={`${import.meta.env.BASE_URL}images/pattern-bg.png`}
-              alt="Pattern"
+              alt="Abstract fabric texture pattern"
               loading="lazy"
               decoding="async"
               className="w-full h-full object-cover"

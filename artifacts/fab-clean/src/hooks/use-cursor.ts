@@ -5,18 +5,9 @@ export function useSteamCursor() {
     // Disable entirely on touch devices
     if (window.matchMedia("(pointer: coarse)").matches) return;
 
-    // ── Elements ──────────────────────────────────────────
-    const ring = document.getElementById("fc-cursor-ring")!;
-    const dot = document.getElementById("fc-cursor-dot")!;
-    if (!ring || !dot) return;
-
     let mouseX = window.innerWidth / 2;
     let mouseY = window.innerHeight / 2;
-    let ringX = mouseX;
-    let ringY = mouseY;
-    let raf: number;
     let isHovering = false;
-    let isDown = false;
 
     // ── Particle pool ─────────────────────────────────────
     const PARTICLE_COUNT = 6;
@@ -32,7 +23,6 @@ export function useSteamCursor() {
     let particleIndex = 0;
     let lastSpawnX = 0;
     let lastSpawnY = 0;
-    let frameCount = 0;
 
     function spawnParticle(x: number, y: number, hover: boolean) {
       const p = particles[particleIndex % PARTICLE_COUNT];
@@ -83,29 +73,10 @@ export function useSteamCursor() {
     }
 
     function onMouseDown() {
-      isDown = true;
-      ring.classList.add("fc-cursor-click");
-      dot.classList.add("fc-cursor-click");
       // Burst of particles on click
       for (let i = 0; i < 4; i++) {
         setTimeout(() => spawnParticle(mouseX, mouseY, isHovering), i * 30);
       }
-    }
-
-    function onMouseUp() {
-      isDown = false;
-      ring.classList.remove("fc-cursor-click");
-      dot.classList.remove("fc-cursor-click");
-    }
-
-    function onMouseEnter() {
-      ring.style.opacity = "1";
-      dot.style.opacity = "1";
-    }
-
-    function onMouseLeave() {
-      ring.style.opacity = "0";
-      dot.style.opacity = "0";
     }
 
     // ── Hover state on interactive elements ───────────────
@@ -116,13 +87,9 @@ export function useSteamCursor() {
       targets.forEach((el) => {
         el.addEventListener("mouseenter", () => {
           isHovering = true;
-          ring.classList.add("fc-cursor-hover");
-          dot.classList.add("fc-cursor-hover");
         });
         el.addEventListener("mouseleave", () => {
           isHovering = false;
-          ring.classList.remove("fc-cursor-hover");
-          dot.classList.remove("fc-cursor-hover");
         });
       });
     }
@@ -132,44 +99,14 @@ export function useSteamCursor() {
     const mo = new MutationObserver(setHoverListeners);
     mo.observe(document.body, { childList: true, subtree: true });
 
-    // ── Spring animation loop ─────────────────────────────
-    const STIFFNESS = 0.13; // lower = more lag / floatier feel
-
-    function loop() {
-      frameCount++;
-
-      // Spring interpolation for the ring (lags behind mouse)
-      ringX += (mouseX - ringX) * STIFFNESS;
-      ringY += (mouseY - ringY) * STIFFNESS;
-
-      // Dot snaps directly to mouse (no lag)
-      dot.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
-      ring.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
-
-      raf = requestAnimationFrame(loop);
-    }
-
-    raf = requestAnimationFrame(loop);
-
     // ── Events ────────────────────────────────────────────
     document.addEventListener("mousemove", onMouseMove, { passive: true });
     document.addEventListener("mousedown", onMouseDown);
-    document.addEventListener("mouseup", onMouseUp);
-    document.addEventListener("mouseenter", onMouseEnter);
-    document.addEventListener("mouseleave", onMouseLeave);
-
-    // Hide native cursor globally
-    document.body.style.cursor = "none";
 
     return () => {
-      cancelAnimationFrame(raf);
       mo.disconnect();
       document.removeEventListener("mousemove", onMouseMove);
       document.removeEventListener("mousedown", onMouseDown);
-      document.removeEventListener("mouseup", onMouseUp);
-      document.removeEventListener("mouseenter", onMouseEnter);
-      document.removeEventListener("mouseleave", onMouseLeave);
-      document.body.style.cursor = "";
       particles.forEach((p) => p.remove());
     };
   }, []);

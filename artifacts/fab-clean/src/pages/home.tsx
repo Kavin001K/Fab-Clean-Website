@@ -1,4 +1,5 @@
 import { Link } from "wouter";
+import { SEO } from "@/components/seo";
 import { motion } from "framer-motion";
 import { AppLayout } from "@/components/layout";
 import { Button, SectionHeading, FadeIn, Card } from "@/components/ui";
@@ -26,6 +27,45 @@ export default function Home() {
 
   return (
     <AppLayout>
+      <SEO 
+        title="Home"
+        description="Premium dry cleaning and laundry services in Pollachi. Doorstep pickup, eco-solvent care, and 48-hour delivery for sarees, suits, and daily wear."
+        schema={{
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          "name": "Fab Clean",
+          "image": "https://myfabclean.com/logo.webp",
+          "@id": "https://myfabclean.com",
+          "url": "https://myfabclean.com",
+          "telephone": "+919363059595",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Mahalingapuram",
+            "addressLocality": "Pollachi",
+            "addressRegion": "Tamil Nadu",
+            "postalCode": "642002",
+            "addressCountry": "IN"
+          },
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 10.6629,
+            "longitude": 77.0065
+          },
+          "openingHoursSpecification": {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": [
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday",
+              "Saturday"
+            ],
+            "opens": "09:00",
+            "closes": "20:00"
+          }
+        }}
+      />
 
       {/* ─── HERO SECTION ─────────────────────────────────── */}
       {/* Updated with a more robust mobile-first flex layout and increased spacing */}
@@ -53,7 +93,7 @@ export default function Home() {
               />
               <img
                 src={`${import.meta.env.BASE_URL}images/premium-hero.png`}
-                alt=""
+                alt="Professional laundry care services in Pollachi"
                 className="w-full h-full object-cover"
                 fetchPriority="high"
                 loading="eager"
@@ -148,7 +188,7 @@ export default function Home() {
                     />
                     <img
                       src={`${import.meta.env.BASE_URL}images/hero-v2.png`}
-                      alt="Premium Laundry Lifestyle"
+                      alt="Premium dry cleaning and laundry lifestyle illustration"
                       className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110 brightness-110 contrast-110"
                       loading="eager"
                       fetchPriority="high"
