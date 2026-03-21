@@ -37,7 +37,7 @@ export default function Home() {
             className="w-full h-full object-cover"
             poster={`${import.meta.env.BASE_URL}images/premium-hero.png`}
           >
-            <source src={`${import.meta.env.BASE_URL}background.mp4`} type="video/mp4" />
+            <source src={`${import.meta.env.BASE_URL}home-background.mp4`} type="video/mp4" />
           </video>
           {/* High-End Glassmorphism Overlay - Optimized for maximum legibility */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80 backdrop-blur-[3px]" />

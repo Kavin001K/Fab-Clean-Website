@@ -17,10 +17,27 @@ export default function Services() {
 
   return (
     <AppLayout>
-      {/* Background Decor */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/2 rounded-full blur-[160px] translate-x-1/2 -translate-y-1/2" />
-        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-secondary/5 rounded-full blur-[140px] -translate-x-1/2 translate-y-1/2" />
+      {/* ─── OPTIMIZED VIDEO BACKGROUND ─────────────────────────── */}
+      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="w-full h-full object-cover opacity-20 grayscale-[30%]"
+        >
+          <source src={`${import.meta.env.BASE_URL}service-background.mp4`} type="video/mp4" />
+        </video>
+        {/* High-End Glassmorphism & Atmospheric Overlays */}
+        <div className="absolute inset-0 bg-background/80 backdrop-blur-[3px]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-transparent to-background/90" />
+        
+        {/* Dynamic accent blobs for depth */}
+        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[160px] translate-x-1/2 -translate-y-1/2 animate-pulse-soft" />
+        <div className="absolute bottom-0 left-0 w-[700px] h-[700px] bg-secondary/10 rounded-full blur-[180px] -translate-x-1/2 translate-y-1/2 animate-pulse-soft delay-1000" />
+        
+        {/* Subtle grid texture for a technical/scientific feel */}
+        <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: 'radial-gradient(circle, #000 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
       </div>
 
       <div className="section-padding relative z-10 overflow-hidden pt-44">
