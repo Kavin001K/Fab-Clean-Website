@@ -15,6 +15,7 @@ const Login = lazy(() => import("@/pages/login"));
 const Register = lazy(() => import("@/pages/register"));
 const SchedulePickup = lazy(() => import("@/pages/schedule-pickup"));
 const Dashboard = lazy(() => import("@/pages/dashboard/index"));
+const Sitemap = lazy(() => import("@/pages/sitemap"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 
 const queryClient = new QueryClient({
@@ -42,6 +43,7 @@ function Router() {
         {/* Dashboard routes use nested routing inside the component, but we declare the base prefix here */}
         <Route path="/dashboard/*?" component={Dashboard} />
         
+        <Route path="/sitemap" component={Sitemap} />
         <Route component={NotFound} />
       </Switch>
     </Suspense>

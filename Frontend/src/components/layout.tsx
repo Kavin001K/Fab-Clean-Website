@@ -291,6 +291,7 @@ export function Footer() {
             © {new Date().getFullYear()} Fab Clean. High Fashion Preservation.
           </p>
           <div className="flex gap-12 text-[10px] font-black uppercase tracking-[0.3em] text-white/50">
+            <Link href="/sitemap" className="hover:text-white transition-colors">Sitemap</Link>
             <a href="#" className="hover:text-white transition-colors">Privacy</a>
             <a href="#" className="hover:text-white transition-colors">Legal</a>
             <a href="#" className="hover:text-white transition-colors">Cookies</a>
