@@ -9,6 +9,9 @@ import {
   Shirt, Briefcase, Zap, ArrowRight, Phone
 } from "lucide-react";
 
+import { LiquidText } from "@/components/ui/LiquidText";
+import { FoamContainer } from "@/components/ui/FoamEffect";
+
 const mockServices = [
   { id: "1", name: "Premium Dry Cleaning", short: "Artisan care for suits, sarees, and delicate couture.", icon: Briefcase, price: "₹150" },
   { id: "2", name: "Luxury Laundry", short: "Softened water wash with premium eco-solvents.", icon: Shirt, price: "₹45" },
@@ -196,10 +199,14 @@ export default function Home() {
 
               <FadeIn delay={0.1}>
                 {/* Scaled-down H1 for mobile-first balance */}
-                <h1 className="text-[2.6rem] sm:text-6xl lg:text-[5.5rem] xl:text-[6.5rem] font-black font-display text-white leading-[1.05] -tracking-tight">
-                  Revive Your <br/>
-                  <span className="text-gradient drop-shadow-2xl font-serif italic">Wardrobe.</span>
-                </h1>
+                <FoamContainer>
+                  <h1 className="text-[2.6rem] sm:text-6xl lg:text-[5.5rem] xl:text-[6.5rem] font-black font-display text-white leading-[1.05] -tracking-tight">
+                    <LiquidText>Revive Your</LiquidText> <br/>
+                    <LiquidText>
+                      <span className="text-gradient drop-shadow-2xl font-serif italic liquid-hover">Wardrobe.</span>
+                    </LiquidText>
+                  </h1>
+                </FoamContainer>
               </FadeIn>
 
               <FadeIn delay={0.2}>
@@ -439,6 +446,21 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ─── LIQUID FILTER ────────────────────────────────── */}
+      <svg style={{ display: 'none' }}>
+        <defs>
+          <filter id="liquid">
+            <feTurbulence type="fractalNoise" baseFrequency="0.01" numOctaves="3" result="noise" />
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="10" />
+          </filter>
+        </defs>
+      </svg>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        .liquid-hover:hover {
+          filter: url(#liquid);
+        }
+      `}} />
     </AppLayout>
   );
 }
