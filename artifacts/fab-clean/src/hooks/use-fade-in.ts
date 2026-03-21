@@ -3,11 +3,11 @@ import { useEffect, useRef } from "react";
 const sharedObserver =
   typeof window !== "undefined"
     ? new IntersectionObserver(
-        (entries) => {
+        (entries, observer) => {
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
               entry.target.classList.add("fade-visible");
-              sharedObserver.unobserve(entry.target);
+              observer.unobserve(entry.target);
             }
           });
         },

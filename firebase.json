@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "artifacts/fab-clean/dist/public",
+    "public": "artifacts/fab-clean/dist-build",
     "ignore": [
       "firebase.json",
       "**/.*",

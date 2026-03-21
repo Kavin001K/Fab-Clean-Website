@@ -16,7 +16,7 @@ export default defineConfig({
   base: basePath,
   logLevel: "error",
   plugins: [
-    react({ babel: { sourceMaps: false } }),
+    react(),
     tailwindcss(),
     runtimeErrorOverlay(),
     ...(process.env.NODE_ENV !== "production" &&
@@ -45,7 +45,7 @@ export default defineConfig({
   },
   root: path.resolve(import.meta.dirname),
   build: {
-    outDir: path.resolve(import.meta.dirname, "dist/public"),
+    outDir: path.resolve(import.meta.dirname, "dist-build"),
     emptyOutDir: true,
     sourcemap: false,
     rollupOptions: {
