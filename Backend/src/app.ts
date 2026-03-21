@@ -4,7 +4,23 @@ import pinoHttp from "pino-http";
 import router from "./routes";
 import { logger } from "./lib/logger";
 
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+
 const app: Express = express();
+
+// Security middleware
+app.use(helmet());
+
+// Rate limiting (max 100 requests per 15 minutes per IP)
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: "Too many requests from this IP, please try again after 15 minutes",
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use("/api", limiter);
 
 app.use(
   pinoHttp({
