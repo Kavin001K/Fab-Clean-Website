@@ -556,7 +556,7 @@ export default function TermsPage() {
             {showBackToTop && (
                 <button
                     onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                    className="fixed bottom-6 right-6 md:bottom-8 md:right-8 w-12 h-12 md:w-14 md:h-14 bg-primary text-foreground rounded-full shadow-lg hover:bg-emerald-700 transition-all flex items-center justify-center z-50 touch-target active:scale-95 animate-fade-in"
+                    className="fixed bottom-6 left-6 md:bottom-8 md:left-8 w-12 h-12 md:w-14 md:h-14 bg-primary text-foreground rounded-full shadow-lg hover:bg-emerald-700 transition-all flex items-center justify-center z-50 touch-target active:scale-95 animate-fade-in"
                     aria-label="Back to top"
                 >
                     <ChevronUp className="w-5 h-5 md:w-6 md:h-6" />

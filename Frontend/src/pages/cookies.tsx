@@ -277,7 +277,7 @@ export default function CookiesPage() {
             {isMobile && (
                 <button
                     onClick={() => setShowMobileToc(true)}
-                    className="fixed bottom-20 right-4 z-40 bg-purple-600 text-foreground p-3 rounded-full shadow-lg touch-target active:scale-95 transition-transform"
+                    className="fixed bottom-20 left-4 z-40 bg-primary text-foreground p-3 rounded-full shadow-lg touch-target active:scale-95 transition-transform"
                 >
                     <Menu className="w-5 h-5" />
                 </button>
@@ -307,7 +307,7 @@ export default function CookiesPage() {
                                     }}
                                     className="w-full flex items-center gap-3 p-3 bg-background rounded-lg touch-target active:scale-95 transition-transform text-left"
                                 >
-                                    <span className="w-8 h-8 flex items-center justify-center bg-purple-600 text-foreground font-semibold rounded-lg text-sm">
+                                    <span className="w-8 h-8 flex items-center justify-center bg-primary text-foreground font-semibold rounded-lg text-sm">
                                         {section.id}
                                     </span>
                                     <span className="text-foreground/80 text-sm">{section.shortTitle}</span>
@@ -332,7 +332,7 @@ export default function CookiesPage() {
                                     onClick={() => document.getElementById(`section-${section.id}`)?.scrollIntoView({ behavior: 'smooth' })}
                                     className="flex items-center gap-3 p-3 bg-card rounded-lg hover:shadow-md transition-shadow text-left group"
                                 >
-                                    <span className="w-8 h-8 flex items-center justify-center bg-purple-100 text-purple-700 font-semibold rounded-lg text-sm group-hover:bg-purple-600 group-hover:text-foreground transition-colors">
+                                    <span className="w-8 h-8 flex items-center justify-center bg-purple-100 text-purple-700 font-semibold rounded-lg text-sm group-hover:bg-primary group-hover:text-foreground transition-colors">
                                         {section.id}
                                     </span>
                                     <span className="text-foreground/80 group-hover:text-purple-700 transition-colors">{section.title}</span>
@@ -347,7 +347,7 @@ export default function CookiesPage() {
                     {cookieData.sections.map((section) => (
                         <section key={section.id} id={`section-${section.id}`} className="scroll-mt-32">
                             <div className="flex items-start gap-3 md:gap-4 mb-4 md:mb-6">
-                                <span className="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center bg-purple-600 text-foreground font-bold rounded-xl text-base md:text-lg">
+                                <span className="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center bg-primary text-foreground font-bold rounded-xl text-base md:text-lg">
                                     {section.id}
                                 </span>
                                 <h2 className="text-xl md:text-2xl font-bold text-foreground pt-1 md:pt-2">
@@ -372,7 +372,7 @@ export default function CookiesPage() {
             {showBackToTop && (
                 <button
                     onClick={scrollToTop}
-                    className="fixed bottom-4 right-4 z-40 bg-purple-600 text-foreground p-3 rounded-full shadow-lg touch-target active:scale-95 transition-transform animate-fade-in"
+                    className="fixed bottom-4 left-4 z-40 bg-primary text-foreground p-3 rounded-full shadow-lg touch-target active:scale-95 transition-transform animate-fade-in"
                 >
                     <ChevronUp className="w-5 h-5" />
                 </button>

@@ -277,7 +277,7 @@ export default function PrivacyPage() {
             {isMobile && (
                 <button
                     onClick={() => setShowMobileToc(true)}
-                    className="fixed bottom-20 right-4 z-40 bg-primary text-foreground p-3 rounded-full shadow-lg touch-target active:scale-95 transition-transform"
+                    className="fixed bottom-20 left-4 z-40 bg-primary text-foreground p-3 rounded-full shadow-lg touch-target active:scale-95 transition-transform"
                 >
                     <Menu className="w-5 h-5" />
                 </button>
@@ -372,7 +372,7 @@ export default function PrivacyPage() {
             {showBackToTop && (
                 <button
                     onClick={scrollToTop}
-                    className="fixed bottom-4 right-4 z-40 bg-primary text-foreground p-3 rounded-full shadow-lg touch-target active:scale-95 transition-transform animate-fade-in"
+                    className="fixed bottom-4 left-4 z-40 bg-primary text-foreground p-3 rounded-full shadow-lg touch-target active:scale-95 transition-transform animate-fade-in"
                 >
                     <ChevronUp className="w-5 h-5" />
                 </button>
