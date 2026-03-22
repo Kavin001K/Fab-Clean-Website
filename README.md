@@ -55,9 +55,9 @@ Premium dry cleaning and laundry service website for Fab Clean (Yadvik Traders),
 
 ```text
 artifacts-monorepo/
-├── artifacts/              # Deployable applications
-│   ├── api-server/         # Express API server
-│   └── fab-clean/          # Fab Clean frontend (React + Vite)
+artifacts-monorepo/
+├── backend/                # Express API server
+└── frontend/               # Fab Clean frontend (React + Vite)
 ├── lib/                    # Shared libraries
 │   ├── api-spec/           # OpenAPI spec + Orval codegen config
 │   ├── api-client-react/   # Generated React Query hooks
