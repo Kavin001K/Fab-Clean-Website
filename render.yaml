@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: fab-clean-backend
+    env: node
+    region: singapore # Change as needed
+    buildCommand: "npm install -g pnpm && pnpm install && pnpm run build --filter backend"
+    startCommand: "node backend/dist/index.cjs"
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_ANON_KEY
+        sync: false
+      - key: NODE_ENV
+        value: production
+      - key: BASE_PATH
+        value: /
