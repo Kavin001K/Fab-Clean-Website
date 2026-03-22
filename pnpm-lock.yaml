@@ -155,7 +155,7 @@ importers:
         specifier: ~5.9.2
         version: 5.9.3
 
-  backend:
+  Backend:
     dependencies:
       '@workspace/api-zod':
         specifier: workspace:*
@@ -216,7 +216,7 @@ importers:
         specifier: 'catalog:'
         version: 4.21.0
 
-  frontend:
+  Frontend:
     devDependencies:
       '@esbuild/darwin-arm64':
         specifier: ^0.27.3
