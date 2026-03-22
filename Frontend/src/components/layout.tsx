@@ -35,114 +35,90 @@ export function Navbar() {
 
   return (
     <header className="fixed top-2.5 md:top-6 inset-x-0 z-50 pointer-events-none px-4 md:px-8 pt-[env(safe-area-inset-top)]">
-      <div className="flex justify-center max-w-[1100px] mx-auto pointer-events-auto w-full">
+      <div className="flex justify-center mx-auto pointer-events-auto w-full">
         <div className={cn(
-          "flex items-center justify-between w-full transition-all duration-500 ease-out font-sans",
-          "bg-white/5 backdrop-blur-md border border-white/10 rounded-[50px] shadow-[0_12px_40px_rgba(0,0,0,0.1)]",
-          shouldShowBackground
-            ? "py-3 px-8 mx-auto bg-white/10 border-white/20"
-            : "py-4 px-8 mx-auto bg-transparent"
+          "navbar",
+          shouldShowBackground && "scrolled"
         )}>
-
-          {/* Logo - Aligned with the start of content */}
-          <Link href="/" className="flex items-center group relative overflow-hidden z-20 shrink-0">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="relative"
-            >
+          {/* Left Section: Logo */}
+          <div className="flex-1 flex items-center">
+            <Link href="/" className="inline-block group transition-all duration-300 hover:scale-105">
               <img
                 src={`${import.meta.env.BASE_URL}logo.webp`}
                 alt="Fab Clean logo"
-                loading="lazy"
-                className={cn(
-                  "h-10 md:h-11 w-auto transition-all duration-700",
-                  !shouldShowBackground && "brightness-0 invert opacity-90"
-                )}
+                className="h-[26px] w-auto opacity-95 transition-all duration-300 logo-img"
               />
-            </motion.div>
-          </Link>
-
-          {/* Nav Links - Focused/Centered */}
-          <nav aria-label="Primary navigation" className="hidden lg:flex items-center gap-1.5 p-1 rounded-[2rem] border border-white/60 bg-white/70 backdrop-blur-2xl shadow-[0_20px_50px_rgba(11,28,59,0.08)] z-10 mx-6">
-            {navLinks.map((link) => {
-              const isActive = location === link.path;
-              return (
-                <Link
-                  key={link.name}
-                  href={link.path}
-                  className={cn(
-                    "text-[10px] font-black uppercase tracking-[0.2em] transition-all px-6 py-2.5 rounded-full relative",
-                    isActive 
-                      ? "text-white" 
-                      : shouldShowBackground
-                        ? "text-muted-foreground hover:text-foreground hover:bg-primary/5"
-                        : "text-white/80 hover:text-white hover:bg-white/10"
-                  )}
-                >
-                  <span className="relative z-10">{link.name}</span>
-                  {isActive && (
-                    <motion.div
-                      layoutId="nav-pill"
-                      className="absolute inset-0 bg-lime-gradient rounded-full shadow-lg shadow-primary/20"
-                      transition={{ type: "spring", bounce: 0.2, duration: 0.8 }}
-                    />
-                  )}
-                </Link>
-              );
-            })}
-          </nav>
-
-          {/* Desktop Tools - Constrained to gutters */}
-          <div className="hidden lg:flex items-center gap-6 z-20 shrink-0">
-            {isAuthenticated ? (
-              <Link href="/dashboard">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className={cn(
-                    "font-black text-[10px] uppercase tracking-widest p-0 h-auto underline decoration-primary/20 decoration-2 underline-offset-4",
-                    shouldShowBackground ? "text-muted-foreground hover:text-primary" : "text-white/80 hover:text-white"
-                  )}
-                >
-                  Dashboard
-                </Button>
-              </Link>
-            ) : (
-              <Link href="/login">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className={cn(
-                    "font-black text-[10px] uppercase tracking-widest p-0 h-auto underline decoration-primary/20 decoration-2 underline-offset-4",
-                    shouldShowBackground ? "text-muted-foreground hover:text-primary" : "text-white/80 hover:text-white"
-                  )}
-                >
-                  Sign In
-                </Button>
-              </Link>
-            )}
-            <Link href="/schedule-pickup">
-              <Button size="sm" className="h-12 px-8 rounded-2xl shadow-2xl hover:scale-105 transition-all">
-                Book Pickup
-              </Button>
             </Link>
           </div>
 
-          <div className="flex items-center gap-3 lg:hidden">
-            <button
+          {/* Center Section: Nav Links (Pill Style) */}
+          <nav aria-label="Primary navigation" className="hidden lg:flex items-center nav-menu px-1 py-1">
+            <div className="relative flex items-center gap-1">
+              {navLinks.map((link) => {
+                const isActive = location === link.path;
+                return (
+                  <Link
+                    key={link.name}
+                    href={link.path}
+                    className={cn(
+                      "nav-item text-[10px] font-black uppercase tracking-[0.2em] transition-all px-6 py-2.5 rounded-full relative liquid-glass-highlight",
+                      isActive ? "text-white" : "text-white/70 hover:text-white"
+                    )}
+                  >
+                    <motion.span 
+                      className="relative z-20 flex items-center justify-center"
+                      whileHover={{ scale: 1.1, x: 2, y: -1 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      {link.name}
+                    </motion.span>
+                    {isActive && (
+                      <motion.div
+                        layoutId="nav-liquid-indicator"
+                        className="nav-indicator absolute inset-0 w-full h-full"
+                        transition={{ 
+                          type: "spring", 
+                          stiffness: 350, 
+                          damping: 30,
+                          mass: 0.8
+                        }}
+                      />
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          </nav>
+
+          {/* Right Section: Actions */}
+          <div className="flex-1 flex items-center justify-end gap-6">
+            <Link 
+              href={isAuthenticated ? "/dashboard" : "/login"}
               className={cn(
-                "p-3 backdrop-blur-md rounded-2xl border transition-all duration-500 z-20",
-                shouldShowBackground 
-                  ? "bg-white/60 border-white/30 text-primary" 
-                  : "bg-brand-navy/20 border-white/20 text-white"
+                "hidden lg:block text-[10px] font-black uppercase tracking-[0.2em] transition-colors",
+                shouldShowBackground ? "text-slate-900" : "text-white/70 hover:text-white"
               )}
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
-              aria-expanded={mobileMenuOpen}
             >
-              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
+              {isAuthenticated ? "Dashboard" : "Sign In"}
+            </Link>
+            
+            <Link href="/schedule-pickup" className="hidden lg:block">
+              <Button size="sm" className="bg-primary hover:bg-primary/90 text-white rounded-full px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-primary/20">
+                Book Pickup
+              </Button>
+            </Link>
+
+            {/* Mobile Menu Toggle */}
+            <div className="lg:hidden flex items-center">
+              <button
+                className="menu-toggle p-4 z-20 active:scale-90 flex items-center justify-center text-white"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+                aria-expanded={mobileMenuOpen}
+              >
+                {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -150,38 +126,56 @@ export function Navbar() {
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: -20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: -20 }}
-            className="lg:hidden absolute top-[calc(100%+0.5rem)] inset-x-6 rounded-[3rem] border border-white/60 bg-white/95 backdrop-blur-3xl shadow-2xl p-10 z-50 overflow-hidden"
+            initial={{ opacity: 0, y: -20, x: "-50%" }}
+            animate={{ opacity: 1, y: 0, x: "-50%" }}
+            exit={{ opacity: 0, y: -20, x: "-50%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="menu-panel md:hidden"
           >
-            <div className="flex flex-col gap-3 relative z-10">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.name}
-                  href={link.path}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={cn(
-                    "px-8 py-5 rounded-[2rem] text-3xl font-black font-display transition-all flex items-center justify-between group",
-                    location === link.path ? "bg-primary/5 text-primary" : "text-muted-foreground"
-                  )}
-                >
-                  {link.name}
-                  <ArrowUpRight className={cn("w-6 h-6 transition-all", location === link.path ? "opacity-100" : "opacity-0 group-hover:opacity-100")} />
-                </Link>
-              ))}
-              <div className="h-px bg-black/5 my-6 mx-4" />
-              <div className="grid grid-cols-2 gap-4">
-                <Link href={isAuthenticated ? "/dashboard" : "/login"} onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="outline" className="w-full rounded-[2rem] h-20 text-xs font-black">
-                    {isAuthenticated ? "Dashboard" : "Account"}
-                  </Button>
-                </Link>
-                <Link href="/schedule-pickup" onClick={() => setMobileMenuOpen(false)}>
-                  <Button className="w-full rounded-[2rem] h-20 text-xs font-black">
-                    Book Now
-                  </Button>
-                </Link>
+            <div className="flex flex-col gap-2">
+              <button
+                className="menu-toggle self-end mb-4 text-black"
+                onClick={() => setMobileMenuOpen(false)}
+                aria-label="Close navigation menu"
+              >
+                <X size={24} />
+              </button>
+              <div className="flex flex-col gap-1 relative z-10">
+                {navLinks.map((link) => {
+                  const isActive = location === link.path;
+                  return (
+                    <Link
+                      key={link.name}
+                      href={link.path}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={cn(
+                        "px-6 py-4 rounded-2xl text-xl font-bold font-display transition-all flex items-center justify-between group touch-action-manipulation select-none active:scale-95",
+                        isActive ? "bg-primary/5 text-primary" : "text-slate-600 hover:text-slate-900"
+                      )}
+                    >
+                      <motion.div 
+                        className="flex items-center justify-between w-full"
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        {link.name}
+                        <ArrowUpRight className={cn("w-6 h-6 transition-all", isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100")} />
+                      </motion.div>
+                    </Link>
+                  );
+                })}
+                <div className="h-px bg-black/5 my-6 mx-4" />
+                <div className="grid grid-cols-2 gap-4">
+                  <Link href={isAuthenticated ? "/dashboard" : "/login"} onClick={() => setMobileMenuOpen(false)}>
+                    <Button variant="outline" className="w-full rounded-[2rem] h-20 text-xs font-black">
+                      {isAuthenticated ? "Dashboard" : "Account"}
+                    </Button>
+                  </Link>
+                  <Link href="/schedule-pickup" onClick={() => setMobileMenuOpen(false)}>
+                    <Button className="w-full rounded-[2rem] h-20 text-xs font-black">
+                      Book Now
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </div>
           </motion.div>

@@ -139,7 +139,7 @@ export default function Home() {
 
       {/* ─── HERO SECTION ─────────────────────────────────── */}
       {/* Updated with a more robust mobile-first flex layout and increased spacing */}
-      <section className="relative min-h-screen flex flex-col items-center justify-start overflow-hidden pt-44 pb-40 lg:pt-64 lg:pb-44">
+      <section className="relative min-h-screen flex flex-col items-center justify-start overflow-hidden pt-32 pb-40 lg:pt-56 lg:pb-44">
         {/* Optimized Video Background */}
         <div className="absolute inset-0 z-0">
           {!isMobile ? (

@@ -11,7 +11,7 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "primary", size = "md", isLoading, children, ...props }, ref) => {
-    const baseStyles = "inline-flex items-center justify-center rounded-2xl font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98] uppercase tracking-[0.18em] text-[11px]";
+    const baseStyles = "inline-flex items-center justify-center rounded-2xl font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50 active:scale-[0.95] active:brightness-110 active:shadow-inner uppercase tracking-[0.18em] text-[11px] touch-action-manipulation select-none cursor-pointer liquid-glass-highlight px-8 py-4 w-full md:w-auto";
     
     const variants = {
       primary: "bg-brand-gradient text-primary-foreground shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-1 transition-all duration-300",
@@ -37,9 +37,11 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       >
         {isLoading ? (
-          <span className="mr-3 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+          <span className="mr-3 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent relative z-20" />
         ) : null}
-        {children}
+        <span className="relative z-20 flex items-center justify-center gap-2">
+          {children}
+        </span>
       </button>
     );
   }
