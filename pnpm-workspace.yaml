@@ -1,6 +1,6 @@
 packages:
-  - frontend
-  - backend
+  - Frontend
+  - Backend
   - lib/*
 
 autoInstallPeers: false
