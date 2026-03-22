@@ -34,15 +34,15 @@ export function Navbar() {
   const shouldShowBackground = isScrolled || !isHomePage;
 
   return (
-    <header className={cn(
-      "fixed top-0 inset-x-0 z-50 transition-all duration-500 ease-out font-sans",
-      shouldShowBackground
-        ? "bg-white/95 lg:bg-white/80 lg:backdrop-blur-2xl border-b border-primary/10 py-4 shadow-[0_8px_30px_rgba(11,28,59,0.12)]"
-        : "bg-transparent py-8"
-    )}>
-      {/* Constrained navbar to match content width for alignment */}
-      <div className="container-wide">
-        <div className="flex items-center justify-between">
+    <header className="fixed top-2.5 md:top-6 inset-x-0 z-50 pointer-events-none px-4 md:px-8 pt-[env(safe-area-inset-top)]">
+      <div className="flex justify-center max-w-[1100px] mx-auto pointer-events-auto w-full">
+        <div className={cn(
+          "flex items-center justify-between w-full transition-all duration-500 ease-out font-sans",
+          "bg-white/5 backdrop-blur-md border border-white/10 rounded-[50px] shadow-[0_12px_40px_rgba(0,0,0,0.1)]",
+          shouldShowBackground
+            ? "py-3 px-8 mx-auto bg-white/10 border-white/20"
+            : "py-4 px-8 mx-auto bg-transparent"
+        )}>
 
           {/* Logo - Aligned with the start of content */}
           <Link href="/" className="flex items-center group relative overflow-hidden z-20 shrink-0">
@@ -131,7 +131,12 @@ export function Navbar() {
 
           <div className="flex items-center gap-3 lg:hidden">
             <button
-              className="p-3 bg-white/60 backdrop-blur-md rounded-2xl border border-white/30 shadow-sm text-white lg:hidden z-20"
+              className={cn(
+                "p-3 backdrop-blur-md rounded-2xl border transition-all duration-500 z-20",
+                shouldShowBackground 
+                  ? "bg-white/60 border-white/30 text-primary" 
+                  : "bg-brand-navy/20 border-white/20 text-white"
+              )}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
               aria-expanded={mobileMenuOpen}
@@ -142,7 +147,6 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Menu Overlay */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
@@ -189,7 +193,7 @@ export function Navbar() {
 
 export function Footer() {
   return (
-    <footer className="bg-[#0B1C3B] text-white pt-40 pb-28 md:pb-24 relative overflow-hidden border-t border-white/10 rounded-t-[4rem]">
+    <footer className="bg-[#0B1C3B] text-white pt-40 pb-28 relative overflow-hidden border-t border-white/5 rounded-t-[4rem]">
       {/* Texture overlay */}
       <div className="absolute inset-0 opacity-[0.06] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.6) 1.2px, transparent 1.2px)', backgroundSize: '48px 48px' }} />
       
@@ -356,36 +360,27 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   }, [pathname]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-background font-sans overflow-x-hidden relative isolate">
+    <div className="min-h-screen flex flex-col bg-transparent font-sans overflow-x-hidden relative isolate">
       <SteamCursor />
       <div className="fixed inset-0 -z-10">
-        <div className="absolute inset-0 page-backdrop" />
-        <div className="absolute inset-0 page-aurora animate-aurora opacity-70" />
-        <div className="absolute inset-0 page-fabric opacity-[0.4]" />
+        <div className="absolute inset-0 bg-transparent" />
+        <div className="absolute inset-0 page-fabric opacity-[0.2]" />
       </div>
       <Navbar />
-      <main className="flex-1 w-full pt-0 pb-32 lg:pb-0">{children}</main>
+      <main className="flex-1 w-full pt-16 lg:pt-0">{children}</main>
       <Footer />
       <a
         href="https://wa.me/919363059595?text=Hi%2C%20I%27d%20like%20to%20book%20a%20laundry%20pickup."
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Chat with Fab Clean on WhatsApp"
-        className="hidden lg:flex fixed right-4 bottom-8 z-50 w-14 h-14 rounded-full bg-[#25D366] text-white items-center justify-center shadow-2xl animate-whatsapp-pulse hover:scale-105 transition-transform"
+        className="fixed right-6 bottom-8 z-50 w-16 h-16 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-2xl animate-whatsapp-pulse hover:scale-110 active:scale-95 transition-all"
       >
-        <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32" aria-hidden="true">
           <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
           <path d="M12 0C5.374 0 0 5.373 0 12c0 2.117.554 4.103 1.527 5.836L.057 23.859l6.204-1.448A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.005-1.368l-.359-.214-3.72.869.9-3.61-.235-.375A9.818 9.818 0 0112 2.182c5.42 0 9.818 4.398 9.818 9.818S17.42 21.818 12 21.818z"/>
         </svg>
-        <span className="absolute right-full mr-3 px-4 py-2 rounded-full bg-white text-[#0B1C3B] text-[10px] font-black uppercase tracking-[0.2em] shadow-lg opacity-0 tooltip-delay lg:hidden">
-          Chat to book
-        </span>
       </a>
-      <div className="mobile-cta-bar lg:hidden">
-        <a href="tel:+919363059595" className="mobile-cta-call">Call</a>
-        <a href="https://wa.me/919363059595" className="mobile-cta-wa" target="_blank" rel="noopener noreferrer">WhatsApp</a>
-      </div>
-      <BottomTabBar />
     </div>
   );
 }

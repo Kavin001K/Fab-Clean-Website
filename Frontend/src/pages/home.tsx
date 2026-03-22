@@ -139,7 +139,7 @@ export default function Home() {
 
       {/* ─── HERO SECTION ─────────────────────────────────── */}
       {/* Updated with a more robust mobile-first flex layout and increased spacing */}
-      <section className="relative min-h-[100svh] flex flex-col items-center justify-start overflow-hidden pt-24 pb-40 lg:pt-56 lg:pb-44">
+      <section className="relative min-h-screen flex flex-col items-center justify-start overflow-hidden pt-44 pb-40 lg:pt-64 lg:pb-44">
         {/* Optimized Video Background */}
         <div className="absolute inset-0 z-0">
           {!isMobile ? (
@@ -171,21 +171,13 @@ export default function Home() {
             </picture>
           )}
           {/* High-End Glassmorphism Overlay - Optimized for maximum legibility */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/65 via-black/45 to-black/85" />
-          <div className="absolute inset-0 bg-background/10" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/70" />
         </div>
 
-        <div className="absolute top-0 inset-x-0 h-32 z-10 bg-gradient-to-b from-black/50 to-transparent pointer-events-none" />
+
 
         {/* Static gradient wash to replace animated blur blobs */}
-        <div
-          className="absolute inset-0 pointer-events-none hidden sm:block"
-          style={{
-            background:
-              "radial-gradient(ellipse 60% 50% at 90% 10%, hsla(87,54%,51%,0.12) 0%, transparent 60%)," +
-              "radial-gradient(ellipse 50% 40% at 10% 90%, hsla(215,91%,54%,0.10) 0%, transparent 60%)",
-          }}
-        />
+
         
         {/* Subtle grid for texture */}
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none z-[1]" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
@@ -200,7 +192,7 @@ export default function Home() {
               <FadeIn delay={0.1}>
                 {/* Scaled-down H1 for mobile-first balance */}
                 <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
-                  <h1 className="text-[2.6rem] sm:text-6xl lg:text-[5.5rem] xl:text-[6.5rem] font-black font-display text-white leading-[1.05] -tracking-tight">
+                  <h1 className="text-5xl sm:text-6xl lg:text-[5.5rem] xl:text-[6.5rem] font-black font-display text-white leading-[1.05] -tracking-tight">
                     <LiquidTextResponsive text="Revive Your" className="justify-center lg:justify-start" />
                     <div className="text-gradient drop-shadow-2xl font-serif italic liquid-hover flex justify-center lg:justify-start">
                       <LiquidTextResponsive text="Wardrobe." />
@@ -210,14 +202,14 @@ export default function Home() {
               </FadeIn>
 
               <FadeIn delay={0.2}>
-                <div className="text-lg sm:text-xl lg:text-2xl text-white/90 max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed drop-shadow-md liquid-hover flex justify-center lg:justify-start">
-                  <LiquidTextResponsive text="We don't just wash clothes; we preserve them. Pollachi's only scientific precision dry cleaning with premium eco-solvents." className="justify-center lg:justify-start" />
+                <div className="text-base sm:text-xl lg:text-2xl text-white/90 max-w-lg mx-auto lg:mx-0 font-medium leading-relaxed drop-shadow-md liquid-hover flex justify-center lg:justify-start">
+                  <LiquidTextResponsive text="We don't just wash clothes; we preserve them. Pollachi's only scientific precision care with eco-solvents." className="justify-center lg:justify-start" />
                 </div>
               </FadeIn>
 
-              <FadeIn delay={0.3} className="flex flex-col sm:flex-row gap-6 items-center lg:items-start justify-center lg:justify-start pt-8" role="group" aria-label="Primary actions">
+              <FadeIn delay={0.3} className="flex flex-col sm:flex-row gap-4 items-center lg:items-start justify-center lg:justify-start pt-4" role="group" aria-label="Primary actions">
                 <Link href="/schedule-pickup">
-                  <Button size="lg" className="w-full sm:w-auto min-w-[300px] shadow-3xl group transition-all h-24 bg-primary text-primary-foreground hover:scale-105 rounded-[2rem] text-xs font-black liquid-hover">
+                  <Button size="lg" className="w-full sm:w-auto min-w-[280px] shadow-3xl group transition-all h-20 bg-primary text-primary-foreground hover:scale-105 rounded-[2rem] text-xs font-black liquid-hover">
                     <span className="flex items-center">
                       <LiquidTextResponsive text="Schedule Free Pickup" />
                       <ArrowRight className="ml-3 w-6 h-6 group-hover:translate-x-2 transition-transform" />
@@ -225,20 +217,20 @@ export default function Home() {
                   </Button>
                 </Link>
                 <Link href="/services">
-                  <Button size="lg" variant="outline" className="w-full sm:w-auto min-w-[240px] bg-white/5 border-white/20 text-white/90 h-24 backdrop-blur-md hover:bg-white/10 rounded-[2rem] text-xs font-black liquid-hover">
+                  <Button size="lg" variant="outline" className="w-full sm:w-auto min-w-[200px] bg-white/5 border-white/20 text-white/90 h-20 backdrop-blur-md hover:bg-white/10 rounded-[2rem] text-xs font-black liquid-hover">
                     <LiquidTextResponsive text="See All Services" />
                   </Button>
                 </Link>
               </FadeIn>
 
-              <FadeIn delay={0.4} className="flex flex-wrap items-center justify-center lg:justify-start gap-12 mt-20 opacity-60">
+              <FadeIn delay={0.4} className="flex flex-wrap items-center justify-center lg:justify-start gap-8 mt-16 opacity-60 px-4">
                 {[
                   { icon: MapPin, label: "Free 3km Hub" },
                   { icon: Clock, label: "48h Promised" },
                   { icon: CheckCircle2, label: "Eco-Solvent" },
                 ].map(({ icon: Icon, label }) => (
-                  <div key={label} className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-white/80">
-                    <Icon className="w-6 h-6 text-primary" />
+                  <div key={label} className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-white/80">
+                    <Icon className="w-5 h-5 text-primary" />
                     {label}
                   </div>
                 ))}
@@ -270,15 +262,15 @@ export default function Home() {
                 
                 {/* Floating Metric - Balanced position */}
                 <div
-                  className="absolute -bottom-4 -left-8 lg:-left-20 bg-white/92 backdrop-blur-2xl shadow-4xl rounded-[2.5rem] p-8 border border-white/50 flex items-center gap-6 z-20 hover:scale-105 transition-transform cursor-pointer"
+                  className="absolute -bottom-2 -left-4 lg:-left-20 bg-white/92 backdrop-blur-2xl shadow-4xl rounded-[2.5rem] p-6 border border-white/50 flex items-center gap-4 z-20 hover:scale-105 transition-transform cursor-pointer"
                   style={{ animation: "float-badge 6s ease-in-out infinite", willChange: "transform" }}
                 >
-                  <div className="w-14 h-14 rounded-[1.2rem] bg-lime-gradient flex items-center justify-center shadow-lg shadow-primary/30">
-                    <CheckCircle2 className="w-6 h-6 text-white" />
+                  <div className="w-12 h-12 rounded-[1.2rem] bg-lime-gradient flex items-center justify-center shadow-lg shadow-primary/30">
+                    <CheckCircle2 className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <div className="text-[9px] uppercase font-black tracking-[0.4em] text-muted-foreground/60 mb-1 leading-none">Delivered</div>
-                    <div className="text-3xl font-black text-foreground tabular-nums tracking-tighter leading-none">50,000<span className="text-primary text-xs ml-0.5">+</span></div>
+                    <div className="text-[8px] uppercase font-black tracking-[0.3em] text-muted-foreground/60 mb-0.5 leading-none">Delivered</div>
+                    <div className="text-2xl font-black text-foreground tabular-nums tracking-tighter leading-none">50,000<span className="text-primary text-[10px] ml-0.5">+</span></div>
                   </div>
                 </div>
               </FadeIn>
