@@ -235,7 +235,7 @@ export default function CookiesPage() {
             
 
             {/* Hero Section */}
-            <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-foreground py-10 md:py-16">
+            <div className="bg-transparent text-foreground py-10 md:py-16">
                 <div className="max-w-5xl mx-auto px-4 md:px-6 text-center">
                     <h1 className="text-3xl md:text-5xl font-bold mb-3 md:mb-4">Cookie Policy</h1>
                     <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto">
