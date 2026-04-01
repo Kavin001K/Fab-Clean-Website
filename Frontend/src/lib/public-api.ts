@@ -62,12 +62,10 @@ export type FeedbackLookupResponse = {
   orderId: string;
   orderNumber: string;
   customerName?: string;
-  customerPhone?: string;
   status: string;
   existingReview?: {
     id: string;
     customer_name?: string | null;
-    customer_phone?: string | null;
     rating: number;
     feedback: string | null;
     feedback_source?: string | null;
@@ -83,7 +81,6 @@ export type FeedbackSubmitResponse = {
   orderId: string;
   orderNumber: string;
   customerName?: string | null;
-  customerPhone?: string | null;
   reviewId: string;
   reviewCreatedAt?: string;
   insight: {
