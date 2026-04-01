@@ -73,9 +73,14 @@ router.get("/orders/track/by-id/:identifier", async (req, res) => {
     });
   } catch (err) {
     req.log.error(err, "Failed to track order by identifier");
+    const message = err instanceof Error ? err.message : "Failed to fetch order status";
     res.status(500).json({
       success: false,
-      error: { code: "INTERNAL_ERROR", message: "Failed to fetch order status" },
+      error: {
+        code: "INTERNAL_ERROR",
+        message: "Failed to fetch order status",
+        details: process.env["NODE_ENV"] === "production" ? undefined : message,
+      },
     });
   }
 });

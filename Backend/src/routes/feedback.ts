@@ -37,9 +37,14 @@ router.get("/feedback/order/:identifier", async (req, res) => {
     });
   } catch (err) {
     req.log.error(err, "Failed to load feedback order");
+    const message = err instanceof Error ? err.message : "Failed to load order for feedback";
     res.status(500).json({
       success: false,
-      error: { code: "INTERNAL_ERROR", message: "Failed to load order for feedback" },
+      error: {
+        code: "INTERNAL_ERROR",
+        message: "Failed to load order for feedback",
+        details: process.env["NODE_ENV"] === "production" ? undefined : message,
+      },
     });
   }
 });
@@ -136,9 +141,14 @@ router.post("/feedback/submit", async (req, res) => {
     });
   } catch (err) {
     req.log.error(err, "Failed to submit feedback");
+    const message = err instanceof Error ? err.message : "Failed to submit feedback";
     res.status(500).json({
       success: false,
-      error: { code: "INTERNAL_ERROR", message: "Failed to submit feedback" },
+      error: {
+        code: "INTERNAL_ERROR",
+        message: "Failed to submit feedback",
+        details: process.env["NODE_ENV"] === "production" ? undefined : message,
+      },
     });
   }
 });
