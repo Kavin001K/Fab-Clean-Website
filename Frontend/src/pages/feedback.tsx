@@ -1,91 +1,75 @@
-import { useMemo, useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "wouter";
+import { useGetFeedbackContext, useSubmitFeedback } from "@workspace/api-client-react";
 import { AppLayout } from "@/components/layout";
 import { SEO } from "@/components/seo";
 import { Badge, Button, Card, FadeIn, SectionHeading } from "@/components/ui";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  apiFetch,
-  GOOGLE_REVIEW_URL,
-  type FeedbackContext,
-} from "@/lib/customer-experience";
+import { GOOGLE_REVIEW_URL } from "@/lib/customer-experience";
 import { cn, formatCurrency } from "@/lib/utils";
 import { ArrowRight, CheckCircle2, Loader2, MessageCircleHeart, Star } from "lucide-react";
 
-type FeedbackContextResponse = {
-  success: boolean;
-  data: FeedbackContext;
-};
-
-type FeedbackSubmitResponse = {
-  success: boolean;
-  data: {
-    orderId: string;
-    orderNumber: string;
-    rating: number;
-    comment: string | null;
-    feedbackSubmittedAt: string;
-    googleReviewEligible: boolean;
-  };
-};
-
 export default function FeedbackPage() {
-  const orderNumber = useMemo(
-    () => new URLSearchParams(window.location.search).get("orderNumber") || "",
-    []
-  );
+  const searchParams = useMemo(() => new URLSearchParams(window.location.search), []);
+  const orderId = searchParams.get("orderId") || "";
+  const orderNumber = searchParams.get("orderNumber") || "";
   const [rating, setRating] = useState<number>(0);
   const [comment, setComment] = useState("");
   const [showGooglePrompt, setShowGooglePrompt] = useState(false);
-  const [submission, setSubmission] = useState<FeedbackSubmitResponse["data"] | null>(null);
+  const [submission, setSubmission] = useState<{
+    orderId: string;
+    orderNumber: string;
+    rating: number;
+    comment?: string | null;
+    feedbackSubmittedAt: string;
+    googleReviewEligible: boolean;
+  } | null>(null);
 
-  const feedbackQuery = useQuery({
-    queryKey: ["feedback-context", orderNumber],
-    queryFn: () =>
-      apiFetch<FeedbackContextResponse>(`/api/feedback/context?orderNumber=${encodeURIComponent(orderNumber)}`).then(
-        (response) => response.data
-      ),
-    enabled: Boolean(orderNumber),
-    retry: false,
-  });
-
-  const submitMutation = useMutation({
-    mutationFn: async () => {
-      const metadata = {
-        userAgent: navigator.userAgent,
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        clientTimestamp: new Date().toISOString(),
-      };
-
-      return apiFetch<FeedbackSubmitResponse>(
-        "/api/feedback",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            orderNumber,
-            rating,
-            comment,
-            metadata,
-          }),
-        }
-      );
+  const feedbackQuery = useGetFeedbackContext(
+    {
+      orderId: orderId || undefined,
+      orderNumber: orderNumber || undefined,
     },
-    onSuccess: (result) => {
-      setSubmission(result.data);
-      setShowGooglePrompt(result.data.googleReviewEligible);
+    {
+      query: {
+        enabled: Boolean(orderId || orderNumber),
+        retry: false,
+      } as any,
+    }
+  );
+
+  const submitMutation = useSubmitFeedback({
+    mutation: {
+      onSuccess: (result) => {
+        setSubmission(result.data);
+        setShowGooglePrompt(result.data.googleReviewEligible);
+      },
     },
   });
 
-  const context = feedbackQuery.data;
+  const context = feedbackQuery.data?.data || null;
+  const canonicalQuery = useMemo(() => {
+    const params = new URLSearchParams();
+    if (orderId) params.set("orderId", orderId);
+    else if (orderNumber) params.set("orderNumber", orderNumber);
+
+    const value = params.toString();
+    return value ? `?${value}` : "";
+  }, [orderId, orderNumber]);
+
+  useEffect(() => {
+    if (!context || submission) return;
+    setRating(context.existingFeedback.rating || 0);
+    setComment(context.existingFeedback.comment || "");
+  }, [context, submission]);
 
   return (
     <AppLayout>
       <SEO
         title="Share Feedback | Fab Clean"
         description="Tell Fab Clean how your order went and help us improve every pickup, clean, and delivery."
-        canonical={`https://myfabclean.com/feedback${orderNumber ? `?orderNumber=${encodeURIComponent(orderNumber)}` : ""}`}
+        canonical={`https://myfabclean.com/feedback${canonicalQuery}`}
       />
 
       <section className="relative overflow-hidden pt-36 pb-28">
@@ -113,11 +97,12 @@ export default function FeedbackPage() {
             </div>
           </FadeIn>
 
-          {!orderNumber ? (
+          {!orderId && !orderNumber ? (
             <Card className="rounded-[3rem] bg-white/90 p-10 text-center">
-              <h3 className="text-3xl font-black text-foreground">Missing order number</h3>
+              <h3 className="text-3xl font-black text-foreground">Missing order reference</h3>
               <p className="mt-4 text-muted-foreground">
-                Open the feedback link from WhatsApp or add <code>?orderNumber=...</code> to continue.
+                Open the feedback link from WhatsApp or add <code>?orderId=...</code> or{" "}
+                <code>?orderNumber=...</code> to continue.
               </p>
             </Card>
           ) : null}
@@ -197,7 +182,21 @@ export default function FeedbackPage() {
                     className="min-w-[220px]"
                     disabled={rating < 1}
                     isLoading={submitMutation.isPending}
-                    onClick={() => submitMutation.mutate()}
+                    onClick={() =>
+                      submitMutation.mutate({
+                        data: {
+                          orderId: orderId || undefined,
+                          orderNumber: orderNumber || undefined,
+                          rating,
+                          comment,
+                          metadata: {
+                            userAgent: navigator.userAgent,
+                            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                            clientTimestamp: new Date().toISOString(),
+                          },
+                        },
+                      })
+                    }
                   >
                     Submit Feedback
                     <ArrowRight className="h-4 w-4" />

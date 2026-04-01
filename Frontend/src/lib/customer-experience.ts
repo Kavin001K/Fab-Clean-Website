@@ -1,107 +1,14 @@
-export const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
+import type { PortalOrder, TrackingStep } from "@workspace/api-client-react";
+
 export const GOOGLE_REVIEW_URL = import.meta.env.VITE_GOOGLE_REVIEW_URL || "";
 
-export interface PortalOrderItem {
-  serviceName: string;
-  quantity: number;
-  price: number;
-}
-
-export interface TrackingStep {
-  key: string;
-  label: string;
-  completed: boolean;
-  current: boolean;
-}
-
-export interface PortalOrder {
-  id: string;
-  orderNumber: string;
-  reference: string;
-  status: string;
-  paymentStatus: string;
-  totalAmount: number | null;
-  services: string[];
-  items: PortalOrderItem[];
-  branch: string;
-  fulfillmentType: string;
-  scheduledDate: string | null;
-  createdAt: string;
-  updatedAt: string | null;
-  pickupDate: string | null;
-  invoiceUrl: string | null;
-  lastWhatsappStatus: string | null;
-  lastWhatsappSentAt: string | null;
-  customerName: string | null;
-  customerPhone: string | null;
-  customerEmail: string | null;
-  customerRating: number | null;
-  feedbackComment: string | null;
-  feedbackSubmittedAt: string | null;
-  steps?: TrackingStep[];
-}
-
-export interface PublicReview {
-  id: string;
-  rating: number;
-  comment: string | null;
-  isTopRating: boolean;
-  isBestRating: boolean;
-  curationScore: number | null;
-  curationReason: string | null;
-  aiProvider: string | null;
-  aiModel: string | null;
-  createdAt: string;
-  customerName: string;
-  location: string;
-  orderNumber: string | null;
-}
-
-export interface FeedbackContext {
-  id: string;
-  orderNumber: string;
-  customerName: string | null;
-  status: string;
-  fulfillmentType: string;
-  totalAmount: number | null;
-  items: PortalOrderItem[];
-  existingFeedback: {
-    rating: number | null;
-    comment: string | null;
-    submittedAt: string | null;
-  };
-}
-
-function getStoredToken() {
-  return localStorage.getItem("fabclean_token");
-}
-
-export async function apiFetch<T>(
-  path: string,
-  init: RequestInit = {},
-  options: { auth?: boolean } = {}
-): Promise<T> {
-  const headers = new Headers(init.headers || {});
-  headers.set("Content-Type", "application/json");
-
-  if (options.auth) {
-    const token = getStoredToken();
-    if (token) headers.set("Authorization", `Bearer ${token}`);
-  }
-
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...init,
-    headers,
-  });
-
-  const json = await response.json().catch(() => null);
-  if (!response.ok) {
-    const message = json?.error?.message || json?.message || "Request failed";
-    throw new Error(message);
-  }
-
-  return json as T;
-}
+export type {
+  FeedbackContext,
+  PortalOrder,
+  PortalOrderItem,
+  PublicReview,
+  TrackingStep,
+} from "@workspace/api-client-react";
 
 export function getOrderStatusLabel(status: string) {
   const labels: Record<string, string> = {

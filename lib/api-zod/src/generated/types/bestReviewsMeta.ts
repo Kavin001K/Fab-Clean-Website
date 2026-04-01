@@ -6,7 +6,8 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type TrackOrderParams = {
-  phone: string;
-  ref: string;
-};
+export interface BestReviewsMeta {
+  page: number;
+  pageSize: number;
+  hasMore: boolean;
+}

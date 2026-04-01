@@ -9,7 +9,8 @@
 export interface UserProfile {
   id: string;
   phone: string;
-  name?: string;
-  email?: string;
-  createdAt?: Date;
+  name?: string | null;
+  email?: string | null;
+  isActive?: boolean;
+  createdAt?: Date | null;
 }

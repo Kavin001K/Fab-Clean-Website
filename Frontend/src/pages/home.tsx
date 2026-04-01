@@ -1,11 +1,11 @@
 import { Link } from "wouter";
 import { SEO } from "@/components/seo";
 import { motion } from "framer-motion";
+import { useListTopReviews } from "@workspace/api-client-react";
 import { AppLayout } from "@/components/layout";
 import { Button, SectionHeading, FadeIn, Card } from "@/components/ui";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useQuery } from "@tanstack/react-query";
-import { apiFetch, type PublicReview } from "@/lib/customer-experience";
+import { type PublicReview } from "@/lib/customer-experience";
 import {
   CheckCircle2, Clock, MapPin, Star,
   Shirt, Briefcase, Zap, ArrowRight, Phone
@@ -28,9 +28,10 @@ const fallbackTestimonials: PublicReview[] = [
 
 export default function Home() {
   const isMobile = useIsMobile();
-  const topReviewsQuery = useQuery({
-    queryKey: ["home-top-reviews"],
-    queryFn: () => apiFetch<{ success: boolean; data: PublicReview[] }>("/api/reviews/top"),
+  const topReviewsQuery = useListTopReviews({
+    query: {
+      retry: false,
+    } as any,
   });
   const testimonials = topReviewsQuery.data?.data?.length ? topReviewsQuery.data.data : fallbackTestimonials;
 

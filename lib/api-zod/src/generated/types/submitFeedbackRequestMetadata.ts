@@ -5,9 +5,5 @@
  * Fab Clean API specification
  * OpenAPI spec version: 0.1.0
  */
-import type { PortalOrder } from "./portalOrder";
 
-export interface OrderDetailResponse {
-  success: boolean;
-  data: PortalOrder;
-}
+export type SubmitFeedbackRequestMetadata = { [key: string]: unknown };

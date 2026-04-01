@@ -18,14 +18,18 @@ import type {
 
 import type {
   AuthResponse,
+  BestReviewsResponse,
   ContactRequest,
   ErrorResponse,
+  FeedbackContextResponse,
+  GetFeedbackContextParams,
   HealthStatus,
+  ListBestReviewsParams,
   OrderDetailResponse,
-  OrderTrackResponse,
   OrdersResponse,
   PricingResponse,
   ProfileResponse,
+  PublicTrackOrderResponse,
   RefreshResponse,
   SchedulePickupRequest,
   SchedulePickupResponse,
@@ -33,8 +37,10 @@ import type {
   SendOtpResponse,
   ServiceDetailResponse,
   ServicesResponse,
+  SubmitFeedbackRequest,
+  SubmitFeedbackResponse,
   SuccessResponse,
-  TrackOrderParams,
+  TopReviewsResponse,
   UpdateProfileRequest,
   VerifyOtpRequest,
 } from "./api.schemas";
@@ -867,7 +873,7 @@ export const useLogout = <
 };
 
 /**
- * @summary List user orders
+ * @summary List portal user orders
  */
 export const getListOrdersUrl = () => {
   return `/api/orders`;
@@ -918,7 +924,7 @@ export type ListOrdersQueryResult = NonNullable<
 export type ListOrdersQueryError = ErrorType<unknown>;
 
 /**
- * @summary List user orders
+ * @summary List portal user orders
  */
 
 export function useListOrders<
@@ -942,7 +948,7 @@ export function useListOrders<
 }
 
 /**
- * @summary Get order by ID
+ * @summary Get portal order by ID
  */
 export const getGetOrderUrl = (id: string) => {
   return `/api/orders/${id}`;
@@ -1000,7 +1006,7 @@ export type GetOrderQueryResult = NonNullable<
 export type GetOrderQueryError = ErrorType<ErrorResponse>;
 
 /**
- * @summary Get order by ID
+ * @summary Get portal order by ID
  */
 
 export function useGetOrder<
@@ -1027,9 +1033,101 @@ export function useGetOrder<
 }
 
 /**
- * @summary Track order by phone and reference
+ * @summary Track an ERP order by order number
  */
-export const getTrackOrderUrl = (params: TrackOrderParams) => {
+export const getGetPublicTrackOrderUrl = (orderNumber: string) => {
+  return `/api/track/${orderNumber}`;
+};
+
+export const getPublicTrackOrder = async (
+  orderNumber: string,
+  options?: RequestInit,
+): Promise<PublicTrackOrderResponse> => {
+  return customFetch<PublicTrackOrderResponse>(
+    getGetPublicTrackOrderUrl(orderNumber),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+export const getGetPublicTrackOrderQueryKey = (orderNumber: string) => {
+  return [`/api/track/${orderNumber}`] as const;
+};
+
+export const getGetPublicTrackOrderQueryOptions = <
+  TData = Awaited<ReturnType<typeof getPublicTrackOrder>>,
+  TError = ErrorType<ErrorResponse>,
+>(
+  orderNumber: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getPublicTrackOrder>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetPublicTrackOrderQueryKey(orderNumber);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getPublicTrackOrder>>
+  > = ({ signal }) =>
+    getPublicTrackOrder(orderNumber, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!orderNumber,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getPublicTrackOrder>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetPublicTrackOrderQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getPublicTrackOrder>>
+>;
+export type GetPublicTrackOrderQueryError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Track an ERP order by order number
+ */
+
+export function useGetPublicTrackOrder<
+  TData = Awaited<ReturnType<typeof getPublicTrackOrder>>,
+  TError = ErrorType<ErrorResponse>,
+>(
+  orderNumber: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getPublicTrackOrder>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetPublicTrackOrderQueryOptions(orderNumber, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Load feedback context for an ERP order
+ */
+export const getGetFeedbackContextUrl = (params?: GetFeedbackContextParams) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
@@ -1041,32 +1139,37 @@ export const getTrackOrderUrl = (params: TrackOrderParams) => {
   const stringifiedParams = normalizedParams.toString();
 
   return stringifiedParams.length > 0
-    ? `/api/orders/track?${stringifiedParams}`
-    : `/api/orders/track`;
+    ? `/api/feedback/context?${stringifiedParams}`
+    : `/api/feedback/context`;
 };
 
-export const trackOrder = async (
-  params: TrackOrderParams,
+export const getFeedbackContext = async (
+  params?: GetFeedbackContextParams,
   options?: RequestInit,
-): Promise<OrderTrackResponse> => {
-  return customFetch<OrderTrackResponse>(getTrackOrderUrl(params), {
-    ...options,
-    method: "GET",
-  });
+): Promise<FeedbackContextResponse> => {
+  return customFetch<FeedbackContextResponse>(
+    getGetFeedbackContextUrl(params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
 };
 
-export const getTrackOrderQueryKey = (params?: TrackOrderParams) => {
-  return [`/api/orders/track`, ...(params ? [params] : [])] as const;
+export const getGetFeedbackContextQueryKey = (
+  params?: GetFeedbackContextParams,
+) => {
+  return [`/api/feedback/context`, ...(params ? [params] : [])] as const;
 };
 
-export const getTrackOrderQueryOptions = <
-  TData = Awaited<ReturnType<typeof trackOrder>>,
+export const getGetFeedbackContextQueryOptions = <
+  TData = Awaited<ReturnType<typeof getFeedbackContext>>,
   TError = ErrorType<ErrorResponse>,
 >(
-  params: TrackOrderParams,
+  params?: GetFeedbackContextParams,
   options?: {
     query?: UseQueryOptions<
-      Awaited<ReturnType<typeof trackOrder>>,
+      Awaited<ReturnType<typeof getFeedbackContext>>,
       TError,
       TData
     >;
@@ -1075,43 +1178,299 @@ export const getTrackOrderQueryOptions = <
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getTrackOrderQueryKey(params);
+  const queryKey =
+    queryOptions?.queryKey ?? getGetFeedbackContextQueryKey(params);
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof trackOrder>>> = ({
-    signal,
-  }) => trackOrder(params, { signal, ...requestOptions });
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getFeedbackContext>>
+  > = ({ signal }) => getFeedbackContext(params, { signal, ...requestOptions });
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof trackOrder>>,
+    Awaited<ReturnType<typeof getFeedbackContext>>,
     TError,
     TData
   > & { queryKey: QueryKey };
 };
 
-export type TrackOrderQueryResult = NonNullable<
-  Awaited<ReturnType<typeof trackOrder>>
+export type GetFeedbackContextQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getFeedbackContext>>
 >;
-export type TrackOrderQueryError = ErrorType<ErrorResponse>;
+export type GetFeedbackContextQueryError = ErrorType<ErrorResponse>;
 
 /**
- * @summary Track order by phone and reference
+ * @summary Load feedback context for an ERP order
  */
 
-export function useTrackOrder<
-  TData = Awaited<ReturnType<typeof trackOrder>>,
+export function useGetFeedbackContext<
+  TData = Awaited<ReturnType<typeof getFeedbackContext>>,
   TError = ErrorType<ErrorResponse>,
 >(
-  params: TrackOrderParams,
+  params?: GetFeedbackContextParams,
   options?: {
     query?: UseQueryOptions<
-      Awaited<ReturnType<typeof trackOrder>>,
+      Awaited<ReturnType<typeof getFeedbackContext>>,
       TError,
       TData
     >;
     request?: SecondParameter<typeof customFetch>;
   },
 ): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getTrackOrderQueryOptions(params, options);
+  const queryOptions = getGetFeedbackContextQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Submit or update ERP-backed order feedback
+ */
+export const getSubmitFeedbackUrl = () => {
+  return `/api/feedback`;
+};
+
+export const submitFeedback = async (
+  submitFeedbackRequest: SubmitFeedbackRequest,
+  options?: RequestInit,
+): Promise<SubmitFeedbackResponse> => {
+  return customFetch<SubmitFeedbackResponse>(getSubmitFeedbackUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(submitFeedbackRequest),
+  });
+};
+
+export const getSubmitFeedbackMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof submitFeedback>>,
+    TError,
+    { data: BodyType<SubmitFeedbackRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof submitFeedback>>,
+  TError,
+  { data: BodyType<SubmitFeedbackRequest> },
+  TContext
+> => {
+  const mutationKey = ["submitFeedback"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof submitFeedback>>,
+    { data: BodyType<SubmitFeedbackRequest> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return submitFeedback(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SubmitFeedbackMutationResult = NonNullable<
+  Awaited<ReturnType<typeof submitFeedback>>
+>;
+export type SubmitFeedbackMutationBody = BodyType<SubmitFeedbackRequest>;
+export type SubmitFeedbackMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Submit or update ERP-backed order feedback
+ */
+export const useSubmitFeedback = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof submitFeedback>>,
+    TError,
+    { data: BodyType<SubmitFeedbackRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof submitFeedback>>,
+  TError,
+  { data: BodyType<SubmitFeedbackRequest> },
+  TContext
+> => {
+  return useMutation(getSubmitFeedbackMutationOptions(options));
+};
+
+/**
+ * @summary List homepage top reviews
+ */
+export const getListTopReviewsUrl = () => {
+  return `/api/reviews/top`;
+};
+
+export const listTopReviews = async (
+  options?: RequestInit,
+): Promise<TopReviewsResponse> => {
+  return customFetch<TopReviewsResponse>(getListTopReviewsUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getListTopReviewsQueryKey = () => {
+  return [`/api/reviews/top`] as const;
+};
+
+export const getListTopReviewsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listTopReviews>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof listTopReviews>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListTopReviewsQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listTopReviews>>> = ({
+    signal,
+  }) => listTopReviews({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listTopReviews>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListTopReviewsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listTopReviews>>
+>;
+export type ListTopReviewsQueryError = ErrorType<unknown>;
+
+/**
+ * @summary List homepage top reviews
+ */
+
+export function useListTopReviews<
+  TData = Awaited<ReturnType<typeof listTopReviews>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof listTopReviews>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListTopReviewsQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary List paginated best reviews
+ */
+export const getListBestReviewsUrl = (params?: ListBestReviewsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/reviews/best?${stringifiedParams}`
+    : `/api/reviews/best`;
+};
+
+export const listBestReviews = async (
+  params?: ListBestReviewsParams,
+  options?: RequestInit,
+): Promise<BestReviewsResponse> => {
+  return customFetch<BestReviewsResponse>(getListBestReviewsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getListBestReviewsQueryKey = (params?: ListBestReviewsParams) => {
+  return [`/api/reviews/best`, ...(params ? [params] : [])] as const;
+};
+
+export const getListBestReviewsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listBestReviews>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: ListBestReviewsParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listBestReviews>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListBestReviewsQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listBestReviews>>> = ({
+    signal,
+  }) => listBestReviews(params, { signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listBestReviews>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListBestReviewsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listBestReviews>>
+>;
+export type ListBestReviewsQueryError = ErrorType<unknown>;
+
+/**
+ * @summary List paginated best reviews
+ */
+
+export function useListBestReviews<
+  TData = Awaited<ReturnType<typeof listBestReviews>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: ListBestReviewsParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listBestReviews>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListBestReviewsQueryOptions(params, options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
     queryKey: QueryKey;

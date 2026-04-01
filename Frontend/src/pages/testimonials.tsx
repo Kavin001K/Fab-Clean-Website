@@ -1,37 +1,42 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { useListBestReviews } from "@workspace/api-client-react";
 import { AppLayout } from "@/components/layout";
 import { SEO } from "@/components/seo";
 import { Badge, Button, Card, FadeIn, SectionHeading } from "@/components/ui";
-import {
-  apiFetch,
-  formatReviewDate,
-  type PublicReview,
-} from "@/lib/customer-experience";
+import { formatReviewDate, type PublicReview } from "@/lib/customer-experience";
 import { Star } from "lucide-react";
-
-type BestReviewsResponse = {
-  success: boolean;
-  data: PublicReview[];
-  meta: {
-    page: number;
-    pageSize: number;
-    hasMore: boolean;
-  };
-};
 
 export default function TestimonialsPage() {
   const [page, setPage] = useState(1);
+  const [reviews, setReviews] = useState<PublicReview[]>([]);
 
-  const reviewsQuery = useQuery({
-    queryKey: ["best-reviews", page],
-    queryFn: () =>
-      apiFetch<BestReviewsResponse>(`/api/reviews/best?page=${page}&pageSize=12`),
-  });
+  const reviewsQuery = useListBestReviews(
+    { page, pageSize: 12 },
+    {
+      query: {
+        placeholderData: (previousData: any) => previousData,
+      } as any,
+    }
+  );
 
-  const reviews = reviewsQuery.data?.data || [];
+  useEffect(() => {
+    const pageReviews = reviewsQuery.data?.data;
+    if (!pageReviews) return;
+
+    setReviews((current) => {
+      if (page === 1) {
+        return pageReviews;
+      }
+
+      const existingIds = new Set(current.map((review) => review.id));
+      return [...current, ...pageReviews.filter((review) => !existingIds.has(review.id))];
+    });
+  }, [page, reviewsQuery.data]);
+
   const hasMore = reviewsQuery.data?.meta?.hasMore || false;
+  const isInitialLoading = reviewsQuery.isLoading && page === 1 && reviews.length === 0;
+  const hasReviews = reviews.length > 0;
 
   return (
     <AppLayout>
@@ -55,10 +60,11 @@ export default function TestimonialsPage() {
             className="mb-12"
           />
           <p className="mx-auto mb-16 max-w-2xl text-center text-lg text-muted-foreground">
-            These reviews are curated from real ERP-linked customer feedback and updated for the website automatically.
+            These reviews are curated from real ERP-linked customer feedback and updated for the
+            website automatically.
           </p>
 
-          {reviewsQuery.isLoading ? (
+          {isInitialLoading ? (
             <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
               {Array.from({ length: 6 }).map((_, index) => (
                 <Card key={index} className="rounded-[3rem] bg-white/88 p-8">
@@ -66,7 +72,7 @@ export default function TestimonialsPage() {
                 </Card>
               ))}
             </div>
-          ) : (
+          ) : hasReviews ? (
             <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
               {reviews.map((review, index) => (
                 <FadeIn key={review.id} delay={index * 0.04}>
@@ -84,7 +90,7 @@ export default function TestimonialsPage() {
                       ))}
                     </div>
                     <p className="text-2xl font-serif italic leading-[1.45] text-foreground">
-                      “{review.comment || "Fab Clean delivered a great experience."}”
+                      "{review.comment || "Fab Clean delivered a great experience."}"
                     </p>
                     <div className="mt-10 flex items-center justify-between gap-4">
                       <div>
@@ -101,6 +107,13 @@ export default function TestimonialsPage() {
                 </FadeIn>
               ))}
             </div>
+          ) : (
+            <Card className="rounded-[3rem] bg-white/90 p-10 text-center">
+              <h3 className="text-3xl font-black text-foreground">No curated reviews are live yet</h3>
+              <p className="mt-4 text-muted-foreground">
+                Positive ERP-linked feedback will start appearing here as soon as curation completes.
+              </p>
+            </Card>
           )}
 
           <motion.div
@@ -110,7 +123,11 @@ export default function TestimonialsPage() {
             className="mt-16 flex justify-center"
           >
             {hasMore ? (
-              <Button size="lg" onClick={() => setPage((current) => current + 1)} isLoading={reviewsQuery.isFetching}>
+              <Button
+                size="lg"
+                onClick={() => setPage((current) => current + 1)}
+                isLoading={reviewsQuery.isFetching}
+              >
                 Load More Reviews
               </Button>
             ) : (

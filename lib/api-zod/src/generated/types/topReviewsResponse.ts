@@ -5,9 +5,9 @@
  * Fab Clean API specification
  * OpenAPI spec version: 0.1.0
  */
-import type { OrderTrackResponseData } from "./orderTrackResponseData";
+import type { PublicReview } from "./publicReview";
 
-export interface OrderTrackResponse {
+export interface TopReviewsResponse {
   success: boolean;
-  data: OrderTrackResponseData;
+  data: PublicReview[];
 }

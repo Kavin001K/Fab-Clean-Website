@@ -5,9 +5,9 @@
  * Fab Clean API specification
  * OpenAPI spec version: 0.1.0
  */
-import type { Order } from "./order";
+import type { PortalOrder } from "./portalOrder";
 
 export interface OrdersResponse {
   success: boolean;
-  data: Order[];
+  data: PortalOrder[];
 }

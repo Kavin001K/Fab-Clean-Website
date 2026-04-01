@@ -1,18 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useRoute } from "wouter";
-import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
+import { useGetPublicTrackOrder } from "@workspace/api-client-react";
 import { AppLayout } from "@/components/layout";
 import { SEO } from "@/components/seo";
 import { Badge, Button, Card, FadeIn, Input, SectionHeading } from "@/components/ui";
 import { cn, formatCurrency } from "@/lib/utils";
 import {
-  apiFetch,
   buildTrackingSteps,
   getOrderStatusLabel,
   getOrderStatusTone,
-  type PortalOrder,
-  type TrackingStep,
 } from "@/lib/customer-experience";
 import {
   ArrowRight,
@@ -29,11 +26,6 @@ import {
   Truck,
 } from "lucide-react";
 
-type TrackOrderResponse = {
-  success: boolean;
-  data: PortalOrder & { steps?: TrackingStep[] };
-};
-
 const stepIcons = [Package2, Shirt, Truck, CheckCircle2];
 
 export default function TrackOrderPage() {
@@ -48,17 +40,13 @@ export default function TrackOrderPage() {
     }
   }, [params?.orderNumber]);
 
-  const orderQuery = useQuery({
-    queryKey: ["public-track-order", activeOrderNumber],
-    queryFn: () =>
-      apiFetch<TrackOrderResponse>(`/api/track/${encodeURIComponent(activeOrderNumber)}`).then(
-        (response) => response.data
-      ),
-    enabled: Boolean(activeOrderNumber),
-    retry: false,
+  const orderQuery = useGetPublicTrackOrder(activeOrderNumber, {
+    query: {
+      retry: false,
+    } as any,
   });
 
-  const order = orderQuery.data || null;
+  const order = orderQuery.data?.data || null;
   const steps = useMemo(
     () => (order ? order.steps || buildTrackingSteps(order) : []),
     [order]
@@ -330,7 +318,7 @@ export default function TrackOrderPage() {
                             Invoice
                           </Button>
                         ) : null}
-                        <Link href={`/feedback?orderNumber=${encodeURIComponent(order.orderNumber)}`}>
+                        <Link href={`/feedback?orderId=${encodeURIComponent(order.id)}`}>
                           <Button className="h-14 rounded-[1.5rem]">
                             <MessageCircle className="h-4 w-4" />
                             Leave Feedback

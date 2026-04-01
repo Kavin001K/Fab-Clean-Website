@@ -5,9 +5,9 @@
  * Fab Clean API specification
  * OpenAPI spec version: 0.1.0
  */
-import type { PortalOrder } from "./portalOrder";
+import type { PublicTrackOrder } from "./publicTrackOrder";
 
-export interface OrderDetailResponse {
+export interface PublicTrackOrderResponse {
   success: boolean;
-  data: PortalOrder;
+  data: PublicTrackOrder;
 }

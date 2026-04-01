@@ -6,8 +6,8 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { PortalOrder } from "./portalOrder";
+import type { TrackingStep } from "./trackingStep";
 
-export interface OrderDetailResponse {
-  success: boolean;
-  data: PortalOrder;
-}
+export type PublicTrackOrder = PortalOrder & {
+  steps: TrackingStep[];
+};

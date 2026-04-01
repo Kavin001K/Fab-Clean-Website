@@ -133,15 +133,16 @@ export interface VerifyOtpRequest {
 export interface UserProfile {
   id: string;
   phone: string;
-  name?: string;
-  email?: string;
-  createdAt?: string;
+  name?: string | null;
+  email?: string | null;
+  isActive?: boolean;
+  createdAt?: string | null;
 }
 
 export type AuthResponseData = {
   accessToken: string;
   isNewUser: boolean;
-  user?: UserProfile;
+  user: UserProfile;
 };
 
 export interface AuthResponse {
@@ -168,58 +169,199 @@ export interface UpdateProfileRequest {
   email?: string;
 }
 
-export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];
+export interface PortalOrderItem {
+  serviceName: string;
+  quantity: number;
+  price: number;
+}
 
-export const OrderStatus = {
-  received: "received",
-  sorting: "sorting",
-  cleaning: "cleaning",
-  quality_check: "quality_check",
-  ready: "ready",
+export interface TrackingStep {
+  key: string;
+  label: string;
+  completed: boolean;
+  current: boolean;
+}
+
+export type PortalOrderStatus =
+  (typeof PortalOrderStatus)[keyof typeof PortalOrderStatus];
+
+export const PortalOrderStatus = {
+  pending: "pending",
+  processing: "processing",
+  ready_for_pickup: "ready_for_pickup",
   out_for_delivery: "out_for_delivery",
+  completed: "completed",
   delivered: "delivered",
+  in_store: "in_store",
+  ready: "ready",
+  cancelled: "cancelled",
 } as const;
 
-export interface Order {
+export type PortalOrderFulfillmentType =
+  (typeof PortalOrderFulfillmentType)[keyof typeof PortalOrderFulfillmentType];
+
+export const PortalOrderFulfillmentType = {
+  pickup: "pickup",
+  delivery: "delivery",
+} as const;
+
+export interface PortalOrder {
   id: string;
+  orderNumber: string;
   reference: string;
-  status: OrderStatus;
+  status: PortalOrderStatus;
+  paymentStatus: string;
+  totalAmount?: number | null;
   services: string[];
+  items: PortalOrderItem[];
   branch: string;
-  scheduledDate?: string;
+  fulfillmentType: PortalOrderFulfillmentType;
+  scheduledDate?: string | null;
   createdAt: string;
-  totalAmount?: number;
+  updatedAt?: string | null;
+  pickupDate?: string | null;
+  invoiceUrl?: string | null;
+  lastWhatsappStatus?: string | null;
+  lastWhatsappSentAt?: string | null;
+  customerName?: string | null;
+  customerPhone?: string | null;
+  customerEmail?: string | null;
+  /**
+   * @minimum 1
+   * @maximum 5
+   */
+  customerRating?: number | null;
+  feedbackComment?: string | null;
+  feedbackSubmittedAt?: string | null;
 }
 
 export interface OrdersResponse {
   success: boolean;
-  data: Order[];
+  data: PortalOrder[];
 }
 
 export interface OrderDetailResponse {
   success: boolean;
-  data: Order;
+  data: PortalOrder;
 }
 
-export type OrderTrackResponseDataStagesItem = {
-  stage: string;
-  label: string;
-  completed: boolean;
-  timestamp?: string;
+export type PublicTrackOrder = PortalOrder & {
+  steps: TrackingStep[];
 };
 
-export type OrderTrackResponseData = {
-  reference: string;
-  status: string;
-  stages: OrderTrackResponseDataStagesItem[];
-};
-
-export interface OrderTrackResponse {
+export interface PublicTrackOrderResponse {
   success: boolean;
-  data: OrderTrackResponseData;
+  data: PublicTrackOrder;
 }
 
-export type TrackOrderParams = {
-  phone: string;
-  ref: string;
+export interface ExistingFeedback {
+  /**
+   * @minimum 1
+   * @maximum 5
+   */
+  rating: number | null;
+  comment: string | null;
+  submittedAt: string | null;
+}
+
+export type FeedbackContextFulfillmentType =
+  (typeof FeedbackContextFulfillmentType)[keyof typeof FeedbackContextFulfillmentType];
+
+export const FeedbackContextFulfillmentType = {
+  pickup: "pickup",
+  delivery: "delivery",
+} as const;
+
+export interface FeedbackContext {
+  id: string;
+  orderNumber: string;
+  customerName?: string | null;
+  status: string;
+  fulfillmentType: FeedbackContextFulfillmentType;
+  totalAmount?: number | null;
+  items: PortalOrderItem[];
+  existingFeedback: ExistingFeedback;
+}
+
+export interface FeedbackContextResponse {
+  success: boolean;
+  data: FeedbackContext;
+}
+
+export type SubmitFeedbackRequestMetadata = { [key: string]: unknown };
+
+export interface SubmitFeedbackRequest {
+  orderId?: string;
+  orderNumber?: string;
+  /**
+   * @minimum 1
+   * @maximum 5
+   */
+  rating: number;
+  comment?: string | null;
+  metadata?: SubmitFeedbackRequestMetadata;
+}
+
+export interface FeedbackSubmission {
+  orderId: string;
+  orderNumber: string;
+  rating: number;
+  comment?: string | null;
+  feedbackSubmittedAt: string;
+  googleReviewEligible: boolean;
+}
+
+export interface SubmitFeedbackResponse {
+  success: boolean;
+  data: FeedbackSubmission;
+}
+
+export interface PublicReview {
+  id: string;
+  rating: number;
+  comment?: string | null;
+  isTopRating: boolean;
+  isBestRating: boolean;
+  curationScore?: number | null;
+  curationReason?: string | null;
+  aiProvider?: string | null;
+  aiModel?: string | null;
+  createdAt: string;
+  customerName: string;
+  location: string;
+  orderNumber?: string | null;
+}
+
+export interface TopReviewsResponse {
+  success: boolean;
+  data: PublicReview[];
+}
+
+export interface BestReviewsMeta {
+  page: number;
+  pageSize: number;
+  hasMore: boolean;
+}
+
+export interface BestReviewsResponse {
+  success: boolean;
+  data: PublicReview[];
+  meta: BestReviewsMeta;
+}
+
+export type GetFeedbackContextParams = {
+  orderId?: string;
+  orderNumber?: string;
+};
+
+export type ListBestReviewsParams = {
+  /**
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * @minimum 1
+   * @maximum 50
+   */
+  pageSize?: number;
 };

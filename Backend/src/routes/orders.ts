@@ -21,7 +21,8 @@ router.get("/orders", requirePortalAuth, async (req, res) => {
 router.get("/orders/:id", requirePortalAuth, async (req, res) => {
   try {
     const user = (req as any).portalUser;
-    const order = await getPortalOrderById(req.params.id, user.phone);
+    const orderId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const order = await getPortalOrderById(orderId, user.phone);
 
     if (!order) {
       res.status(404).json({

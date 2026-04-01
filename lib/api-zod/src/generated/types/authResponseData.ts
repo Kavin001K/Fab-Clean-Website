@@ -10,5 +10,5 @@ import type { UserProfile } from "./userProfile";
 export type AuthResponseData = {
   accessToken: string;
   isNewUser: boolean;
-  user?: UserProfile;
+  user: UserProfile;
 };

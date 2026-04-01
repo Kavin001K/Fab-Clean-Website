@@ -5,9 +5,9 @@
  * Fab Clean API specification
  * OpenAPI spec version: 0.1.0
  */
-import type { PortalOrder } from "./portalOrder";
+import type { FeedbackContext } from "./feedbackContext";
 
-export interface OrderDetailResponse {
+export interface FeedbackContextResponse {
   success: boolean;
-  data: PortalOrder;
+  data: FeedbackContext;
 }

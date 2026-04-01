@@ -160,7 +160,7 @@ function mapOrderRow(row: any): PortalOrder {
     createdAt: row.created_at,
     updatedAt: row.updated_at || null,
     pickupDate: row.pickup_date || null,
-    invoiceUrl: row.invoice_url || null,
+    invoiceUrl: row.invoice_url || row.resolved_invoice_url || null,
     lastWhatsappStatus: row.last_whatsapp_status || null,
     lastWhatsappSentAt: row.last_whatsapp_sent_at || null,
     customerName: row.customer_name || null,
@@ -169,6 +169,38 @@ function mapOrderRow(row: any): PortalOrder {
     customerRating: toNumber(row.customer_rating),
     feedbackComment: row.feedback_comment || null,
     feedbackSubmittedAt: row.feedback_submitted_at || null,
+  };
+}
+
+async function resolveInvoiceUrl(order: PortalOrder): Promise<PortalOrder> {
+  if (order.invoiceUrl || !order.orderNumber) return order;
+
+  const { rows } = await pool.query(
+    `
+      select file_url, filepath, metadata
+      from documents
+      where type = 'invoice'
+        and (
+          order_number = $1
+          or metadata ->> 'orderNumber' = $1
+          or metadata ->> 'orderId' = $2
+        )
+      order by created_at desc nulls last
+      limit 1
+    `,
+    [order.orderNumber, order.id]
+  );
+
+  const document = rows[0];
+  const invoiceUrl =
+    document?.file_url ||
+    (typeof document?.filepath === "string" && document.filepath.trim().length > 0
+      ? document.filepath
+      : null);
+
+  return {
+    ...order,
+    invoiceUrl: invoiceUrl || null,
   };
 }
 
@@ -198,7 +230,26 @@ export async function findOrderByOrderNumber(orderNumber: string): Promise<Porta
     [normalized]
   );
 
-  return rows[0] ? mapOrderRow(rows[0]) : null;
+  if (!rows[0]) return null;
+  return resolveInvoiceUrl(mapOrderRow(rows[0]));
+}
+
+export async function findOrderById(id: string): Promise<PortalOrder | null> {
+  const normalized = String(id || "").trim();
+  if (!normalized) return null;
+
+  const { rows } = await pool.query(
+    `
+      select *
+      from orders
+      where id = $1
+      limit 1
+    `,
+    [normalized]
+  );
+
+  if (!rows[0]) return null;
+  return resolveInvoiceUrl(mapOrderRow(rows[0]));
 }
 
 export async function listOrdersForPortalPhone(phone: string): Promise<PortalOrder[]> {
@@ -233,16 +284,20 @@ export async function getPortalOrderById(id: string, phone: string): Promise<Por
     [id, normalizedPhone]
   );
 
-  return rows[0] ? mapOrderRow(rows[0]) : null;
+  if (!rows[0]) return null;
+  return resolveInvoiceUrl(mapOrderRow(rows[0]));
 }
 
 export async function updateOrderFeedback(input: {
-  orderNumber: string;
+  orderId?: string;
+  orderNumber?: string;
   rating: number;
   comment?: string | null;
   metadata?: Record<string, unknown> | null;
 }) {
-  const order = await findOrderByOrderNumber(input.orderNumber);
+  const order = input.orderId
+    ? await findOrderById(input.orderId)
+    : await findOrderByOrderNumber(input.orderNumber ?? "");
   if (!order) return null;
 
   const { rows } = await pool.query(
@@ -309,7 +364,9 @@ export async function listPublicReviews(options: {
       where ${filter}
       order by
         pwr.curation_score desc nulls last,
-        pwr.created_at desc
+        pwr.rating desc,
+        pwr.created_at desc,
+        pwr.id asc
       ${limitClause}
     `,
     params

@@ -1,5 +1,6 @@
 import { Router, type IRouter } from "express";
 import {
+  findOrderById,
   buildTrackingSteps,
   findOrderByOrderNumber,
   listPublicReviews,
@@ -7,31 +8,6 @@ import {
 } from "../lib/erp-data.js";
 
 const router: IRouter = Router();
-const REVIEW_CURATION_WEBHOOK_URL = process.env.REVIEW_CURATION_WEBHOOK_URL;
-const REVIEW_CURATION_WEBHOOK_SECRET = process.env.REVIEW_CURATION_WEBHOOK_SECRET;
-
-async function triggerReviewCuration(orderId: string, orderNumber: string) {
-  if (!REVIEW_CURATION_WEBHOOK_URL) return;
-
-  try {
-    await fetch(REVIEW_CURATION_WEBHOOK_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(REVIEW_CURATION_WEBHOOK_SECRET
-          ? { Authorization: `Bearer ${REVIEW_CURATION_WEBHOOK_SECRET}` }
-          : {}),
-      },
-      body: JSON.stringify({
-        orderId,
-        orderNumber,
-        source: "website-feedback",
-      }),
-    });
-  } catch {
-    // Non-blocking: feedback save should succeed even if curation trigger fails.
-  }
-}
 
 router.get("/track/:orderNumber", async (req, res) => {
   try {
@@ -65,7 +41,11 @@ router.get("/feedback/context", async (req, res) => {
   try {
     const orderNumber =
       typeof req.query.orderNumber === "string" ? req.query.orderNumber : "";
-    const order = await findOrderByOrderNumber(orderNumber);
+    const orderId =
+      typeof req.query.orderId === "string" ? req.query.orderId : "";
+    const order = orderId
+      ? await findOrderById(orderId)
+      : await findOrderByOrderNumber(orderNumber);
 
     if (!order) {
       res.status(404).json({
@@ -103,6 +83,7 @@ router.get("/feedback/context", async (req, res) => {
 
 router.post("/feedback", async (req, res) => {
   try {
+    const orderId = String(req.body?.orderId || "").trim();
     const orderNumber = String(req.body?.orderNumber || "").trim();
     const rating = Number(req.body?.rating);
     const comment =
@@ -112,18 +93,19 @@ router.post("/feedback", async (req, res) => {
         ? req.body.metadata
         : {};
 
-    if (!orderNumber || !Number.isFinite(rating) || rating < 1 || rating > 5) {
+    if ((!orderId && !orderNumber) || !Number.isFinite(rating) || rating < 1 || rating > 5) {
       res.status(400).json({
         success: false,
         error: {
           code: "VALIDATION_ERROR",
-          message: "orderNumber and a rating between 1 and 5 are required",
+          message: "orderId or orderNumber and a rating between 1 and 5 are required",
         },
       });
       return;
     }
 
     const updatedOrder = await updateOrderFeedback({
+      orderId,
       orderNumber,
       rating,
       comment,
@@ -136,12 +118,6 @@ router.post("/feedback", async (req, res) => {
         error: { code: "NOT_FOUND", message: "Order not found" },
       });
       return;
-    }
-
-    if (rating >= 4 && comment) {
-      setImmediate(() => {
-        void triggerReviewCuration(updatedOrder.id, updatedOrder.orderNumber);
-      });
     }
 
     res.json({

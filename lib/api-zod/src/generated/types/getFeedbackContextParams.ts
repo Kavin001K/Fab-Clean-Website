@@ -6,9 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type OrderTrackResponseDataStagesItem = {
-  stage: string;
-  label: string;
-  completed: boolean;
-  timestamp?: Date;
+export type GetFeedbackContextParams = {
+  orderId?: string;
+  orderNumber?: string;
 };

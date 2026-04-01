@@ -10,11 +10,13 @@ export const contactsTable = pgTable("contacts", {
   subject: text("subject"),
   message: text("message").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
 export const insertContactSchema = createInsertSchema(contactsTable).omit({
   id: true,
   createdAt: true,
+  updatedAt: true,
 });
 
 export type InsertContact = z.infer<typeof insertContactSchema>;

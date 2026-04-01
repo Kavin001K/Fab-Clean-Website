@@ -1,15 +1,13 @@
 import { Switch, Route, Link, useLocation } from "wouter";
-import { useQuery } from "@tanstack/react-query";
+import { useGetOrder, useListOrders } from "@workspace/api-client-react";
 import { AppLayout } from "@/components/layout";
 import { useRequireAuth } from "@/hooks/use-auth";
 import { Card, Button, Badge, FadeIn } from "@/components/ui";
 import { useAuth } from "@/hooks/use-auth";
 import {
-  apiFetch,
   buildTrackingSteps,
   getOrderStatusLabel,
   getOrderStatusTone,
-  type PortalOrder,
 } from "@/lib/customer-experience";
 import {
   ArrowUpRight,
@@ -22,16 +20,6 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn, formatCurrency } from "@/lib/utils";
-
-type OrdersResponse = {
-  success: boolean;
-  data: PortalOrder[];
-};
-
-type OrderResponse = {
-  success: boolean;
-  data: PortalOrder;
-};
 
 function Sidebar() {
   const [location] = useLocation();
@@ -70,9 +58,10 @@ function Sidebar() {
 }
 
 function OrdersList() {
-  const ordersQuery = useQuery({
-    queryKey: ["portal-orders"],
-    queryFn: () => apiFetch<OrdersResponse>("/api/orders", {}, { auth: true }).then((response) => response.data),
+  const ordersQuery = useListOrders({
+    query: {
+      retry: false,
+    } as any,
   });
 
   if (ordersQuery.isLoading) {
@@ -83,7 +72,7 @@ function OrdersList() {
     );
   }
 
-  const orders = ordersQuery.data || [];
+  const orders = ordersQuery.data?.data || [];
 
   if (!orders.length) {
     return (
@@ -134,10 +123,11 @@ function OrdersList() {
 }
 
 function OrderTrack({ id }: { id: string }) {
-  const orderQuery = useQuery({
-    queryKey: ["portal-order", id],
-    queryFn: () => apiFetch<OrderResponse>(`/api/orders/${id}`, {}, { auth: true }).then((response) => response.data),
-    enabled: Boolean(id),
+  const orderQuery = useGetOrder(id, {
+    query: {
+      enabled: Boolean(id),
+      retry: false,
+    } as any,
   });
 
   if (orderQuery.isLoading) {
@@ -148,7 +138,7 @@ function OrderTrack({ id }: { id: string }) {
     );
   }
 
-  const order = orderQuery.data;
+  const order = orderQuery.data?.data;
 
   if (!order) {
     return <div>Order not found.</div>;
@@ -219,7 +209,9 @@ function OrderTrack({ id }: { id: string }) {
             </div>
             <div className="flex justify-between gap-4">
               <span>Payment Status</span>
-              <span className="text-white font-semibold capitalize">{order.paymentStatus}</span>
+              <span className="text-white font-semibold capitalize">
+                {order.paymentStatus.replace(/_/g, " ")}
+              </span>
             </div>
             <div className="flex justify-between gap-4">
               <span>Total</span>
@@ -238,7 +230,36 @@ function OrderTrack({ id }: { id: string }) {
                 {order.customerPhone || "Unavailable"}
               </span>
             </div>
+            <div className="flex justify-between gap-4">
+              <span>WhatsApp Status</span>
+              <span className="text-white font-semibold capitalize">
+                {order.lastWhatsappStatus ? order.lastWhatsappStatus.replace(/_/g, " ") : "Not available"}
+              </span>
+            </div>
           </div>
+
+          <div className="mt-6 flex flex-wrap gap-3">
+            {order.invoiceUrl ? (
+              <Button
+                variant="outline"
+                onClick={() => window.open(order.invoiceUrl!, "_blank", "noopener,noreferrer")}
+              >
+                Open Invoice
+                <ArrowUpRight className="h-4 w-4" />
+              </Button>
+            ) : null}
+            <Link href={`/feedback?orderId=${encodeURIComponent(order.id)}`}>
+              <Button variant="outline">Update Feedback</Button>
+            </Link>
+          </div>
+
+          {order.feedbackSubmittedAt ? (
+            <div className="mt-6 rounded-[1.6rem] border border-emerald-200 bg-emerald-50/70 px-4 py-4 text-sm text-emerald-800">
+              Feedback saved on {format(new Date(order.feedbackSubmittedAt), "MMM dd, yyyy hh:mm a")}
+              {order.customerRating ? ` • ${order.customerRating}/5 stars` : ""}
+              {order.feedbackComment ? ` • ${order.feedbackComment}` : ""}
+            </div>
+          ) : null}
         </Card>
 
         <Card className="p-8">

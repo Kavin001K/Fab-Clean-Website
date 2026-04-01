@@ -20,7 +20,13 @@ tags:
   - name: auth
     description: Authentication
   - name: orders
-    description: Order management
+    description: Authenticated customer portal orders
+  - name: tracking
+    description: Public ERP-backed order tracking
+  - name: feedback
+    description: Public ERP-backed order feedback
+  - name: reviews
+    description: Curated public reviews
 paths:
   /healthz:
     get:
@@ -228,7 +234,7 @@ paths:
     get:
       operationId: listOrders
       tags: [orders]
-      summary: List user orders
+      summary: List portal user orders
       security:
         - bearerAuth: []
       responses:
@@ -243,7 +249,7 @@ paths:
     get:
       operationId: getOrder
       tags: [orders]
-      summary: Get order by ID
+      summary: Get portal order by ID
       security:
         - bearerAuth: []
       parameters:
@@ -266,29 +272,24 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
-  /orders/track:
+  /track/{orderNumber}:
     get:
-      operationId: trackOrder
-      tags: [orders]
-      summary: Track order by phone and reference
+      operationId: getPublicTrackOrder
+      tags: [tracking]
+      summary: Track an ERP order by order number
       parameters:
-        - name: phone
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: ref
-          in: query
+        - name: orderNumber
+          in: path
           required: true
           schema:
             type: string
       responses:
         "200":
-          description: Order tracking info
+          description: ERP-backed order tracking data
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OrderTrackResponse"
+                $ref: "#/components/schemas/PublicTrackOrderResponse"
         "404":
           description: Order not found
           content:
@@ -296,10 +297,111 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /feedback/context:
+    get:
+      operationId: getFeedbackContext
+      tags: [feedback]
+      summary: Load feedback context for an ERP order
+      parameters:
+        - name: orderId
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: orderNumber
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Feedback context loaded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FeedbackContextResponse"
+        "404":
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /feedback:
+    post:
+      operationId: submitFeedback
+      tags: [feedback]
+      summary: Submit or update ERP-backed order feedback
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubmitFeedbackRequest"
+      responses:
+        "200":
+          description: Feedback submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmitFeedbackResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /reviews/top:
+    get:
+      operationId: listTopReviews
+      tags: [reviews]
+      summary: List homepage top reviews
+      responses:
+        "200":
+          description: Curated top reviews
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TopReviewsResponse"
+
+  /reviews/best:
+    get:
+      operationId: listBestReviews
+      tags: [reviews]
+      summary: List paginated best reviews
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 12
+      responses:
+        "200":
+          description: Paginated best reviews
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BestReviewsResponse"
+
   /users/profile:
     get:
       operationId: getProfile
-      tags: [orders]
+      tags: [auth]
       summary: Get user profile
       security:
         - bearerAuth: []
@@ -312,7 +414,7 @@ paths:
                 $ref: "#/components/schemas/ProfileResponse"
     patch:
       operationId: updateProfile
-      tags: [orders]
+      tags: [auth]
       summary: Update user profile
       security:
         - bearerAuth: []
@@ -343,8 +445,7 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
     ErrorResponse:
       type: object
@@ -358,12 +459,8 @@ components:
               type: string
             message:
               type: string
-          required:
-            - code
-            - message
-      required:
-        - success
-        - error
+          required: [code, message]
+      required: [success, error]
 
     SuccessResponse:
       type: object
@@ -372,8 +469,7 @@ components:
           type: boolean
         message:
           type: string
-      required:
-        - success
+      required: [success]
 
     Service:
       type: object
@@ -418,9 +514,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Service"
-      required:
-        - success
-        - data
+      required: [success, data]
 
     ServiceDetailResponse:
       type: object
@@ -429,9 +523,7 @@ components:
           type: boolean
         data:
           $ref: "#/components/schemas/Service"
-      required:
-        - success
-        - data
+      required: [success, data]
 
     PricingItem:
       type: object
@@ -444,9 +536,7 @@ components:
           type: number
         unit:
           type: string
-      required:
-        - item
-        - price
+      required: [item, price]
 
     PricingCategory:
       type: object
@@ -457,9 +547,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/PricingItem"
-      required:
-        - category
-        - items
+      required: [category, items]
 
     PricingResponse:
       type: object
@@ -470,9 +558,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/PricingCategory"
-      required:
-        - success
-        - data
+      required: [success, data]
 
     SchedulePickupRequest:
       type: object
@@ -523,12 +609,8 @@ components:
               type: string
             message:
               type: string
-          required:
-            - bookingReference
-            - message
-      required:
-        - success
-        - data
+          required: [bookingReference, message]
+      required: [success, data]
 
     ContactRequest:
       type: object
@@ -544,18 +626,14 @@ components:
           type: string
         message:
           type: string
-      required:
-        - name
-        - email
-        - message
+      required: [name, email, message]
 
     SendOtpRequest:
       type: object
       properties:
         phone:
           type: string
-      required:
-        - phone
+      required: [phone]
 
     SendOtpResponse:
       type: object
@@ -569,12 +647,8 @@ components:
               type: string
             expiresIn:
               type: number
-          required:
-            - message
-            - expiresIn
-      required:
-        - success
-        - data
+          required: [message, expiresIn]
+      required: [success, data]
 
     VerifyOtpRequest:
       type: object
@@ -583,9 +657,7 @@ components:
           type: string
         otp:
           type: string
-      required:
-        - phone
-        - otp
+      required: [phone, otp]
 
     AuthResponse:
       type: object
@@ -601,12 +673,8 @@ components:
               type: boolean
             user:
               $ref: "#/components/schemas/UserProfile"
-          required:
-            - accessToken
-            - isNewUser
-      required:
-        - success
-        - data
+          required: [accessToken, isNewUser, user]
+      required: [success, data]
 
     RefreshResponse:
       type: object
@@ -618,11 +686,8 @@ components:
           properties:
             accessToken:
               type: string
-          required:
-            - accessToken
-      required:
-        - success
-        - data
+          required: [accessToken]
+      required: [success, data]
 
     UserProfile:
       type: object
@@ -633,14 +698,17 @@ components:
           type: string
         name:
           type: string
+          nullable: true
         email:
           type: string
+          nullable: true
+        isActive:
+          type: boolean
         createdAt:
           type: string
           format: date-time
-      required:
-        - id
-        - phone
+          nullable: true
+      required: [id, phone]
 
     ProfileResponse:
       type: object
@@ -649,9 +717,7 @@ components:
           type: boolean
         data:
           $ref: "#/components/schemas/UserProfile"
-      required:
-        - success
-        - data
+      required: [success, data]
 
     UpdateProfileRequest:
       type: object
@@ -662,36 +728,125 @@ components:
           type: string
           format: email
 
-    Order:
+    PortalOrderItem:
+      type: object
+      properties:
+        serviceName:
+          type: string
+        quantity:
+          type: integer
+        price:
+          type: number
+      required: [serviceName, quantity, price]
+
+    TrackingStep:
+      type: object
+      properties:
+        key:
+          type: string
+        label:
+          type: string
+        completed:
+          type: boolean
+        current:
+          type: boolean
+      required: [key, label, completed, current]
+
+    PortalOrder:
       type: object
       properties:
         id:
+          type: string
+        orderNumber:
           type: string
         reference:
           type: string
         status:
           type: string
-          enum: [received, sorting, cleaning, quality_check, ready, out_for_delivery, delivered]
+          enum:
+            - pending
+            - processing
+            - ready_for_pickup
+            - out_for_delivery
+            - completed
+            - delivered
+            - in_store
+            - ready
+            - cancelled
+        paymentStatus:
+          type: string
+        totalAmount:
+          type: number
+          nullable: true
         services:
           type: array
           items:
             type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/PortalOrderItem"
         branch:
           type: string
+        fulfillmentType:
+          type: string
+          enum: [pickup, delivery]
         scheduledDate:
           type: string
           format: date-time
+          nullable: true
         createdAt:
           type: string
           format: date-time
-        totalAmount:
-          type: number
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+        pickupDate:
+          type: string
+          format: date-time
+          nullable: true
+        invoiceUrl:
+          type: string
+          nullable: true
+        lastWhatsappStatus:
+          type: string
+          nullable: true
+        lastWhatsappSentAt:
+          type: string
+          format: date-time
+          nullable: true
+        customerName:
+          type: string
+          nullable: true
+        customerPhone:
+          type: string
+          nullable: true
+        customerEmail:
+          type: string
+          nullable: true
+        customerRating:
+          type: integer
+          minimum: 1
+          maximum: 5
+          nullable: true
+        feedbackComment:
+          type: string
+          nullable: true
+        feedbackSubmittedAt:
+          type: string
+          format: date-time
+          nullable: true
       required:
         - id
+        - orderNumber
         - reference
         - status
+        - paymentStatus
         - services
+        - items
         - branch
+        - fulfillmentType
         - createdAt
 
     OrdersResponse:
@@ -702,10 +857,8 @@ components:
         data:
           type: array
           items:
-            $ref: "#/components/schemas/Order"
-      required:
-        - success
-        - data
+            $ref: "#/components/schemas/PortalOrder"
+      required: [success, data]
 
     OrderDetailResponse:
       type: object
@@ -713,45 +866,215 @@ components:
         success:
           type: boolean
         data:
-          $ref: "#/components/schemas/Order"
-      required:
-        - success
-        - data
+          $ref: "#/components/schemas/PortalOrder"
+      required: [success, data]
 
-    OrderTrackResponse:
+    PublicTrackOrder:
+      allOf:
+        - $ref: "#/components/schemas/PortalOrder"
+        - type: object
+          properties:
+            steps:
+              type: array
+              items:
+                $ref: "#/components/schemas/TrackingStep"
+          required: [steps]
+
+    PublicTrackOrderResponse:
       type: object
       properties:
         success:
           type: boolean
         data:
-          type: object
-          properties:
-            reference:
-              type: string
-            status:
-              type: string
-            stages:
-              type: array
-              items:
-                type: object
-                properties:
-                  stage:
-                    type: string
-                  label:
-                    type: string
-                  completed:
-                    type: boolean
-                  timestamp:
-                    type: string
-                    format: date-time
-                required:
-                  - stage
-                  - label
-                  - completed
-          required:
-            - reference
-            - status
-            - stages
+          $ref: "#/components/schemas/PublicTrackOrder"
+      required: [success, data]
+
+    ExistingFeedback:
+      type: object
+      properties:
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+          nullable: true
+        comment:
+          type: string
+          nullable: true
+        submittedAt:
+          type: string
+          format: date-time
+          nullable: true
+      required: [rating, comment, submittedAt]
+
+    FeedbackContext:
+      type: object
+      properties:
+        id:
+          type: string
+        orderNumber:
+          type: string
+        customerName:
+          type: string
+          nullable: true
+        status:
+          type: string
+        fulfillmentType:
+          type: string
+          enum: [pickup, delivery]
+        totalAmount:
+          type: number
+          nullable: true
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/PortalOrderItem"
+        existingFeedback:
+          $ref: "#/components/schemas/ExistingFeedback"
       required:
-        - success
-        - data
+        - id
+        - orderNumber
+        - status
+        - fulfillmentType
+        - items
+        - existingFeedback
+
+    FeedbackContextResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: "#/components/schemas/FeedbackContext"
+      required: [success, data]
+
+    SubmitFeedbackRequest:
+      type: object
+      properties:
+        orderId:
+          type: string
+        orderNumber:
+          type: string
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        comment:
+          type: string
+          nullable: true
+        metadata:
+          type: object
+          additionalProperties: true
+      required: [rating]
+
+    FeedbackSubmission:
+      type: object
+      properties:
+        orderId:
+          type: string
+        orderNumber:
+          type: string
+        rating:
+          type: integer
+        comment:
+          type: string
+          nullable: true
+        feedbackSubmittedAt:
+          type: string
+          format: date-time
+        googleReviewEligible:
+          type: boolean
+      required:
+        - orderId
+        - orderNumber
+        - rating
+        - feedbackSubmittedAt
+        - googleReviewEligible
+
+    SubmitFeedbackResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: "#/components/schemas/FeedbackSubmission"
+      required: [success, data]
+
+    PublicReview:
+      type: object
+      properties:
+        id:
+          type: string
+        rating:
+          type: integer
+        comment:
+          type: string
+          nullable: true
+        isTopRating:
+          type: boolean
+        isBestRating:
+          type: boolean
+        curationScore:
+          type: number
+          nullable: true
+        curationReason:
+          type: string
+          nullable: true
+        aiProvider:
+          type: string
+          nullable: true
+        aiModel:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        customerName:
+          type: string
+        location:
+          type: string
+        orderNumber:
+          type: string
+          nullable: true
+      required:
+        - id
+        - rating
+        - isTopRating
+        - isBestRating
+        - createdAt
+        - customerName
+        - location
+
+    TopReviewsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/PublicReview"
+      required: [success, data]
+
+    BestReviewsMeta:
+      type: object
+      properties:
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        hasMore:
+          type: boolean
+      required: [page, pageSize, hasMore]
+
+    BestReviewsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/PublicReview"
+        meta:
+          $ref: "#/components/schemas/BestReviewsMeta"
+      required: [success, data, meta]

@@ -136,15 +136,14 @@ export const VerifyOtpResponse = zod.object({
   data: zod.object({
     accessToken: zod.string(),
     isNewUser: zod.boolean(),
-    user: zod
-      .object({
-        id: zod.string(),
-        phone: zod.string(),
-        name: zod.string().optional(),
-        email: zod.string().optional(),
-        createdAt: zod.date().optional(),
-      })
-      .optional(),
+    user: zod.object({
+      id: zod.string(),
+      phone: zod.string(),
+      name: zod.string().nullish(),
+      email: zod.string().nullish(),
+      isActive: zod.boolean().optional(),
+      createdAt: zod.date().nullish(),
+    }),
   }),
 });
 
@@ -167,82 +166,317 @@ export const LogoutResponse = zod.object({
 });
 
 /**
- * @summary List user orders
+ * @summary List portal user orders
  */
+export const listOrdersResponseDataItemCustomerRatingMax = 5;
+
 export const ListOrdersResponse = zod.object({
   success: zod.boolean(),
   data: zod.array(
     zod.object({
       id: zod.string(),
+      orderNumber: zod.string(),
       reference: zod.string(),
       status: zod.enum([
-        "received",
-        "sorting",
-        "cleaning",
-        "quality_check",
-        "ready",
+        "pending",
+        "processing",
+        "ready_for_pickup",
         "out_for_delivery",
+        "completed",
         "delivered",
+        "in_store",
+        "ready",
+        "cancelled",
       ]),
+      paymentStatus: zod.string(),
+      totalAmount: zod.number().nullish(),
       services: zod.array(zod.string()),
+      items: zod.array(
+        zod.object({
+          serviceName: zod.string(),
+          quantity: zod.number(),
+          price: zod.number(),
+        }),
+      ),
       branch: zod.string(),
-      scheduledDate: zod.date().optional(),
+      fulfillmentType: zod.enum(["pickup", "delivery"]),
+      scheduledDate: zod.date().nullish(),
       createdAt: zod.date(),
-      totalAmount: zod.number().optional(),
+      updatedAt: zod.date().nullish(),
+      pickupDate: zod.date().nullish(),
+      invoiceUrl: zod.string().nullish(),
+      lastWhatsappStatus: zod.string().nullish(),
+      lastWhatsappSentAt: zod.date().nullish(),
+      customerName: zod.string().nullish(),
+      customerPhone: zod.string().nullish(),
+      customerEmail: zod.string().nullish(),
+      customerRating: zod
+        .number()
+        .min(1)
+        .max(listOrdersResponseDataItemCustomerRatingMax)
+        .nullish(),
+      feedbackComment: zod.string().nullish(),
+      feedbackSubmittedAt: zod.date().nullish(),
     }),
   ),
 });
 
 /**
- * @summary Get order by ID
+ * @summary Get portal order by ID
  */
 export const GetOrderParams = zod.object({
   id: zod.coerce.string(),
 });
 
+export const getOrderResponseDataCustomerRatingMax = 5;
+
 export const GetOrderResponse = zod.object({
   success: zod.boolean(),
   data: zod.object({
     id: zod.string(),
+    orderNumber: zod.string(),
     reference: zod.string(),
     status: zod.enum([
-      "received",
-      "sorting",
-      "cleaning",
-      "quality_check",
-      "ready",
+      "pending",
+      "processing",
+      "ready_for_pickup",
       "out_for_delivery",
+      "completed",
       "delivered",
+      "in_store",
+      "ready",
+      "cancelled",
     ]),
+    paymentStatus: zod.string(),
+    totalAmount: zod.number().nullish(),
     services: zod.array(zod.string()),
+    items: zod.array(
+      zod.object({
+        serviceName: zod.string(),
+        quantity: zod.number(),
+        price: zod.number(),
+      }),
+    ),
     branch: zod.string(),
-    scheduledDate: zod.date().optional(),
+    fulfillmentType: zod.enum(["pickup", "delivery"]),
+    scheduledDate: zod.date().nullish(),
     createdAt: zod.date(),
-    totalAmount: zod.number().optional(),
+    updatedAt: zod.date().nullish(),
+    pickupDate: zod.date().nullish(),
+    invoiceUrl: zod.string().nullish(),
+    lastWhatsappStatus: zod.string().nullish(),
+    lastWhatsappSentAt: zod.date().nullish(),
+    customerName: zod.string().nullish(),
+    customerPhone: zod.string().nullish(),
+    customerEmail: zod.string().nullish(),
+    customerRating: zod
+      .number()
+      .min(1)
+      .max(getOrderResponseDataCustomerRatingMax)
+      .nullish(),
+    feedbackComment: zod.string().nullish(),
+    feedbackSubmittedAt: zod.date().nullish(),
   }),
 });
 
 /**
- * @summary Track order by phone and reference
+ * @summary Track an ERP order by order number
  */
-export const TrackOrderQueryParams = zod.object({
-  phone: zod.coerce.string(),
-  ref: zod.coerce.string(),
+export const GetPublicTrackOrderParams = zod.object({
+  orderNumber: zod.coerce.string(),
 });
 
-export const TrackOrderResponse = zod.object({
+export const getPublicTrackOrderResponseDataOneCustomerRatingMax = 5;
+
+export const GetPublicTrackOrderResponse = zod.object({
   success: zod.boolean(),
-  data: zod.object({
-    reference: zod.string(),
-    status: zod.string(),
-    stages: zod.array(
+  data: zod
+    .object({
+      id: zod.string(),
+      orderNumber: zod.string(),
+      reference: zod.string(),
+      status: zod.enum([
+        "pending",
+        "processing",
+        "ready_for_pickup",
+        "out_for_delivery",
+        "completed",
+        "delivered",
+        "in_store",
+        "ready",
+        "cancelled",
+      ]),
+      paymentStatus: zod.string(),
+      totalAmount: zod.number().nullish(),
+      services: zod.array(zod.string()),
+      items: zod.array(
+        zod.object({
+          serviceName: zod.string(),
+          quantity: zod.number(),
+          price: zod.number(),
+        }),
+      ),
+      branch: zod.string(),
+      fulfillmentType: zod.enum(["pickup", "delivery"]),
+      scheduledDate: zod.date().nullish(),
+      createdAt: zod.date(),
+      updatedAt: zod.date().nullish(),
+      pickupDate: zod.date().nullish(),
+      invoiceUrl: zod.string().nullish(),
+      lastWhatsappStatus: zod.string().nullish(),
+      lastWhatsappSentAt: zod.date().nullish(),
+      customerName: zod.string().nullish(),
+      customerPhone: zod.string().nullish(),
+      customerEmail: zod.string().nullish(),
+      customerRating: zod
+        .number()
+        .min(1)
+        .max(getPublicTrackOrderResponseDataOneCustomerRatingMax)
+        .nullish(),
+      feedbackComment: zod.string().nullish(),
+      feedbackSubmittedAt: zod.date().nullish(),
+    })
+    .and(
       zod.object({
-        stage: zod.string(),
-        label: zod.string(),
-        completed: zod.boolean(),
-        timestamp: zod.date().optional(),
+        steps: zod.array(
+          zod.object({
+            key: zod.string(),
+            label: zod.string(),
+            completed: zod.boolean(),
+            current: zod.boolean(),
+          }),
+        ),
       }),
     ),
+});
+
+/**
+ * @summary Load feedback context for an ERP order
+ */
+export const GetFeedbackContextQueryParams = zod.object({
+  orderId: zod.coerce.string().optional(),
+  orderNumber: zod.coerce.string().optional(),
+});
+
+export const getFeedbackContextResponseDataExistingFeedbackRatingMax = 5;
+
+export const GetFeedbackContextResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    id: zod.string(),
+    orderNumber: zod.string(),
+    customerName: zod.string().nullish(),
+    status: zod.string(),
+    fulfillmentType: zod.enum(["pickup", "delivery"]),
+    totalAmount: zod.number().nullish(),
+    items: zod.array(
+      zod.object({
+        serviceName: zod.string(),
+        quantity: zod.number(),
+        price: zod.number(),
+      }),
+    ),
+    existingFeedback: zod.object({
+      rating: zod
+        .number()
+        .min(1)
+        .max(getFeedbackContextResponseDataExistingFeedbackRatingMax)
+        .nullable(),
+      comment: zod.string().nullable(),
+      submittedAt: zod.date().nullable(),
+    }),
+  }),
+});
+
+/**
+ * @summary Submit or update ERP-backed order feedback
+ */
+export const submitFeedbackBodyRatingMax = 5;
+
+export const SubmitFeedbackBody = zod.object({
+  orderId: zod.string().optional(),
+  orderNumber: zod.string().optional(),
+  rating: zod.number().min(1).max(submitFeedbackBodyRatingMax),
+  comment: zod.string().nullish(),
+  metadata: zod.record(zod.string(), zod.unknown()).optional(),
+});
+
+export const SubmitFeedbackResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.object({
+    orderId: zod.string(),
+    orderNumber: zod.string(),
+    rating: zod.number(),
+    comment: zod.string().nullish(),
+    feedbackSubmittedAt: zod.date(),
+    googleReviewEligible: zod.boolean(),
+  }),
+});
+
+/**
+ * @summary List homepage top reviews
+ */
+export const ListTopReviewsResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.array(
+    zod.object({
+      id: zod.string(),
+      rating: zod.number(),
+      comment: zod.string().nullish(),
+      isTopRating: zod.boolean(),
+      isBestRating: zod.boolean(),
+      curationScore: zod.number().nullish(),
+      curationReason: zod.string().nullish(),
+      aiProvider: zod.string().nullish(),
+      aiModel: zod.string().nullish(),
+      createdAt: zod.date(),
+      customerName: zod.string(),
+      location: zod.string(),
+      orderNumber: zod.string().nullish(),
+    }),
+  ),
+});
+
+/**
+ * @summary List paginated best reviews
+ */
+export const listBestReviewsQueryPageDefault = 1;
+
+export const listBestReviewsQueryPageSizeDefault = 12;
+export const listBestReviewsQueryPageSizeMax = 50;
+
+export const ListBestReviewsQueryParams = zod.object({
+  page: zod.coerce.number().min(1).default(listBestReviewsQueryPageDefault),
+  pageSize: zod.coerce
+    .number()
+    .min(1)
+    .max(listBestReviewsQueryPageSizeMax)
+    .default(listBestReviewsQueryPageSizeDefault),
+});
+
+export const ListBestReviewsResponse = zod.object({
+  success: zod.boolean(),
+  data: zod.array(
+    zod.object({
+      id: zod.string(),
+      rating: zod.number(),
+      comment: zod.string().nullish(),
+      isTopRating: zod.boolean(),
+      isBestRating: zod.boolean(),
+      curationScore: zod.number().nullish(),
+      curationReason: zod.string().nullish(),
+      aiProvider: zod.string().nullish(),
+      aiModel: zod.string().nullish(),
+      createdAt: zod.date(),
+      customerName: zod.string(),
+      location: zod.string(),
+      orderNumber: zod.string().nullish(),
+    }),
+  ),
+  meta: zod.object({
+    page: zod.number(),
+    pageSize: zod.number(),
+    hasMore: zod.boolean(),
   }),
 });
 
@@ -254,9 +488,10 @@ export const GetProfileResponse = zod.object({
   data: zod.object({
     id: zod.string(),
     phone: zod.string(),
-    name: zod.string().optional(),
-    email: zod.string().optional(),
-    createdAt: zod.date().optional(),
+    name: zod.string().nullish(),
+    email: zod.string().nullish(),
+    isActive: zod.boolean().optional(),
+    createdAt: zod.date().nullish(),
   }),
 });
 
@@ -273,8 +508,9 @@ export const UpdateProfileResponse = zod.object({
   data: zod.object({
     id: zod.string(),
     phone: zod.string(),
-    name: zod.string().optional(),
-    email: zod.string().optional(),
-    createdAt: zod.date().optional(),
+    name: zod.string().nullish(),
+    email: zod.string().nullish(),
+    isActive: zod.boolean().optional(),
+    createdAt: zod.date().nullish(),
   }),
 });
