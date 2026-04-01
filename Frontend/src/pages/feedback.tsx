@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLocation, useRoute } from "wouter";
 import { AppLayout } from "@/components/layout";
 import { SEO } from "@/components/seo";
 import { Badge, Button, Card, FadeIn, Input, SectionHeading } from "@/components/ui";
@@ -35,6 +36,8 @@ function RatingSelector({
 }
 
 export default function FeedbackPage() {
+  const [, setLocation] = useLocation();
+  const [matchesIdentifierRoute, routeParams] = useRoute("/feedback/:identifier");
   const [identifier, setIdentifier] = useState("");
   const [feedback, setFeedback] = useState("");
   const [rating, setRating] = useState(5);
@@ -43,14 +46,7 @@ export default function FeedbackPage() {
   const [isLookingUp, setIsLookingUp] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const orderId = params.get("orderId");
-    if (orderId) {
-      setIdentifier(orderId);
-    }
-  }, []);
+  const routeIdentifier = matchesIdentifierRoute ? decodeURIComponent(routeParams.identifier || "") : "";
 
   const sentimentTone = useMemo(() => {
     if (!submitted) return "";
@@ -61,6 +57,41 @@ export default function FeedbackPage() {
         : "bg-slate-500/15 text-slate-200 border border-slate-300/20";
   }, [submitted]);
 
+  async function loadOrder(rawIdentifier: string, options?: { syncUrl?: boolean; showErrors?: boolean }) {
+    const cleanIdentifier = rawIdentifier.trim();
+    if (!cleanIdentifier) return;
+
+    setIsLookingUp(true);
+    setSubmitted(null);
+    try {
+      const result = await lookupFeedbackOrder(cleanIdentifier);
+      setOrderData(result.data);
+      setIdentifier(result.data.orderNumber);
+      if (result.data.existingReview) {
+        setRating(result.data.existingReview.rating);
+        setFeedback(result.data.existingReview.feedback || "");
+      }
+
+      if (options?.syncUrl !== false) {
+        const nextPath = `/feedback/${encodeURIComponent(result.data.orderNumber || cleanIdentifier)}`;
+        if (window.location.pathname !== nextPath) {
+          setLocation(nextPath);
+        }
+      }
+    } catch (error) {
+      if (options?.showErrors !== false) {
+        toast({
+          title: "Unable to load order",
+          description: error instanceof Error ? error.message : "Please verify the order ID.",
+          variant: "destructive",
+        });
+      }
+      setOrderData(null);
+    } finally {
+      setIsLookingUp(false);
+    }
+  }
+
   async function handleLookup(event: React.FormEvent) {
     event.preventDefault();
     if (!identifier.trim()) {
@@ -68,25 +99,19 @@ export default function FeedbackPage() {
       return;
     }
 
-    setIsLookingUp(true);
-    try {
-      const result = await lookupFeedbackOrder(identifier.trim());
-      setOrderData(result.data);
-      if (result.data.existingReview) {
-        setRating(result.data.existingReview.rating);
-        setFeedback(result.data.existingReview.feedback || "");
-      }
-    } catch (error) {
-      toast({
-        title: "Unable to load order",
-        description: error instanceof Error ? error.message : "Please verify the order ID.",
-        variant: "destructive",
-      });
-      setOrderData(null);
-    } finally {
-      setIsLookingUp(false);
-    }
+    await loadOrder(identifier, { syncUrl: true, showErrors: true });
   }
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const initialIdentifier = routeIdentifier || params.get("orderId") || "";
+    const normalizedIdentifier = initialIdentifier.trim();
+
+    if (!normalizedIdentifier) return;
+
+    setIdentifier(normalizedIdentifier);
+    void loadOrder(normalizedIdentifier, { syncUrl: true, showErrors: true });
+  }, [routeIdentifier]);
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -120,7 +145,7 @@ export default function FeedbackPage() {
       <SEO
         title="Share Feedback | Fab Clean"
         description="Submit service feedback for your Fab Clean order using the order ID."
-        canonical="https://myfabclean.com/feedback"
+        canonical={`https://myfabclean.com${routeIdentifier ? `/feedback/${encodeURIComponent(routeIdentifier)}` : "/feedback"}`}
       />
       <div className="relative overflow-hidden pt-32 pb-24">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(244,185,66,0.14),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(10,132,255,0.14),transparent_34%)]" />

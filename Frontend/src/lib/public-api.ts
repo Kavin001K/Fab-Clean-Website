@@ -1,8 +1,22 @@
 const getApiBase = () => {
-  if (import.meta.env.PROD) {
-    return import.meta.env.VITE_API_URL || "/api";
+  const configured = import.meta.env.VITE_API_URL?.trim();
+
+  if (import.meta.env.PROD && !configured) {
+    throw new Error("VITE_API_URL is required for production builds");
   }
-  return import.meta.env.VITE_API_URL || "/api";
+
+  const candidate = configured || "/api";
+
+  if (!candidate.startsWith("http://") && !candidate.startsWith("https://")) {
+    return candidate;
+  }
+
+  const parsed = new URL(candidate);
+  if (parsed.pathname === "/" || parsed.pathname === "") {
+    parsed.pathname = "/api";
+  }
+
+  return parsed.toString();
 };
 
 const API_BASE = getApiBase().replace(/\/$/, "");

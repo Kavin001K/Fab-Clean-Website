@@ -1,5 +1,8 @@
 type SupabaseMethod = "GET" | "POST" | "PATCH";
 
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 function getRequiredEnv(name: string): string {
   const value = process.env[name];
   if (!value) {
@@ -79,24 +82,48 @@ function encodeIdentifier(value: string): string {
   return encodeURIComponent(value.trim());
 }
 
+function isUuid(value: string): boolean {
+  return UUID_PATTERN.test(value.trim());
+}
+
+function normalizeOrderIdentifier(value: string): string {
+  return value.trim();
+}
+
+function normalizeOrderNumber(value: string): string {
+  return normalizeOrderIdentifier(value).toUpperCase();
+}
+
 export async function fetchOrderByIdentifier(identifier: string): Promise<PublicOrderRecord | null> {
-  const clean = identifier.trim();
+  const clean = normalizeOrderIdentifier(identifier);
   if (!clean) return null;
 
   const select =
     "id,order_number,customer_id,customer_name,customer_phone,status,payment_status,total_amount,items,fulfillment_type,pickup_date,invoice_url,created_at,updated_at,rating,feedback,ai_category,ai_sentiment,ai_score";
 
-  const byId = await request<PublicOrderRecord[]>(
-    `/rest/v1/orders?select=${select}&id=eq.${encodeIdentifier(clean)}&limit=1`,
-    "GET",
-  );
-  if (byId[0]) return byId[0];
+  if (isUuid(clean)) {
+    const byId = await request<PublicOrderRecord[]>(
+      `/rest/v1/orders?select=${select}&id=eq.${encodeIdentifier(clean)}&limit=1`,
+      "GET",
+    );
+    if (byId[0]) return byId[0];
+  }
 
   const byOrderNumber = await request<PublicOrderRecord[]>(
+    `/rest/v1/orders?select=${select}&order_number=eq.${encodeIdentifier(normalizeOrderNumber(clean))}&limit=1`,
+    "GET",
+  );
+  if (byOrderNumber[0]) return byOrderNumber[0];
+
+  if (!isUuid(clean)) {
+    return null;
+  }
+
+  const byRawOrderNumber = await request<PublicOrderRecord[]>(
     `/rest/v1/orders?select=${select}&order_number=eq.${encodeIdentifier(clean)}&limit=1`,
     "GET",
   );
-  return byOrderNumber[0] ?? null;
+  return byRawOrderNumber[0] ?? null;
 }
 
 export async function fetchReviewByOrderId(orderId: string): Promise<ReviewRecord | null> {

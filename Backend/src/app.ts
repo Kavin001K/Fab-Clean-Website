@@ -12,6 +12,13 @@ const app: Express = express();
 // Security middleware
 app.use(helmet());
 
+app.get("/", (_req, res) => {
+  res.status(200).json({
+    ok: true,
+    service: "fab-clean-backend",
+  });
+});
+
 // Rate limiting (max 100 requests per 15 minutes per IP)
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,

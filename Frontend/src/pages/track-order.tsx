@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "wouter";
+import { Link, useLocation, useRoute } from "wouter";
 import { AppLayout } from "@/components/layout";
 import { SEO } from "@/components/seo";
 import { Button, Card, FadeIn, Input, SectionHeading, Badge } from "@/components/ui";
@@ -61,15 +61,52 @@ function StageRail({ order }: { order: PublicTrackedOrder }) {
 }
 
 export default function TrackOrder() {
+  const [, setLocation] = useLocation();
+  const [matchesIdentifierRoute, routeParams] = useRoute("/track-order/:identifier");
   const [identifier, setIdentifier] = useState("");
   const [order, setOrder] = useState<PublicTrackedOrder | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const lastRequestedIdentifier = useRef<string | null>(null);
   const { toast } = useToast();
+
+  const routeIdentifier = matchesIdentifierRoute ? decodeURIComponent(routeParams.identifier || "") : "";
 
   const statusClass = useMemo(
     () => (order ? statusTone[order.status] || "bg-white/10 text-white border border-white/10" : ""),
     [order],
   );
+
+  async function lookupOrder(rawIdentifier: string, options?: { syncUrl?: boolean; showErrors?: boolean }) {
+    const cleanIdentifier = rawIdentifier.trim();
+    if (!cleanIdentifier) return;
+
+    lastRequestedIdentifier.current = cleanIdentifier.toUpperCase();
+    setIsLoading(true);
+    try {
+      const result = await trackOrderById(cleanIdentifier);
+      setOrder(result.data);
+      const canonicalIdentifier = result.data.reference || cleanIdentifier;
+      setIdentifier(canonicalIdentifier);
+
+      if (options?.syncUrl !== false) {
+        const nextPath = `/track-order/${encodeURIComponent(canonicalIdentifier)}`;
+        if (window.location.pathname !== nextPath) {
+          setLocation(nextPath);
+        }
+      }
+    } catch (error) {
+      if (options?.showErrors !== false) {
+        toast({
+          title: "Order not found",
+          description: error instanceof Error ? error.message : "Unable to locate that order.",
+          variant: "destructive",
+        });
+      }
+      setOrder(null);
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   async function handleTrack(event: React.FormEvent) {
     event.preventDefault();
@@ -78,28 +115,34 @@ export default function TrackOrder() {
       return;
     }
 
-    setIsLoading(true);
-    try {
-      const result = await trackOrderById(identifier.trim());
-      setOrder(result.data);
-    } catch (error) {
-      toast({
-        title: "Order not found",
-        description: error instanceof Error ? error.message : "Unable to locate that order.",
-        variant: "destructive",
-      });
-      setOrder(null);
-    } finally {
-      setIsLoading(false);
-    }
+    await lookupOrder(identifier, { syncUrl: true, showErrors: true });
   }
+
+  useEffect(() => {
+    const legacyIdentifier = new URLSearchParams(window.location.search).get("orderId") || "";
+    const initialIdentifier = routeIdentifier || legacyIdentifier;
+    const normalizedIdentifier = initialIdentifier.trim();
+
+    if (!normalizedIdentifier) return;
+
+    setIdentifier(normalizedIdentifier);
+
+    if (lastRequestedIdentifier.current === normalizedIdentifier.toUpperCase()) {
+      return;
+    }
+
+    void lookupOrder(normalizedIdentifier, {
+      syncUrl: true,
+      showErrors: true,
+    });
+  }, [routeIdentifier]);
 
   return (
     <AppLayout>
       <SEO
         title="Track Your Order | Fab Clean"
         description="Track your Fab Clean order in real time using your order ID or order number."
-        canonical="https://myfabclean.com/track-order"
+        canonical={`https://myfabclean.com${routeIdentifier ? `/track-order/${encodeURIComponent(routeIdentifier)}` : "/track-order"}`}
       />
       <div className="relative overflow-hidden pt-32 pb-24">
         <div className="pointer-events-none absolute inset-0">
@@ -244,7 +287,7 @@ export default function TrackOrder() {
                           <Button className="w-full h-14 rounded-[1.6rem]">Open Invoice</Button>
                         </a>
                       ) : null}
-                      <Link href={`/feedback?orderId=${encodeURIComponent(order.orderId)}`}>
+                      <Link href={`/feedback/${encodeURIComponent(order.reference || order.orderId)}`}>
                         <Button variant="outline" className="w-full h-14 rounded-[1.6rem] border-white/15 bg-white/5 text-white">
                           Leave Feedback
                         </Button>
