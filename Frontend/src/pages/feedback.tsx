@@ -47,6 +47,7 @@ export default function FeedbackPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const routeIdentifier = matchesIdentifierRoute ? decodeURIComponent(routeParams.identifier || "") : "";
+  const resolvedIdentifier = orderData?.orderNumber || identifier.trim();
 
   const sentimentTone = useMemo(() => {
     if (!submitted) return "";
@@ -115,15 +116,28 @@ export default function FeedbackPage() {
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    if (!identifier.trim() || !feedback.trim()) {
-      toast({ title: "Feedback incomplete", description: "Provide the order ID and your review.", variant: "destructive" });
+    if (!resolvedIdentifier) {
+      toast({
+        title: "Order required",
+        description: "Load your order before submitting feedback.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!feedback.trim()) {
+      toast({
+        title: "Review required",
+        description: "Write a short review before submitting feedback.",
+        variant: "destructive",
+      });
       return;
     }
 
     setIsSubmitting(true);
     try {
       const result = await submitPublicFeedback({
-        identifier: identifier.trim(),
+        identifier: resolvedIdentifier,
         rating,
         feedback: feedback.trim(),
       });
@@ -229,7 +243,12 @@ export default function FeedbackPage() {
                       </div>
                     </div>
 
-                    <Button type="submit" isLoading={isSubmitting} className="h-16 w-full rounded-[1.8rem]">
+                    <Button
+                      type="submit"
+                      isLoading={isSubmitting}
+                      disabled={!orderData || !feedback.trim()}
+                      className="h-16 w-full rounded-[1.8rem] disabled:cursor-not-allowed disabled:opacity-50"
+                    >
                       Submit Feedback
                     </Button>
                   </div>
