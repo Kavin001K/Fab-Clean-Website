@@ -11,6 +11,9 @@ const Services = lazy(() => import("@/pages/services"));
 const Pricing = lazy(() => import("@/pages/pricing"));
 const About = lazy(() => import("@/pages/about"));
 const Contact = lazy(() => import("@/pages/contact"));
+const TrackOrder = lazy(() => import("@/pages/track-order"));
+const Feedback = lazy(() => import("@/pages/feedback"));
+const Testimonials = lazy(() => import("@/pages/testimonials"));
 const Login = lazy(() => import("@/pages/login"));
 const Register = lazy(() => import("@/pages/register"));
 const SchedulePickup = lazy(() => import("@/pages/schedule-pickup"));
@@ -40,6 +43,10 @@ function Router() {
         <Route path="/pricing" component={Pricing} />
         <Route path="/about" component={About} />
         <Route path="/contact" component={Contact} />
+        <Route path="/trackorder" component={TrackOrder} />
+        <Route path="/trackorder/:orderNumber" component={TrackOrder} />
+        <Route path="/feedback" component={Feedback} />
+        <Route path="/testimonials" component={Testimonials} />
         <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
         <Route path="/schedule-pickup" component={SchedulePickup} />

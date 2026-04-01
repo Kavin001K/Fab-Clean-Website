@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import { AppLayout } from "@/components/layout";
 import { Button, SectionHeading, FadeIn, Card } from "@/components/ui";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useQuery } from "@tanstack/react-query";
+import { apiFetch, type PublicReview } from "@/lib/customer-experience";
 import {
   CheckCircle2, Clock, MapPin, Star,
   Shirt, Briefcase, Zap, ArrowRight, Phone
@@ -18,14 +20,19 @@ const mockServices = [
   { id: "4", name: "House Linen Care", short: "Medical grade sanitization for your home bedsheets.", icon: CheckCircle2, price: "₹70/kg" },
 ];
 
-const testimonials = [
-  { name: "Ananya Iyer", location: "Mahalingapuram", stars: 5, text: "The quality is outstanding. My wedding silk sarees looked exactly like they did on the first day. Best in Pollachi!" },
-  { name: "Vikram Seth", location: "Kinathukadavu", stars: 5, text: "I've tried many services, but Fab Clean's precision with leather jackets and shoes is unmatched. Highly professional." },
-  { name: "Suresh Pillai", location: "Pollachi Town", stars: 5, text: "Their 48-hour express delivery saved my business trip. The clothes were perfectly steamed and vacuum packed." },
+const fallbackTestimonials: PublicReview[] = [
+  { id: "1", customerName: "Ananya I.", location: "Pollachi", rating: 5, comment: "The quality is outstanding. My wedding silk sarees looked exactly like they did on the first day.", isTopRating: true, isBestRating: true, curationScore: 5, curationReason: null, aiProvider: null, aiModel: null, createdAt: new Date().toISOString(), orderNumber: null },
+  { id: "2", customerName: "Vikram S.", location: "Kinathukadavu", rating: 5, comment: "Fab Clean's precision with leather jackets and shoes is unmatched. Highly professional from pickup to finishing.", isTopRating: true, isBestRating: true, curationScore: 5, curationReason: null, aiProvider: null, aiModel: null, createdAt: new Date().toISOString(), orderNumber: null },
+  { id: "3", customerName: "Suresh P.", location: "Pollachi Town", rating: 5, comment: "Their 48-hour express delivery saved my business trip. Everything came back perfectly steamed and packed.", isTopRating: true, isBestRating: true, curationScore: 5, curationReason: null, aiProvider: null, aiModel: null, createdAt: new Date().toISOString(), orderNumber: null },
 ];
 
 export default function Home() {
   const isMobile = useIsMobile();
+  const topReviewsQuery = useQuery({
+    queryKey: ["home-top-reviews"],
+    queryFn: () => apiFetch<{ success: boolean; data: PublicReview[] }>("/api/reviews/top"),
+  });
+  const testimonials = topReviewsQuery.data?.data?.length ? topReviewsQuery.data.data : fallbackTestimonials;
 
   return (
     <AppLayout>
@@ -384,21 +391,31 @@ export default function Home() {
               <FadeIn key={i} delay={0.1 * i}>
                 <Card className="p-12 hover:shadow-[0_40px_100px_-20px_rgba(0,0,0,0.08)] transition-all h-full flex flex-col bg-background rounded-[4rem]">
                   <div className="flex mb-10 gap-1.5 underline decoration-primary decoration-4 underline-offset-8">
-                    {[1, 2, 3, 4, 5].map(s => <Star key={s} className="w-5 h-5 fill-yellow-400 text-yellow-400" />)}
+                    {Array.from({ length: 5 }).map((_, starIndex) => (
+                      <Star
+                        key={starIndex}
+                        className={`w-5 h-5 ${starIndex < t.rating ? "fill-yellow-400 text-yellow-400" : "text-slate-300"}`}
+                      />
+                    ))}
                   </div>
-                  <p className="text-foreground text-2xl leading-[1.4] mb-12 font-serif italic pr-4">"{t.text}"</p>
+                  <p className="text-foreground text-2xl leading-[1.4] mb-12 font-serif italic pr-4">"{t.comment}"</p>
                   <div className="flex items-center gap-5 mt-auto">
                     <div className="w-14 h-14 rounded-2xl bg-foreground text-white flex items-center justify-center font-black text-xl shadow-xl shadow-foreground/20">
-                      {t.name[0]}
+                      {t.customerName[0]}
                     </div>
                     <div>
-                      <div className="text-xl font-bold text-foreground leading-none mb-1.5">{t.name}</div>
+                      <div className="text-xl font-bold text-foreground leading-none mb-1.5">{t.customerName}</div>
                       <div className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">{t.location}</div>
                     </div>
                   </div>
                 </Card>
               </FadeIn>
             ))}
+          </div>
+          <div className="mt-12 flex justify-center">
+            <Link href="/testimonials">
+              <Button variant="outline" size="lg">View All Testimonials</Button>
+            </Link>
           </div>
         </div>
       </section>
