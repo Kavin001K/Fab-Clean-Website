@@ -15,6 +15,8 @@ const Login = lazy(() => import("@/pages/login"));
 const Register = lazy(() => import("@/pages/register"));
 const SchedulePickup = lazy(() => import("@/pages/schedule-pickup"));
 const Dashboard = lazy(() => import("@/pages/dashboard/index"));
+const TrackOrder = lazy(() => import("@/pages/track-order"));
+const Feedback = lazy(() => import("@/pages/feedback"));
 const Sitemap = lazy(() => import("@/pages/sitemap"));
 const Privacy = lazy(() => import("@/pages/privacy"));
 const Terms = lazy(() => import("@/pages/terms"));
@@ -43,6 +45,8 @@ function Router() {
         <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
         <Route path="/schedule-pickup" component={SchedulePickup} />
+        <Route path="/track-order" component={TrackOrder} />
+        <Route path="/feedback" component={Feedback} />
         
         {/* Dashboard routes use nested routing inside the component, but we declare the base prefix here */}
         <Route path="/dashboard/*?" component={Dashboard} />

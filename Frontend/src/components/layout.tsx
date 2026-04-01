@@ -26,6 +26,7 @@ export function Navbar() {
     { name: "Home", path: "/" },
     { name: "Services", path: "/services" },
     { name: "Pricing", path: "/pricing" },
+    { name: "Track", path: "/track-order" },
     { name: "About", path: "/about" },
     { name: "Contact", path: "/contact" },
   ];
@@ -226,6 +227,7 @@ export function Footer() {
               {[
                 { label: "Our Services", path: "/services" },
                 { label: "Pricing List", path: "/pricing" },
+                { label: "Track Order", path: "/track-order" },
                 { label: "Book Pickup", path: "/schedule-pickup" },
                 { label: "Tech & Science", path: "/about" },
               ].map((item) => (
