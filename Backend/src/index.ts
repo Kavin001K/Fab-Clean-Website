@@ -1,13 +1,15 @@
 import app from "./app";
 import { logger } from "./lib/logger";
 
-const rawPort = process.env["PORT"];
+const requiredEnv = ["PORT", "DATABASE_URL", "SUPABASE_URL", "SUPABASE_SERVICE_KEY"] as const;
 
-if (!rawPort) {
-  throw new Error(
-    "PORT environment variable is required but was not provided.",
-  );
+for (const name of requiredEnv) {
+  if (!process.env[name]?.trim()) {
+    throw new Error(`${name} environment variable is required but was not provided.`);
+  }
 }
+
+const rawPort = process.env["PORT"];
 
 const port = Number(rawPort);
 
