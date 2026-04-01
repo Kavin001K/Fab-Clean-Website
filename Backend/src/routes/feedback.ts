@@ -31,6 +31,7 @@ router.get("/feedback/order/:identifier", async (req, res) => {
         orderId: order.id,
         orderNumber: order.order_number,
         customerName: order.customer_name,
+        customerPhone: order.customer_phone,
         status: order.status,
         existingReview,
       },
@@ -105,6 +106,8 @@ router.post("/feedback/submit", async (req, res) => {
     const review = await upsertReview({
       order_id: order.id,
       customer_id: order.customer_id ?? null,
+      customer_name: order.customer_name ?? null,
+      customer_phone: order.customer_phone ?? null,
       rating: numericRating,
       feedback: feedback.trim(),
       feedback_source: "website_manual_feedback",
@@ -128,14 +131,21 @@ router.post("/feedback/submit", async (req, res) => {
       ai_score: reviewInsight.score,
     });
 
-    await callRpc("refresh_review_rankings");
+    try {
+      await callRpc("refresh_review_rankings");
+    } catch (rpcError) {
+      req.log.warn(rpcError, "Review saved but ranking refresh failed");
+    }
 
     res.json({
       success: true,
       data: {
         orderId: order.id,
         orderNumber: order.order_number,
+        customerName: order.customer_name,
+        customerPhone: order.customer_phone,
         reviewId: review.id,
+        reviewCreatedAt: review.created_at,
         insight: reviewInsight,
       },
     });

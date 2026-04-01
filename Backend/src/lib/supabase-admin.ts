@@ -69,8 +69,12 @@ export type PublicOrderRecord = {
 export type ReviewRecord = {
   id: string;
   order_id: string;
+  customer_id: string | null;
+  customer_name: string | null;
+  customer_phone: string | null;
   rating: number;
   feedback: string | null;
+  feedback_source: string | null;
   feedback_status: string;
   ai_category: string | null;
   ai_sentiment: string | null;
@@ -128,7 +132,7 @@ export async function fetchOrderByIdentifier(identifier: string): Promise<Public
 
 export async function fetchReviewByOrderId(orderId: string): Promise<ReviewRecord | null> {
   const rows = await request<ReviewRecord[]>(
-    `/rest/v1/reviews_table?select=id,order_id,rating,feedback,feedback_status,ai_category,ai_sentiment,ai_score,created_at&order_id=eq.${encodeIdentifier(orderId)}&limit=1`,
+    `/rest/v1/reviews_table?select=id,order_id,customer_id,customer_name,customer_phone,rating,feedback,feedback_source,feedback_status,ai_category,ai_sentiment,ai_score,created_at&order_id=eq.${encodeIdentifier(orderId)}&limit=1`,
     "GET",
   );
   return rows[0] ?? null;

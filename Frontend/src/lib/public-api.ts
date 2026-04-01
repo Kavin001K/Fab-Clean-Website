@@ -62,22 +62,30 @@ export type FeedbackLookupResponse = {
   orderId: string;
   orderNumber: string;
   customerName?: string;
+  customerPhone?: string;
   status: string;
   existingReview?: {
     id: string;
+    customer_name?: string | null;
+    customer_phone?: string | null;
     rating: number;
     feedback: string | null;
+    feedback_source?: string | null;
     feedback_status: string;
     ai_category: string | null;
     ai_sentiment: string | null;
     ai_score: number | null;
+    created_at?: string;
   } | null;
 };
 
 export type FeedbackSubmitResponse = {
   orderId: string;
   orderNumber: string;
+  customerName?: string | null;
+  customerPhone?: string | null;
   reviewId: string;
+  reviewCreatedAt?: string;
   insight: {
     category: string;
     sentiment: "positive" | "neutral" | "negative";

@@ -20,6 +20,38 @@ type GeminiGenerateResponse = {
   }>;
 };
 
+function buildFallbackInsight(input: GeminiReviewInput): GeminiReviewInsight {
+  const normalizedFeedback = input.feedback.trim().toLowerCase();
+
+  const category = normalizedFeedback.includes("deliver")
+    ? "delivery"
+    : normalizedFeedback.includes("time") || normalizedFeedback.includes("late")
+      ? "timeliness"
+      : normalizedFeedback.includes("staff") || normalizedFeedback.includes("support")
+        ? "staff"
+        : normalizedFeedback.includes("price") || normalizedFeedback.includes("cost")
+          ? "pricing"
+          : normalizedFeedback.includes("quality") || normalizedFeedback.includes("clean")
+            ? "quality"
+            : "overall";
+
+  const sentiment =
+    input.rating <= 2 ? "negative" : input.rating === 3 ? "neutral" : "positive";
+
+  const score =
+    input.rating <= 1 ? 0.15 :
+    input.rating === 2 ? 0.35 :
+    input.rating === 3 ? 0.55 :
+    input.rating === 4 ? 0.8 : 0.95;
+
+  return {
+    category,
+    sentiment,
+    score,
+    summary: "Review saved with fallback analysis while AI enrichment was unavailable.",
+  };
+}
+
 function clampScore(value: number): number {
   if (!Number.isFinite(value)) return 0;
   return Math.max(0, Math.min(1, value));
@@ -50,49 +82,54 @@ export async function analyzeReviewWithGemini(
     `Feedback: ${input.feedback || "No written feedback provided."}`,
   ].join("\n");
 
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        contents: [
-          {
-            role: "user",
-            parts: [{ text: prompt }],
-          },
-        ],
-        generationConfig: {
-          temperature: 0.1,
-          responseMimeType: "application/json",
+  try {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      }),
-    },
-  );
+        body: JSON.stringify({
+          contents: [
+            {
+              role: "user",
+              parts: [{ text: prompt }],
+            },
+          ],
+          generationConfig: {
+            temperature: 0.1,
+            responseMimeType: "application/json",
+          },
+        }),
+        signal: AbortSignal.timeout(12000),
+      },
+    );
 
-  if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`Gemini request failed (${response.status}): ${body}`);
+    if (!response.ok) {
+      const body = await response.text();
+      throw new Error(`Gemini request failed (${response.status}): ${body}`);
+    }
+
+    const payload = await response.json() as GeminiGenerateResponse;
+    const rawText =
+      payload?.candidates?.[0]?.content?.parts?.[0]?.text ??
+      payload?.candidates?.[0]?.content?.parts?.map((part: { text?: string }) => part.text ?? "").join("") ??
+      "";
+
+    const parsed = JSON.parse(rawText) as Partial<GeminiReviewInsight>;
+    const sentiment =
+      parsed.sentiment === "negative" || parsed.sentiment === "neutral"
+        ? parsed.sentiment
+        : "positive";
+
+    return {
+      category: parsed.category?.trim() || "overall",
+      sentiment,
+      score: clampScore(Number(parsed.score)),
+      summary: parsed.summary?.trim() || "Review analyzed successfully.",
+    };
+  } catch {
+    return buildFallbackInsight(input);
   }
-
-  const payload = await response.json() as GeminiGenerateResponse;
-  const rawText =
-    payload?.candidates?.[0]?.content?.parts?.[0]?.text ??
-    payload?.candidates?.[0]?.content?.parts?.map((part: { text?: string }) => part.text ?? "").join("") ??
-    "";
-
-  const parsed = JSON.parse(rawText) as Partial<GeminiReviewInsight>;
-  const sentiment =
-    parsed.sentiment === "negative" || parsed.sentiment === "neutral"
-      ? parsed.sentiment
-      : "positive";
-
-  return {
-    category: parsed.category?.trim() || "overall",
-    sentiment,
-    score: clampScore(Number(parsed.score)),
-    summary: parsed.summary?.trim() || "Review analyzed successfully.",
-  };
 }

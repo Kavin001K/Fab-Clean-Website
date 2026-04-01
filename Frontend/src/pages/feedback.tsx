@@ -35,6 +35,17 @@ function RatingSelector({
   );
 }
 
+function formatReviewTimestamp(value?: string | null): string {
+  if (!value) return "Just now";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Just now";
+
+  return new Intl.DateTimeFormat("en-IN", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(date);
+}
+
 export default function FeedbackPage() {
   const [, setLocation] = useLocation();
   const [matchesIdentifierRoute, routeParams] = useRoute("/feedback/:identifier");
@@ -210,6 +221,12 @@ export default function FeedbackPage() {
                           <Badge className="border-primary/20 bg-primary/15 text-primary">Existing feedback found</Badge>
                         ) : null}
                       </div>
+                      {orderData.existingReview ? (
+                        <p className="mt-4 text-sm text-white/50">
+                          Reviewed by {orderData.existingReview.customer_name || orderData.customerName || "Fab Clean Customer"} on{" "}
+                          {formatReviewTimestamp(orderData.existingReview.created_at)}
+                        </p>
+                      ) : null}
                     </motion.div>
                   ) : null}
                 </AnimatePresence>
@@ -270,6 +287,9 @@ export default function FeedbackPage() {
                             <p className="text-lg font-black text-white">Feedback captured</p>
                           </div>
                           <p className="mt-3 text-white/55">{submitted.insight.summary}</p>
+                          <p className="mt-3 text-sm text-white/45">
+                            {submitted.customerName || orderData?.customerName || "Fab Clean Customer"} • {formatReviewTimestamp(submitted.reviewCreatedAt)}
+                          </p>
                         </div>
                         <Badge className={sentimentTone}>{submitted.insight.sentiment}</Badge>
                       </div>
