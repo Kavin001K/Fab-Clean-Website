@@ -6,6 +6,7 @@ import contactRouter from "./contact.js";
 import authRouter from "./auth.js";
 import aiRouter from "./ai.js";
 import publicOrdersRouter from "./public-orders.js";
+import publicReviewsRouter from "./public-reviews.js";
 import feedbackRouter from "./feedback.js";
 
 const router: IRouter = Router();
@@ -17,6 +18,7 @@ router.use(contactRouter);
 router.use(authRouter);
 router.use(aiRouter);
 router.use(publicOrdersRouter);
+router.use(publicReviewsRouter);
 router.use(feedbackRouter);
 
 export default router;

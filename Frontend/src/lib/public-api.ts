@@ -91,6 +91,23 @@ export type FeedbackSubmitResponse = {
   };
 };
 
+export type HomepageReview = {
+  id: string;
+  customer_name?: string | null;
+  rating: number | string;
+  feedback?: string | null;
+  ai_category?: string | null;
+  ai_sentiment?: string | null;
+  ai_score?: number | string | null;
+  created_at: string;
+};
+
+export type HomepageReviewsResponse = {
+  topReviews: HomepageReview[];
+  bestReviews: HomepageReview[];
+  latestReviews: HomepageReview[];
+};
+
 export async function trackOrderById(identifier: string) {
   return request<{ success: boolean; data: PublicTrackedOrder }>(
     `/orders/track/by-id/${encodeURIComponent(identifier)}`,
@@ -112,4 +129,8 @@ export async function submitPublicFeedback(payload: {
     method: "POST",
     body: JSON.stringify(payload),
   });
+}
+
+export async function fetchHomepageReviews() {
+  return request<{ success: boolean; data: HomepageReviewsResponse }>("/reviews/homepage");
 }

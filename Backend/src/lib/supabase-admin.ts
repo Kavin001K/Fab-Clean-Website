@@ -82,6 +82,17 @@ export type ReviewRecord = {
   created_at: string;
 };
 
+export type PublicWebsiteReview = {
+  id: string;
+  customer_name: string | null;
+  rating: number | string;
+  feedback: string | null;
+  ai_category: string | null;
+  ai_sentiment: string | null;
+  ai_score: number | string | null;
+  created_at: string;
+};
+
 function encodeIdentifier(value: string): string {
   return encodeURIComponent(value.trim());
 }
@@ -166,4 +177,20 @@ export async function updateOrder(orderId: string, payload: Record<string, unkno
 
 export async function callRpc<T>(name: string, payload?: Record<string, unknown>): Promise<T> {
   return request<T>(`/rest/v1/rpc/${name}`, "POST", payload ?? {});
+}
+
+export async function fetchHomepageReviews() {
+  const select = "id,customer_name,rating,feedback,ai_category,ai_sentiment,ai_score,created_at";
+
+  const [topReviews, bestReviews, latestReviews] = await Promise.all([
+    request<PublicWebsiteReview[]>(`/rest/v1/website_top_reviews?select=${select}&limit=6`, "GET"),
+    request<PublicWebsiteReview[]>(`/rest/v1/website_best_reviews?select=${select}&limit=6`, "GET"),
+    request<PublicWebsiteReview[]>(`/rest/v1/website_latest_reviews?select=${select}&limit=6`, "GET"),
+  ]);
+
+  return {
+    topReviews,
+    bestReviews,
+    latestReviews,
+  };
 }
