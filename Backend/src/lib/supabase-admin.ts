@@ -93,6 +93,26 @@ export type PublicWebsiteReview = {
   created_at: string;
 };
 
+export type CustomerRecord = {
+  id: string;
+  name: string | null;
+  email: string | null;
+  phone: string | null;
+  address: string | Record<string, unknown> | null;
+  wallet_balance_cache?: number | string | null;
+  credit_balance?: number | string | null;
+  total_orders?: number | string | null;
+  total_spent?: number | string | null;
+  created_at?: string | null;
+};
+
+export type WalletSummary = {
+  balance: number;
+  creditBalance: number;
+  totalOrders: number;
+  totalSpent: number;
+};
+
 function encodeIdentifier(value: string): string {
   return encodeURIComponent(value.trim());
 }
@@ -107,6 +127,10 @@ function normalizeOrderIdentifier(value: string): string {
 
 function normalizeOrderNumber(value: string): string {
   return normalizeOrderIdentifier(value).toUpperCase();
+}
+
+function normalizePhone(value: string): string {
+  return value.replace(/\D/g, "").slice(-10);
 }
 
 export async function fetchOrderByIdentifier(identifier: string): Promise<PublicOrderRecord | null> {
@@ -139,6 +163,64 @@ export async function fetchOrderByIdentifier(identifier: string): Promise<Public
     "GET",
   );
   return byRawOrderNumber[0] ?? null;
+}
+
+export async function fetchCustomerByPhone(phone: string): Promise<CustomerRecord | null> {
+  const cleanPhone = normalizePhone(phone);
+  if (!cleanPhone) return null;
+
+  const rows = await request<CustomerRecord[]>(
+    `/rest/v1/customers?select=id,name,email,phone,address,wallet_balance_cache,credit_balance,total_orders,total_spent,created_at&phone=eq.${encodeIdentifier(cleanPhone)}&limit=1`,
+    "GET",
+  );
+
+  return rows[0] ?? null;
+}
+
+export async function updateCustomerById(customerId: string, payload: Record<string, unknown>): Promise<CustomerRecord | null> {
+  const rows = await request<CustomerRecord[]>(
+    `/rest/v1/customers?id=eq.${encodeIdentifier(customerId)}`,
+    "PATCH",
+    payload,
+    {
+      Prefer: "return=representation",
+    },
+  );
+
+  return rows[0] ?? null;
+}
+
+export async function fetchOrdersByPhone(phone: string): Promise<PublicOrderRecord[]> {
+  const cleanPhone = normalizePhone(phone);
+  const customer = await fetchCustomerByPhone(cleanPhone);
+  const select =
+    "id,order_number,customer_id,customer_name,customer_phone,status,payment_status,total_amount,items,fulfillment_type,pickup_date,invoice_url,created_at,updated_at,rating,feedback,ai_category,ai_sentiment,ai_score";
+
+  if (customer?.id) {
+    return request<PublicOrderRecord[]>(
+      `/rest/v1/orders?select=${select}&customer_id=eq.${encodeIdentifier(customer.id)}&order=created_at.desc`,
+      "GET",
+    );
+  }
+
+  return request<PublicOrderRecord[]>(
+    `/rest/v1/orders?select=${select}&customer_phone=eq.${encodeIdentifier(cleanPhone)}&order=created_at.desc`,
+    "GET",
+  );
+}
+
+export async function fetchOwnedOrderById(phone: string, orderId: string): Promise<PublicOrderRecord | null> {
+  const orders = await fetchOrdersByPhone(phone);
+  return orders.find((order) => order.id === orderId) ?? null;
+}
+
+export function mapWalletSummary(customer: CustomerRecord | null): WalletSummary {
+  return {
+    balance: Number(customer?.wallet_balance_cache ?? 0),
+    creditBalance: Number(customer?.credit_balance ?? 0),
+    totalOrders: Number(customer?.total_orders ?? 0),
+    totalSpent: Number(customer?.total_spent ?? 0),
+  };
 }
 
 export async function fetchReviewByOrderId(orderId: string): Promise<ReviewRecord | null> {

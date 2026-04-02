@@ -410,7 +410,18 @@ export default function Home() {
             className="mb-32"
           />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-16">
-            {(featuredReviews.length ? featuredReviews : []).map((review, i) => (
+            {(featuredReviews.length
+              ? featuredReviews
+              : [
+                  {
+                    id: "fallback-review-1",
+                    customer_name: "Fab Clean Customer",
+                    rating: 5,
+                    feedback: "Real-time review highlights appear here as soon as verified customer feedback is available.",
+                    created_at: new Date().toISOString(),
+                  },
+                ]
+            ).map((review, i) => (
               <FadeIn key={i} delay={0.1 * i}>
                 <Card className="p-12 hover:shadow-[0_40px_100px_-20px_rgba(0,0,0,0.08)] transition-all h-full flex flex-col bg-background rounded-[4rem]">
                   <div className="flex mb-10 gap-1.5 underline decoration-primary decoration-4 underline-offset-8">
@@ -431,6 +442,13 @@ export default function Home() {
                 </Card>
               </FadeIn>
             ))}
+          </div>
+          <div className="mt-12 flex justify-center">
+            <Link href="/reviews">
+              <Button variant="outline" className="rounded-[1.6rem] border-foreground/10 bg-background/80">
+                Explore All Reviews
+              </Button>
+            </Link>
           </div>
         </div>
       </section>

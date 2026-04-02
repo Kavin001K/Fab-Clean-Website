@@ -1,9 +1,11 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useGetProfile, setBaseUrl, setAuthTokenGetter } from "@workspace/api-client-react";
+import { useLocation } from "wouter";
+import { getApiBaseUrl } from "@/lib/api-base";
 
 // Initialize API
-setBaseUrl(import.meta.env.VITE_API_URL || "http://localhost:3001");
+setBaseUrl(getApiBaseUrl());
 
 interface AuthContextType {
   token: string | null;
@@ -15,6 +17,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const [, setLocation] = useLocation();
   const [token, setTokenState] = useState<string | null>(() => {
     return localStorage.getItem("fabclean_token");
   });
@@ -32,7 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     setToken(null);
     queryClient.clear();
-    window.location.href = "/";
+    setLocation("/");
   };
 
   // Setup API auth token
@@ -57,6 +60,7 @@ export function useAuth() {
 
 export function useRequireAuth() {
   const { isAuthenticated } = useAuth();
+  const [, setLocation] = useLocation();
   const { data: profile, isLoading } = useGetProfile({
     query: {
       enabled: isAuthenticated,
@@ -66,14 +70,13 @@ export function useRequireAuth() {
 
   useEffect(() => {
     if (!isLoading && (!isAuthenticated || !profile)) {
-      // Small delay to prevent layout thrashing
       const t = setTimeout(() => {
-        window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+        setLocation(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
       }, 100);
       return () => clearTimeout(t);
     }
     return () => {};
-  }, [isAuthenticated, profile, isLoading]);
+  }, [isAuthenticated, profile, isLoading, setLocation]);
 
   return { profile: profile?.data, isLoading };
 }

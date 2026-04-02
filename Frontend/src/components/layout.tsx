@@ -27,12 +27,14 @@ export function Navbar() {
     { name: "Services", path: "/services" },
     { name: "Pricing", path: "/pricing" },
     { name: "Track", path: "/track-order" },
+    { name: "Reviews", path: "/reviews" },
     { name: "About", path: "/about" },
     { name: "Contact", path: "/contact" },
   ];
 
   const isHomePage = location === "/";
   const shouldShowBackground = isScrolled || !isHomePage;
+  const isLinkActive = (path: string) => location === path || (path !== "/" && location.startsWith(path));
 
   return (
     <header className="fixed top-2.5 md:top-6 inset-x-0 z-50 pointer-events-none px-4 md:px-8 pt-[env(safe-area-inset-top)]">
@@ -56,7 +58,7 @@ export function Navbar() {
           <nav aria-label="Primary navigation" className="hidden lg:flex items-center nav-menu px-1 py-1">
             <div className="relative flex items-center gap-1">
               {navLinks.map((link) => {
-                const isActive = location === link.path;
+                const isActive = isLinkActive(link.path);
                 return (
                   <Link
                     key={link.name}
@@ -143,7 +145,7 @@ export function Navbar() {
               </button>
               <div className="flex flex-col gap-1 relative z-10">
                 {navLinks.map((link) => {
-                  const isActive = location === link.path;
+                  const isActive = isLinkActive(link.path);
                   return (
                     <Link
                       key={link.name}
@@ -168,7 +170,7 @@ export function Navbar() {
                 <div className="grid grid-cols-2 gap-4">
                   <Link href={isAuthenticated ? "/dashboard" : "/login"} onClick={() => setMobileMenuOpen(false)}>
                     <Button variant="outline" className="w-full rounded-[2rem] h-20 text-xs font-black">
-                      {isAuthenticated ? "Dashboard" : "Account"}
+                      {isAuthenticated ? "Portal" : "Account"}
                     </Button>
                   </Link>
                   <Link href="/schedule-pickup" onClick={() => setMobileMenuOpen(false)}>
@@ -228,6 +230,7 @@ export function Footer() {
                 { label: "Our Services", path: "/services" },
                 { label: "Pricing List", path: "/pricing" },
                 { label: "Track Order", path: "/track-order" },
+                { label: "Reviews", path: "/reviews" },
                 { label: "Book Pickup", path: "/schedule-pickup" },
                 { label: "Tech & Science", path: "/about" },
               ].map((item) => (
@@ -309,8 +312,8 @@ export function BottomTabBar() {
 
   const tabs = [
     { name: "Home", icon: Home, path: "/" },
+    { name: "Track", icon: Package, path: "/track-order" },
     { name: "Care", icon: List, path: "/services" },
-    { name: "Pickup", icon: Package, path: "/schedule-pickup" },
     { name: "Me", icon: User, path: isAuthenticated ? "/dashboard" : "/login" },
   ];
 

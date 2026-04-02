@@ -8,6 +8,7 @@ import aiRouter from "./ai.js";
 import publicOrdersRouter from "./public-orders.js";
 import publicReviewsRouter from "./public-reviews.js";
 import feedbackRouter from "./feedback.js";
+import portalRouter from "./portal.js";
 
 const router: IRouter = Router();
 
@@ -20,5 +21,6 @@ router.use(aiRouter);
 router.use(publicOrdersRouter);
 router.use(publicReviewsRouter);
 router.use(feedbackRouter);
+router.use(portalRouter);
 
 export default router;
