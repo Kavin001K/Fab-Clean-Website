@@ -118,7 +118,7 @@ export default function TrackOrder() {
         <section className="container-wide section-padding">
           <SectionHeading title="Track your order in one quick view" subtitle="Track order" />
           <p className="mx-auto mt-6 max-w-3xl text-center text-lg leading-8 text-muted-foreground">
-            Enter the order number from your receipt or open a direct tracking link. The status shown here is read from the same operational order record used by the store.
+            Enter the order number from your receipt to check the current progress of your garments and access your invoice.
           </p>
 
           <FadeIn className="mx-auto mt-10 max-w-5xl">
@@ -142,17 +142,16 @@ export default function TrackOrder() {
                   </form>
 
                   <div className="mt-5 flex flex-wrap gap-3">
-                    <span className="info-chip">Direct tracking links supported</span>
-                    <span className="info-chip">ERP order numbers supported</span>
-                    <span className="info-chip">Invoice link shown when available</span>
+                    <span className="info-chip">Real-time status updates</span>
+                    <span className="info-chip">Order history and details</span>
                   </div>
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
                   {[
-                    { icon: Package2, title: "See the current step", body: "The page shows the order stage without calling the store." },
-                    { icon: Truck, title: "Follow delivery progress", body: "Ready, out for delivery, and delivered states are all shown here." },
-                    { icon: FileText, title: "Open invoice when ready", body: "Invoice access appears as soon as billing is attached to the order." },
+                    { icon: Package2, title: "Order progress", body: "View exactly which stage your order is in, from pickup to delivery." },
+                    { icon: Truck, title: "Delivery updates", body: "Get notified when your garments are ready or out for delivery." },
+                    { icon: FileText, title: "Digital invoices", body: "Access and download your service invoices directly from your order page." },
                   ].map((item) => (
                     <div key={item.title} className="surface-soft p-4">
                       <item.icon className="h-5 w-5 text-primary" />

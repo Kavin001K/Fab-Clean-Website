@@ -92,10 +92,9 @@ export default function Login() {
         <div className="grid w-full items-center gap-8 lg:grid-cols-[0.95fr_1.05fr]">
           <FadeIn className="order-2 lg:order-1">
             <Card className="p-6 sm:p-8 lg:p-10">
-              <span className="eyebrow">Customer sign in</span>
-              <h1 className="mt-5 text-4xl font-black sm:text-5xl lg:text-6xl">Phone OTP login, made simpler.</h1>
+              <h1 className="mt-5 text-4xl font-black sm:text-5xl lg:text-6xl">Sign in to your account.</h1>
               <p className="mt-4 text-lg leading-8 text-muted-foreground">
-                Use your phone number to sign in. If the number already matches a customer, your account connects to the same order history. If not, the website can still create your customer profile flow.
+                Enter your phone number to access your order history, track current items, and manage your account settings quickly and securely.
               </p>
 
               <div className="mt-8 grid gap-4 sm:grid-cols-3">

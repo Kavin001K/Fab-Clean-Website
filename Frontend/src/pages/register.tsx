@@ -49,10 +49,9 @@ export default function Register() {
         <div className="grid w-full items-center gap-8 lg:grid-cols-[0.92fr_1.08fr]">
           <FadeIn>
             <Card className="p-6 sm:p-8 lg:p-10">
-              <span className="eyebrow">Complete profile</span>
-              <h1 className="mt-5 text-4xl font-black sm:text-5xl lg:text-6xl">Finish the customer profile setup.</h1>
+              <h1 className="mt-5 text-4xl font-black sm:text-5xl lg:text-6xl">Complete your profile.</h1>
               <p className="mt-4 text-lg leading-8 text-muted-foreground">
-                This step keeps the website account easy to recognize inside the customer portal and helps align the website profile with the linked customer record.
+                Tell us a bit more about yourself to personalize your experience and manage your orders effectively.
               </p>
 
               <div className="mt-8 grid gap-4">
@@ -75,8 +74,8 @@ export default function Register() {
                 <img src={`${import.meta.env.BASE_URL}logo.webp`} alt="Fab Clean logo" className="h-9 w-auto" />
               </Link>
 
-              <h2 className="mt-8 text-3xl font-black sm:text-4xl">Tell us how you want your profile to appear</h2>
-              <p className="mt-3 text-sm leading-7 text-muted-foreground">This is the last step before you move into the customer dashboard.</p>
+              <h2 className="mt-8 text-3xl font-black sm:text-4xl">Personalize your profile</h2>
+              <p className="mt-3 text-sm leading-7 text-muted-foreground">Almost there! Just a few more details before you move into your dashboard.</p>
 
               <form onSubmit={handleSubmit} className="mt-8 space-y-5">
                 <div>

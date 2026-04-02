@@ -154,9 +154,9 @@ export default function FeedbackPage() {
 
       <div className="page-shell">
         <section className="container-wide section-padding">
-          <SectionHeading title="Leave feedback linked to the correct order" subtitle="Feedback" />
+          <SectionHeading title="Share your experience" subtitle="Service Feedback" />
           <p className="mx-auto mt-6 max-w-3xl text-center text-lg leading-8 text-muted-foreground">
-            First load the order. Then rate the service and leave a short review. Existing feedback is shown when the order already has a saved review.
+            We value your feedback. Please load your order to share your experience with our garment care services.
           </p>
         </section>
 
@@ -167,7 +167,7 @@ export default function FeedbackPage() {
                 <p className="text-sm font-bold uppercase tracking-[0.16em] text-primary">Step 1</p>
                 <h2 className="mt-4 text-3xl font-black">Load your order</h2>
                 <p className="mt-3 text-sm leading-7 text-muted-foreground">
-                  You can open this page directly with the order number in the URL or type it below.
+                  Enter your order number from your receipt to get started.
                 </p>
 
                 <form onSubmit={handleLookup} className="mt-6 space-y-4">
@@ -209,9 +209,7 @@ export default function FeedbackPage() {
                 <form onSubmit={handleSubmit}>
                   <p className="text-sm font-bold uppercase tracking-[0.16em] text-primary">Step 2</p>
                   <h2 className="mt-4 text-3xl font-black">Rate the service and write the review</h2>
-                  <p className="mt-3 text-sm leading-7 text-muted-foreground">
-                    Keep the feedback direct. Customers, store staff, and internal ranking tools all benefit from clear review text.
-                  </p>
+                  <p className="mt-3 text-sm leading-7 text-muted-foreground">Your feedback helps us maintain the highest standards of care for your garments.</p>
 
                   <div className="mt-8 space-y-6">
                     <div>

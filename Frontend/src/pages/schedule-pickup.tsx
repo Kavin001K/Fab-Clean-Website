@@ -111,7 +111,7 @@ export default function SchedulePickup() {
         <section className="container-tight section-padding">
           <SectionHeading title="Book a pickup in a few short steps" subtitle="Schedule pickup" />
           <p className="mx-auto mt-6 max-w-3xl text-center text-lg leading-8 text-muted-foreground">
-            This form is designed to keep the booking flow simple. Start with contact details, choose the services you need, then confirm the date and branch.
+            Complete the form below to request a garment pickup. Choose your preferred services, date, and time slot, and our team will handle the rest.
           </p>
 
           <div className="mx-auto mt-10 grid max-w-3xl gap-3 sm:grid-cols-3">
@@ -142,7 +142,7 @@ export default function SchedulePickup() {
                     <motion.div key="pickup-step-1" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-5">
                       <div>
                         <h2 className="text-3xl font-black">Tell us where to reach you</h2>
-                        <p className="mt-2 text-sm leading-7 text-muted-foreground">We use these details to assign the pickup and create the booking reference.</p>
+                        <p className="mt-2 text-sm leading-7 text-muted-foreground">Please provide your contact information and pickup location.</p>
                       </div>
                       <div className="grid gap-4 sm:grid-cols-2">
                         <div>
@@ -177,7 +177,7 @@ export default function SchedulePickup() {
                     <motion.div key="pickup-step-2" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-5">
                       <div>
                         <h2 className="text-3xl font-black">Choose your service type</h2>
-                        <p className="mt-2 text-sm leading-7 text-muted-foreground">Pick one or more service categories. The team can still refine the exact items later.</p>
+                        <p className="mt-2 text-sm leading-7 text-muted-foreground">Select the type of care your garments need.</p>
                       </div>
                       <Controller
                         name="services"
@@ -215,7 +215,7 @@ export default function SchedulePickup() {
                     <motion.div key="pickup-step-3" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-5">
                       <div>
                         <h2 className="text-3xl font-black">Pick the date, branch, and time</h2>
-                        <p className="mt-2 text-sm leading-7 text-muted-foreground">This gives the store a clean booking window to work with.</p>
+                        <p className="mt-2 text-sm leading-7 text-muted-foreground">Choose a time that works best for your schedule.</p>
                       </div>
 
                       <div className="grid gap-4 sm:grid-cols-2">

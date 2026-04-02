@@ -14,9 +14,9 @@ export default function About() {
 
       <div className="page-shell">
         <section className="container-tight section-padding">
-          <SectionHeading title="A simpler story about what Fab Clean does" subtitle="About us" />
+          <SectionHeading title="Your partner in premium garment care" subtitle="About us" />
           <p className="mx-auto mt-6 max-w-3xl text-center text-lg leading-8 text-muted-foreground">
-            Fab Clean was built to make garment care feel more dependable. The goal is straightforward: keep service quality high, keep communication clear, and make it easier for customers to know what is happening to their order.
+            We are dedicated to providing high-quality laundry and dry cleaning with transparent communication and reliable service. Our goal is to make garment care simple, organized, and worry-free for every customer.
           </p>
         </section>
 
@@ -24,12 +24,11 @@ export default function About() {
           <div className="grid gap-6 lg:grid-cols-[1fr_0.95fr]">
             <FadeIn>
               <Card className="h-full p-7 sm:p-8">
-                <Badge>How we think about service</Badge>
+                <Badge>Our Vision</Badge>
                 <h2 className="mt-5 text-4xl font-black sm:text-5xl">Care, clarity, and consistency</h2>
                 <div className="mt-6 space-y-4 text-base leading-8 text-muted-foreground">
-                  <p>Customers should not need to guess what service to choose, what the status means, or whether the team received their feedback.</p>
-                  <p>The website and ERP now work together so store operations, billing, order progress, and customer feedback can stay aligned in one system.</p>
-                  <p>That means the public website can feel simple, while the operational side still has the detail the store needs.</p>
+                  <p>We believe that garment care should be a seamless experience. You should always know the status of your order and feel confident in the quality of service you receive.</p>
+                  <p>By combining traditional expertise with modern convenience, we provide a service that respects your time and your wardrobe.</p>
                 </div>
               </Card>
             </FadeIn>
@@ -45,13 +44,13 @@ export default function About() {
                     },
                     {
                       icon: CheckCircle2,
-                      title: "Order tracking and feedback",
-                      text: "Customers can track orders by identifier and submit order-linked reviews after service.",
+                      title: "Real-time order tracking",
+                      text: "Stay updated on your order progress and share your feedback directly through our platform.",
                     },
                     {
                       icon: ShieldCheck,
-                      title: "Customer access with OTP",
-                      text: "Phone OTP sign-in keeps access tied to the customer record without adding a separate password system.",
+                      title: "Secure and easy access",
+                      text: "Quick sign-in with your phone number ensures your account remains private and easy to manage.",
                     },
                   ].map((item) => (
                     <div key={item.title} className="surface-soft p-5">

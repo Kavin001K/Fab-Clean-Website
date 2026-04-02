@@ -53,7 +53,7 @@ function ReviewSection({
       ) : (
         <Card className="p-6">
           <p className="text-lg font-black">Fresh reviews will appear here soon.</p>
-          <p className="mt-3 text-sm leading-7 text-muted-foreground">This section reads from the live review views, so new approved feedback will show up automatically.</p>
+          <p className="mt-3 text-sm leading-7 text-muted-foreground">New reviews will appear here as soon as they are approved by our team.</p>
         </Card>
       )}
     </section>
@@ -83,9 +83,9 @@ export default function ReviewsPage() {
 
       <div className="page-shell">
         <section className="container-wide section-padding">
-          <SectionHeading title="Real reviews from real orders" subtitle="Customer reviews" />
+          <SectionHeading title="What our customers say" subtitle="Customer reviews" />
           <p className="mx-auto mt-6 max-w-3xl text-center text-lg leading-8 text-muted-foreground">
-            Reviews displayed here come from feedback saved against real orders. We show the customer name, rating, review text, and review time. Phone numbers stay private.
+            We are proud to share the experiences of our customers. Each review represents a real order and our commitment to quality garment care.
           </p>
 
           <div className="mt-10 grid gap-4 sm:grid-cols-3">
@@ -103,7 +103,7 @@ export default function ReviewsPage() {
         </section>
 
         <section className="container-wide space-y-16 pb-20">
-          <ReviewSection title="Top reviews" subtitle="AI ranked" reviews={sections.topReviews} />
+          <ReviewSection title="Top reviews" subtitle="Most helpful" reviews={sections.topReviews} />
           <ReviewSection title="Best reviews" subtitle="Featured feedback" reviews={sections.bestReviews} />
           <ReviewSection title="Latest reviews" subtitle="Recent customer feedback" reviews={sections.latestReviews} />
         </section>

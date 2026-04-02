@@ -95,7 +95,6 @@ export default function Home() {
         <section className="container-wide section-padding relative">
           <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
             <FadeIn className="space-y-6">
-              <span className="eyebrow">Simple garment care, clearly explained</span>
               <div className="space-y-5">
                 <h1 className="max-w-3xl text-5xl font-black sm:text-6xl lg:text-7xl">
                   Laundry and dry cleaning that feels <span className="text-gradient">easy to trust</span>.
@@ -141,12 +140,12 @@ export default function Home() {
                 <div className="absolute inset-0 bg-gradient-to-t from-[#10244f]/48 via-transparent to-white/10" />
                 <div className="absolute bottom-5 left-5 right-5 grid gap-4 sm:grid-cols-2">
                   <div className="surface-soft p-4">
-                    <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-primary">What customers can do</p>
-                    <p className="mt-2 text-sm leading-7 text-foreground">Track orders, open feedback links, and view live review content without calling the store.</p>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-primary">For Our Customers</p>
+                    <p className="mt-2 text-sm leading-7 text-foreground">Track your orders in real-time, share feedback, and manage your garment care effortlessly.</p>
                   </div>
                   <div className="surface-soft p-4">
-                    <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-primary">What stores can do</p>
-                    <p className="mt-2 text-sm leading-7 text-foreground">Keep ERP data, website signups, order updates, and customer history aligned.</p>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-primary">Our Commitment</p>
+                    <p className="mt-2 text-sm leading-7 text-foreground">We ensure your garments get the best care while keeping your order history and updates synchronized.</p>
                   </div>
                 </div>
               </div>
@@ -190,11 +189,11 @@ export default function Home() {
             <FadeIn className="space-y-5">
               <SectionHeading
                 align="left"
-                title="Services customers usually ask for first"
-                subtitle="Popular care categories"
+                title="Premium care for every garment"
+                subtitle="Popular categories"
               />
               <p className="max-w-xl text-lg leading-8 text-muted-foreground">
-                The service list stays practical: everyday wear, delicate garments, and items that need specialist handling. Every card below explains what the service is for in simple language.
+                From everyday wear to delicate fabrics, we provide specialized cleaning and handling for everything in your wardrobe.
               </p>
               <Link href="/services">
                 <Button variant="outline">
@@ -273,10 +272,9 @@ export default function Home() {
           <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
             <FadeIn>
               <Card className="h-full p-7 sm:p-8">
-                <Badge>Service area</Badge>
-                <h2 className="mt-5 text-4xl font-black sm:text-5xl">Pickup support across Pollachi and nearby areas</h2>
+                <h2 className="mt-5 text-4xl font-black sm:text-5xl">Reliable pickup across Pollachi and nearby areas</h2>
                 <p className="mt-5 max-w-2xl text-lg leading-8 text-muted-foreground">
-                  The website is designed to explain where service is available, how pickup works, and how customers can get support quickly without guessing what to do next.
+                  Our dedicated team ensures your garments are collected and delivered with care, right from your doorstep.
                 </p>
 
                 <div className="mt-8 grid gap-4 sm:grid-cols-2">
@@ -307,9 +305,9 @@ export default function Home() {
             <FadeIn delay={0.06}>
               <Card className="h-full bg-brand-gradient p-7 text-white sm:p-8">
                 <p className="text-sm font-black uppercase tracking-[0.18em] text-white/80">Need help right now?</p>
-                <h2 className="mt-5 text-4xl font-black sm:text-5xl">Use the shortest path.</h2>
+                <h2 className="mt-5 text-4xl font-black sm:text-5xl">Fresh clothes are just a click away.</h2>
                 <p className="mt-5 text-lg leading-8 text-white/80">
-                  Book a pickup if you are ready to send garments. Use order tracking if you already have a receipt. Use feedback when the order is complete and you want the team to review your experience.
+                  Book a pickup for your next laundry day, or track the progress of your current items in real-time.
                 </p>
                 <div className="mt-8 grid gap-3">
                   <Link href="/schedule-pickup">

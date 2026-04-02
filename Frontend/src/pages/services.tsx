@@ -26,11 +26,11 @@ export default function Services() {
       <div className="page-shell">
         <section className="container-wide section-padding">
           <SectionHeading
-            title="Services explained in plain language"
-            subtitle="Garment care without guesswork"
+            title="Garment care for every occasion"
+            subtitle="Our Services"
           />
           <p className="mx-auto mt-6 max-w-3xl text-center text-lg leading-8 text-muted-foreground">
-            Each service card below tells you what the service is for, what is usually included, and the starting price. If you are not sure what to choose, booking a pickup is still the fastest way to ask the team.
+            Explore our professional laundry and dry cleaning options. Each service is tailored to provide the best care for your garments, ensuring they look and feel their best.
           </p>
         </section>
 
@@ -105,9 +105,9 @@ export default function Services() {
               <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-center">
                 <div>
                   <p className="text-sm font-black uppercase tracking-[0.18em] text-white/80">Still not sure?</p>
-                  <h2 className="mt-4 text-4xl font-black sm:text-5xl">Tell us what you want cleaned and we will guide you.</h2>
+                  <h2 className="mt-4 text-4xl font-black sm:text-5xl">Ready to give your garments the care they deserve?</h2>
                   <p className="mt-4 max-w-2xl text-lg leading-8 text-white/80">
-                    This site is meant to reduce confusion. If you do not know the correct service name, contact the team or book a pickup and describe the item in plain words.
+                    If you have questions about a specific item or need custom care, our team is here to help. Reach out to us or schedule a pickup today.
                   </p>
                 </div>
                 <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
