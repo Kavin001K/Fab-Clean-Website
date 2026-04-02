@@ -1,83 +1,105 @@
 import { useState } from "react";
-import { AppLayout } from "@/components/layout";
-import { SectionHeading, Card, Input, Button, FadeIn } from "@/components/ui";
-import { useListServices, useSchedulePickup } from "@workspace/api-client-react";
-import { useForm, Controller } from "react-hook-form";
+import { AnimatePresence, motion } from "framer-motion";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { motion, AnimatePresence } from "framer-motion";
-import { Check, CheckCircle2, ChevronRight, MapPin } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
+import { CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react";
+import { useListServices, useSchedulePickup } from "@workspace/api-client-react";
+import { AppLayout } from "@/components/layout";
+import { Button, Card, FadeIn, Input, SectionHeading } from "@/components/ui";
+import { useToast } from "@/hooks/use-toast";
 
 const pickupSchema = z.object({
-  name: z.string().min(2),
-  phone: z.string().length(10),
-  address: z.string().min(10),
+  name: z.string().min(2, "Enter your name"),
+  phone: z.string().length(10, "Enter a 10-digit phone number"),
+  address: z.string().min(10, "Enter the full pickup address"),
   services: z.array(z.string()).min(1, "Select at least one service"),
-  preferredDate: z.string(),
+  preferredDate: z.string().min(1, "Pick a date"),
   timeSlot: z.enum(["morning", "afternoon", "evening"]),
   branch: z.enum(["pollachi", "kinathukadavu"]),
-  specialInstructions: z.string().optional()
+  specialInstructions: z.string().optional(),
 });
 
 type PickupForm = z.infer<typeof pickupSchema>;
 
+const steps = ["Your details", "Services", "Date and branch"];
+
 export default function SchedulePickup() {
   const [step, setStep] = useState(1);
+  const [successData, setSuccessData] = useState<{ ref: string; msg: string } | null>(null);
   const { data: servicesData } = useListServices();
   const { toast } = useToast();
-  const [successData, setSuccessData] = useState<{ref: string, msg: string} | null>(null);
 
-  const { control, register, handleSubmit, watch, formState: { errors, isValid } } = useForm<PickupForm>({
+  const {
+    control,
+    register,
+    handleSubmit,
+    watch,
+    trigger,
+    formState: { errors, isValid },
+  } = useForm<PickupForm>({
     resolver: zodResolver(pickupSchema),
     mode: "onChange",
     defaultValues: {
       services: [],
       branch: "pollachi",
-      timeSlot: "morning"
-    }
+      timeSlot: "morning",
+    },
   });
 
   const { mutate: schedule, isPending } = useSchedulePickup({
     mutation: {
-      onSuccess: (res) => setSuccessData({ ref: res.data.bookingReference, msg: res.data.message }),
-      onError: () => toast({ title: "Error", description: "Failed to schedule pickup", variant: "destructive" })
-    }
+      onSuccess: (result) => setSuccessData({ ref: result.data.bookingReference, msg: result.data.message }),
+      onError: () => {
+        toast({ title: "Unable to schedule pickup", description: "Please try again in a moment.", variant: "destructive" });
+      },
+    },
   });
 
-  const onSubmit = (data: PickupForm) => {
-    schedule({ data });
+  const onSubmit = (values: PickupForm) => {
+    schedule({ data: values });
   };
 
-  const nextStep = () => {
-    if (step === 1 && !errors.name && !errors.phone && !errors.address && watch('name') && watch('phone') && watch('address')) setStep(2);
-    if (step === 2 && watch('services').length > 0) setStep(3);
+  const nextStep = async () => {
+    if (step === 1) {
+      const ok = await trigger(["name", "phone", "address"]);
+      if (ok) setStep(2);
+      return;
+    }
+    if (step === 2) {
+      const ok = await trigger(["services"]);
+      if (ok) setStep(3);
+    }
   };
 
   if (successData) {
     return (
       <AppLayout>
-        <div className="relative min-h-[80vh] flex items-center justify-center pt-20 px-4 overflow-hidden">
-          <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-            <div className="absolute top-0 left-0 w-[820px] h-[820px] bg-primary/10 rounded-full blur-[220px] -translate-x-1/2 -translate-y-1/2" />
-            <div className="absolute bottom-0 right-0 w-[650px] h-[650px] bg-secondary/7 rounded-full blur-[190px] translate-x-1/2 translate-y-1/2" />
-          </div>
-
-          <FadeIn className="relative z-10 text-center max-w-md">
-            <div className="w-20 h-20 bg-primary/15 text-primary rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle2 className="w-10 h-10" />
-            </div>
-            <h2 className="text-3xl font-display font-bold text-foreground mb-4">Pickup Scheduled!</h2>
-            <p className="text-muted-foreground mb-6">{successData.msg}</p>
-            <div className="bg-muted border border-border rounded-xl p-6 mb-8">
-              <p className="text-sm text-muted-foreground uppercase tracking-wider mb-1">Booking Reference</p>
-              <p className="text-2xl font-mono font-bold text-primary">{successData.ref}</p>
-            </div>
-            <Link href="/dashboard">
-              <Button size="lg" className="w-full">Track My Order</Button>
-            </Link>
-          </FadeIn>
+        <div className="page-shell">
+          <section className="container-tight section-padding">
+            <FadeIn className="mx-auto max-w-2xl">
+              <Card className="p-8 text-center sm:p-10">
+                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <CheckCircle2 className="h-8 w-8" />
+                </div>
+                <h1 className="mt-6 text-4xl font-black sm:text-5xl">Pickup request saved</h1>
+                <p className="mt-4 text-lg leading-8 text-muted-foreground">{successData.msg}</p>
+                <div className="mt-6 rounded-[1.5rem] bg-muted/70 px-6 py-5">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-primary">Booking reference</p>
+                  <p className="mt-2 text-2xl font-black text-foreground">{successData.ref}</p>
+                </div>
+                <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+                  <Link href="/dashboard/orders">
+                    <Button>Open dashboard</Button>
+                  </Link>
+                  <Link href="/track-order">
+                    <Button variant="outline">Track an order</Button>
+                  </Link>
+                </div>
+              </Card>
+            </FadeIn>
+          </section>
         </div>
       </AppLayout>
     );
@@ -85,178 +107,215 @@ export default function SchedulePickup() {
 
   return (
     <AppLayout>
-      <div className="relative pt-32 pb-24 max-w-3xl mx-auto px-4 overflow-hidden">
-        <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-          <div className="absolute top-0 right-0 w-[900px] h-[900px] bg-primary/10 rounded-full blur-[220px] translate-x-1/2 -translate-y-1/2" />
-          <div className="absolute bottom-0 left-0 w-[680px] h-[680px] bg-secondary/6 rounded-full blur-[190px] -translate-x-1/2 translate-y-1/2" />
-        </div>
+      <div className="page-shell">
+        <section className="container-tight section-padding">
+          <SectionHeading title="Book a pickup in a few short steps" subtitle="Schedule pickup" />
+          <p className="mx-auto mt-6 max-w-3xl text-center text-lg leading-8 text-muted-foreground">
+            This form is designed to keep the booking flow simple. Start with contact details, choose the services you need, then confirm the date and branch.
+          </p>
 
-        <div className="relative z-10">
-        <SectionHeading title="Schedule Pickup" subtitle="Fast & Free within 3km" className="mb-12" />
-
-        {/* Progress Bar */}
-        <div className="flex items-center justify-between mb-12 relative">
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-border -z-10 rounded-full overflow-hidden">
-            <motion.div 
-              className="h-full bg-primary"
-              initial={{ width: "33%" }}
-              animate={{ width: `${(step / 3) * 100}%` }}
-            />
+          <div className="mx-auto mt-10 grid max-w-3xl gap-3 sm:grid-cols-3">
+            {steps.map((label, index) => {
+              const active = index + 1 === step;
+              const complete = index + 1 < step;
+              return (
+                <div
+                  key={label}
+                  className={`rounded-[1.25rem] border px-4 py-4 text-sm font-bold transition-colors ${
+                    active ? "border-primary bg-primary/10 text-primary" : complete ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-border bg-white text-muted-foreground"
+                  }`}
+                >
+                  <div className="text-[11px] uppercase tracking-[0.14em]">{`Step ${index + 1}`}</div>
+                  <div className="mt-1">{label}</div>
+                </div>
+              );
+            })}
           </div>
-          {[1, 2, 3].map((num) => (
-            <div key={num} className={`w-10 h-10 rounded-full flex items-center justify-center font-bold border-4 border-background transition-colors ${step >= num ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground border-border"}`}>
-              {num}
-            </div>
-          ))}
-        </div>
+        </section>
 
-        <Card className="p-6 md:p-10 border-border shadow-lg relative overflow-hidden">
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <AnimatePresence mode="wait">
-              
-              {/* STEP 1 */}
-              {step === 1 && (
-                <motion.div key="1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-                  <h3 className="text-2xl font-bold text-foreground mb-6">Contact Details</h3>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <Input placeholder="Full Name" {...register("name")} />
-                      {errors.name && <span className="text-xs text-destructive">{errors.name.message}</span>}
-                    </div>
-                    <div>
-                      <Input placeholder="Phone (10 digits)" {...register("phone")} maxLength={10} />
-                      {errors.phone && <span className="text-xs text-destructive">{errors.phone.message}</span>}
-                    </div>
-                  </div>
-                  <div>
-                    <textarea
-                      className="flex min-h-[100px] w-full rounded-xl border-2 border-border bg-white px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all resize-none"
-                      placeholder="Full Pickup Address with landmarks"
-                      {...register("address")}
-                    />
-                    {errors.address && <span className="text-xs text-destructive">{errors.address.message}</span>}
-                  </div>
-                  <Button type="button" onClick={nextStep} className="w-full h-12" disabled={!watch('name') || !watch('phone') || !watch('address')}>
-                    Next Step <ChevronRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </motion.div>
-              )}
-
-              {/* STEP 2 */}
-              {step === 2 && (
-                <motion.div key="2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-                  <h3 className="text-2xl font-bold text-foreground mb-6">Select Services</h3>
-                  
-                  <Controller
-                    name="services"
-                    control={control}
-                    render={({ field }) => (
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        {servicesData?.data.map((srv) => {
-                          const isSelected = field.value.includes(srv.id);
-                          return (
-                            <div 
-                              key={srv.id}
-                              onClick={() => {
-                                const newValues = isSelected ? field.value.filter(id => id !== srv.id) : [...field.value, srv.id];
-                                field.onChange(newValues);
-                              }}
-                              className={`p-4 rounded-xl border-2 cursor-pointer transition-all flex flex-col items-center text-center gap-3 relative ${isSelected ? 'border-primary bg-primary/10' : 'border-border bg-white hover:border-primary/50 hover:bg-muted/50'}`}
-                            >
-                              {isSelected && <div className="absolute top-2 right-2 w-5 h-5 bg-primary rounded-full flex items-center justify-center text-primary-foreground"><Check className="w-3 h-3" /></div>}
-                              <img src={`https://api.dicebear.com/7.x/icons/svg?seed=${srv.icon}&backgroundColor=transparent`} className="w-8 h-8 opacity-80" alt="icon"/>
-                              <span className="text-sm font-medium text-foreground">{srv.name}</span>
-                            </div>
-                          );
-                        })}
+        <section className="container-tight pb-20">
+          <FadeIn className="mx-auto max-w-3xl">
+            <Card className="p-6 sm:p-8">
+              <form onSubmit={handleSubmit(onSubmit)}>
+                <AnimatePresence mode="wait">
+                  {step === 1 ? (
+                    <motion.div key="pickup-step-1" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-5">
+                      <div>
+                        <h2 className="text-3xl font-black">Tell us where to reach you</h2>
+                        <p className="mt-2 text-sm leading-7 text-muted-foreground">We use these details to assign the pickup and create the booking reference.</p>
                       </div>
-                    )}
-                  />
-                  {errors.services && <span className="text-xs text-destructive">{errors.services.message}</span>}
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        <div>
+                          <Input placeholder="Full name" {...register("name")} />
+                          {errors.name ? <p className="mt-2 text-sm text-destructive">{errors.name.message}</p> : null}
+                        </div>
+                        <div>
+                          <Input
+                            placeholder="Phone number"
+                            maxLength={10}
+                            {...register("phone")}
+                            onInput={(event) => {
+                              const target = event.currentTarget as HTMLInputElement;
+                              target.value = target.value.replace(/\D/g, "").slice(0, 10);
+                            }}
+                          />
+                          {errors.phone ? <p className="mt-2 text-sm text-destructive">{errors.phone.message}</p> : null}
+                        </div>
+                      </div>
+                      <div>
+                        <textarea
+                          className="min-h-[140px] w-full rounded-[1.4rem] border border-border bg-white px-4 py-3 text-sm text-foreground shadow-sm outline-none transition focus:border-primary/40 focus:ring-4 focus:ring-primary/12"
+                          placeholder="Full pickup address with nearby landmark"
+                          {...register("address")}
+                        />
+                        {errors.address ? <p className="mt-2 text-sm text-destructive">{errors.address.message}</p> : null}
+                      </div>
+                    </motion.div>
+                  ) : null}
 
-                  <Button type="button" onClick={nextStep} className="w-full h-12" disabled={watch('services').length === 0}>
-                    Next Step <ChevronRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </motion.div>
-              )}
-
-              {/* STEP 3 */}
-              {step === 3 && (
-                <motion.div key="3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-                  <h3 className="text-2xl font-bold text-foreground mb-6">Schedule Time &amp; Branch</h3>
-
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                      <label className="text-sm font-medium text-foreground">Preferred Branch</label>
+                  {step === 2 ? (
+                    <motion.div key="pickup-step-2" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-5">
+                      <div>
+                        <h2 className="text-3xl font-black">Choose your service type</h2>
+                        <p className="mt-2 text-sm leading-7 text-muted-foreground">Pick one or more service categories. The team can still refine the exact items later.</p>
+                      </div>
                       <Controller
-                        name="branch"
+                        name="services"
                         control={control}
                         render={({ field }) => (
-                          <div className="flex gap-4">
-                            {['pollachi', 'kinathukadavu'].map(b => (
-                              <button
-                                type="button"
-                                key={b}
-                                onClick={() => field.onChange(b)}
-                                className={`flex-1 py-3 rounded-xl border-2 capitalize text-sm font-semibold transition-all ${field.value === b ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-white text-muted-foreground hover:border-primary/50'}`}
-                              >
-                                {b}
-                              </button>
-                            ))}
+                          <div className="grid gap-4 sm:grid-cols-2">
+                            {servicesData?.data?.map((service) => {
+                              const selected = field.value.includes(service.id);
+                              return (
+                                <button
+                                  key={service.id}
+                                  type="button"
+                                  onClick={() => {
+                                    field.onChange(
+                                      selected ? field.value.filter((value) => value !== service.id) : [...field.value, service.id],
+                                    );
+                                  }}
+                                  className={`rounded-[1.5rem] border px-5 py-5 text-left transition-all ${
+                                    selected ? "border-primary bg-primary/10 shadow-sm" : "border-border bg-white hover:border-primary/35 hover:bg-muted/70"
+                                  }`}
+                                >
+                                  <p className="font-black text-foreground">{service.name}</p>
+                                  <p className="mt-2 text-sm leading-7 text-muted-foreground">{service.description}</p>
+                                </button>
+                              );
+                            })}
                           </div>
                         )}
                       />
-                    </div>
+                      {errors.services ? <p className="text-sm text-destructive">{errors.services.message}</p> : null}
+                    </motion.div>
+                  ) : null}
 
-                    <div className="space-y-4">
-                      <label className="text-sm font-medium text-foreground">Pickup Date</label>
-                      <Input type="date" {...register("preferredDate")} min={new Date().toISOString().split('T')[0]} />
-                      {errors.preferredDate && <span className="text-xs text-destructive">Required</span>}
-                    </div>
-                  </div>
+                  {step === 3 ? (
+                    <motion.div key="pickup-step-3" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-5">
+                      <div>
+                        <h2 className="text-3xl font-black">Pick the date, branch, and time</h2>
+                        <p className="mt-2 text-sm leading-7 text-muted-foreground">This gives the store a clean booking window to work with.</p>
+                      </div>
 
-                  <div className="space-y-4">
-                    <label className="text-sm font-medium text-foreground">Time Slot</label>
-                    <Controller
-                      name="timeSlot"
-                      control={control}
-                      render={({ field }) => (
-                        <div className="grid grid-cols-3 gap-4">
-                          {[
-                            { id: 'morning', label: 'Morning', time: '10 AM - 1 PM' },
-                            { id: 'afternoon', label: 'Afternoon', time: '1 PM - 4 PM' },
-                            { id: 'evening', label: 'Evening', time: '4 PM - 8 PM' },
-                          ].map(t => (
-                            <button
-                              type="button"
-                              key={t.id}
-                              onClick={() => field.onChange(t.id)}
-                              className={`p-3 rounded-xl border-2 flex flex-col items-center transition-all ${field.value === t.id ? 'border-primary bg-primary/10' : 'border-border bg-white hover:border-primary/40'}`}
-                            >
-                              <span className={`font-semibold ${field.value === t.id ? 'text-primary' : 'text-foreground'}`}>{t.label}</span>
-                              <span className="text-xs text-muted-foreground mt-1">{t.time}</span>
-                            </button>
-                          ))}
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        <div>
+                          <label className="mb-2 block text-sm font-bold text-foreground">Preferred date</label>
+                          <Input type="date" min={new Date().toISOString().split("T")[0]} {...register("preferredDate")} />
+                          {errors.preferredDate ? <p className="mt-2 text-sm text-destructive">{errors.preferredDate.message}</p> : null}
                         </div>
-                      )}
-                    />
+
+                        <div>
+                          <label className="mb-2 block text-sm font-bold text-foreground">Preferred branch</label>
+                          <Controller
+                            name="branch"
+                            control={control}
+                            render={({ field }) => (
+                              <div className="grid grid-cols-2 gap-3">
+                                {["pollachi", "kinathukadavu"].map((branch) => (
+                                  <button
+                                    key={branch}
+                                    type="button"
+                                    onClick={() => field.onChange(branch)}
+                                    className={`rounded-[1.2rem] border px-4 py-3 text-sm font-bold capitalize ${
+                                      field.value === branch ? "border-primary bg-primary/10 text-primary" : "border-border bg-white text-foreground"
+                                    }`}
+                                  >
+                                    {branch}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="mb-2 block text-sm font-bold text-foreground">Time slot</label>
+                        <Controller
+                          name="timeSlot"
+                          control={control}
+                          render={({ field }) => (
+                            <div className="grid gap-3 sm:grid-cols-3">
+                              {[
+                                { id: "morning", label: "Morning", time: "10 AM to 1 PM" },
+                                { id: "afternoon", label: "Afternoon", time: "1 PM to 4 PM" },
+                                { id: "evening", label: "Evening", time: "4 PM to 8 PM" },
+                              ].map((slot) => (
+                                <button
+                                  key={slot.id}
+                                  type="button"
+                                  onClick={() => field.onChange(slot.id)}
+                                  className={`rounded-[1.2rem] border px-4 py-4 text-left ${
+                                    field.value === slot.id ? "border-primary bg-primary/10" : "border-border bg-white"
+                                  }`}
+                                >
+                                  <p className="font-black text-foreground">{slot.label}</p>
+                                  <p className="mt-1 text-sm text-muted-foreground">{slot.time}</p>
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        />
+                      </div>
+
+                      <div>
+                        <label className="mb-2 block text-sm font-bold text-foreground">Special instructions (optional)</label>
+                        <textarea
+                          className="min-h-[120px] w-full rounded-[1.4rem] border border-border bg-white px-4 py-3 text-sm text-foreground shadow-sm outline-none transition focus:border-primary/40 focus:ring-4 focus:ring-primary/12"
+                          placeholder="Anything the pickup team should know?"
+                          {...register("specialInstructions")}
+                        />
+                      </div>
+                    </motion.div>
+                  ) : null}
+                </AnimatePresence>
+
+                <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex gap-3">
+                    {step > 1 ? (
+                      <Button type="button" variant="outline" onClick={() => setStep((value) => Math.max(1, value - 1))}>
+                        <ChevronLeft className="h-4 w-4" />
+                        Back
+                      </Button>
+                    ) : null}
                   </div>
 
-                  <Button type="submit" isLoading={isPending} disabled={!isValid} className="w-full h-14 text-lg mt-8 shadow-primary/30 shadow-xl">
-                    Confirm Booking
-                  </Button>
-                </motion.div>
-              )}
-            </AnimatePresence>
-            
-            {step > 1 && (
-              <button type="button" onClick={() => setStep(step - 1)} className="absolute top-8 right-8 text-sm text-muted-foreground hover:text-foreground transition-colors">
-                Go Back
-              </button>
-            )}
-          </form>
-        </Card>
-        </div>
+                  {step < 3 ? (
+                    <Button type="button" onClick={() => void nextStep()}>
+                      Next
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  ) : (
+                    <Button type="submit" isLoading={isPending} disabled={!isValid}>
+                      Confirm pickup
+                    </Button>
+                  )}
+                </div>
+              </form>
+            </Card>
+          </FadeIn>
+        </section>
       </div>
     </AppLayout>
   );

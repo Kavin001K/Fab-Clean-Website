@@ -1,152 +1,109 @@
 // @ts-nocheck
-import { useState, useEffect } from "react";
-import { useLocation, Link } from "wouter";
-import { motion } from "framer-motion";
-import { Button, Input, FadeIn } from "@/components/ui";
-import { useAuth } from "@/hooks/use-auth";
+import { useEffect, useState } from "react";
+import { Link, useLocation } from "wouter";
+import { CheckCircle2, Mail, User } from "lucide-react";
 import { useUpdateProfile } from "@workspace/api-client-react";
+import { Button, Card, FadeIn, Input } from "@/components/ui";
+import { useAuth } from "@/hooks/use-auth";
 import { toast } from "@/hooks/use-toast";
-import { 
-  ArrowRight, User, Sparkles, 
-  ArrowLeft, CheckCircle2, Star, ShieldCheck
-} from "lucide-react";
 
 export default function Register() {
   const [, setLocation] = useLocation();
-  const { isAuthenticated, setToken } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
 
-  const { mutate: update, isPending } = useUpdateProfile({
-    onSuccess: () => {
-      toast({ title: "Welcome aboard!", description: "Your profile has been set up successfully." });
-      setLocation("/dashboard");
+  const updateProfile = useUpdateProfile({
+    mutation: {
+      onSuccess: () => {
+        toast({ title: "Profile saved", description: "Your customer profile is ready." });
+        setLocation("/dashboard/profile");
+      },
+      onError: (error: any) => {
+        toast({
+          title: "Unable to save profile",
+          description: error.response?.data?.message || "Please try again.",
+          variant: "destructive",
+        });
+      },
     },
-    onError: (err: any) => {
-      toast({ 
-        variant: "destructive", 
-        title: "Registration failed", 
-        description: err.response?.data?.message || "Something went wrong. Please try again." 
-      });
-    }
   });
 
-  // If not authenticated, redirected to login first
-  // In a real app, the token should already be in the context from the successful OTP step
   useEffect(() => {
-    if (!isAuthenticated) {
-      // Small timeout to allow state to settle
-      const t = setTimeout(() => {
-        if (!isAuthenticated) setLocation("/login");
-      }, 500);
-      return () => clearTimeout(t);
-    }
+    if (!isAuthenticated) setLocation("/login?redirect=%2Fregister");
   }, [isAuthenticated, setLocation]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (name.trim().length < 2) return toast({ variant: "destructive", title: "Invalid Name" });
-    update({ data: { name, email } });
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (name.trim().length < 2) {
+      toast({ title: "Please enter your name", variant: "destructive" });
+      return;
+    }
+
+    updateProfile.mutate({ data: { name, email } });
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-background">
-      
-      {/* Immersive Background Image (Matches Login) */}
-      <div className="absolute inset-0 z-0">
-        <picture>
-          <source
-            srcSet={`${import.meta.env.BASE_URL}images/auth-bg.webp`}
-            type="image/webp"
-          />
-          <motion.img 
-              initial={{ scale: 1.1, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 2, ease: "easeOut" }}
-              src={`${import.meta.env.BASE_URL}images/auth-bg.png`} 
-              className="w-full h-full object-cover grayscale opacity-40 mix-blend-multiply"
-              loading="lazy"
-              decoding="async"
-              alt=""
-          />
-        </picture>
-        <div className="absolute inset-0 bg-gradient-to-br from-white/80 via-white/40 to-primary/10 backdrop-blur-3xl" />
-      </div>
+    <div className="min-h-screen bg-background px-4 py-8 sm:px-6">
+      <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-5xl items-center justify-center">
+        <div className="grid w-full items-center gap-8 lg:grid-cols-[0.92fr_1.08fr]">
+          <FadeIn>
+            <Card className="p-6 sm:p-8 lg:p-10">
+              <span className="eyebrow">Complete profile</span>
+              <h1 className="mt-5 text-4xl font-black sm:text-5xl lg:text-6xl">Finish the customer profile setup.</h1>
+              <p className="mt-4 text-lg leading-8 text-muted-foreground">
+                This step keeps the website account easy to recognize inside the customer portal and helps align the website profile with the linked customer record.
+              </p>
 
-      <div className="container relative z-10 p-6 flex items-center justify-center">
-        <FadeIn className="w-full max-w-xl">
-          <div className="bg-white/80 backdrop-blur-2xl rounded-[4rem] p-10 md:p-20 shadow-[0_80px_160px_-40px_rgba(0,0,0,0.15)] border border-white/50 relative overflow-hidden group">
-            
-            {/* Logo area */}
-            <Link href="/" className="inline-block mb-16 hover:scale-105 transition-transform z-20">
-                <img src={`${import.meta.env.BASE_URL}logo.webp`} className="h-10 w-auto" alt="Logo" />
-            </Link>
+              <div className="mt-8 grid gap-4">
+                {[
+                  "Use the same name you want on your customer account.",
+                  "Email is optional, but helpful for future updates.",
+                  "Phone number stays locked because sign-in is tied to OTP.",
+                ].map((item) => (
+                  <div key={item} className="surface-soft px-4 py-4 text-sm leading-7 text-muted-foreground">
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </FadeIn>
 
-            <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8 }}
-                className="space-y-12 relative z-10"
-            >
-                <div className="space-y-4">
-                    <h1 className="text-5xl md:text-7xl font-black font-display text-foreground leading-none">Almost <br/><span className="text-primary italic font-serif">Aboard.</span></h1>
-                    <p className="text-muted-foreground text-xl font-medium">Define your personalized care preferences below.</p>
+          <FadeIn delay={0.08}>
+            <Card className="p-6 sm:p-8 lg:p-10">
+              <Link href="/" className="inline-flex items-center gap-3">
+                <img src={`${import.meta.env.BASE_URL}logo.webp`} alt="Fab Clean logo" className="h-9 w-auto" />
+              </Link>
+
+              <h2 className="mt-8 text-3xl font-black sm:text-4xl">Tell us how you want your profile to appear</h2>
+              <p className="mt-3 text-sm leading-7 text-muted-foreground">This is the last step before you move into the customer dashboard.</p>
+
+              <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+                <div>
+                  <label className="mb-2 block text-sm font-bold text-foreground">Full name</label>
+                  <div className="relative">
+                    <User className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input value={name} onChange={(event) => setName(event.target.value)} className="pl-11" placeholder="Your name" />
+                  </div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-10">
-                    <div className="space-y-8">
-                        <div className="relative group/input">
-                            <div className="absolute left-6 top-1/2 -translate-y-1/2 text-muted-foreground/30 group-focus-within/input:text-primary transition-colors">
-                                <User className="w-6 h-6" />
-                            </div>
-                            <Input
-                                type="text"
-                                placeholder="Full Name"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                className="pl-16 h-20 text-2xl font-black bg-white/40 focus:bg-white transition-all shadow-sm"
-                                required
-                            />
-                        </div>
-
-                        <div className="relative group/input">
-                            <div className="absolute left-6 top-1/2 -translate-y-1/2 text-muted-foreground/30 group-focus-within/input:text-primary transition-colors">
-                                <ShieldCheck className="w-6 h-6" />
-                            </div>
-                            <Input
-                                type="email"
-                                placeholder="Email (Optional)"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="pl-16 h-20 text-2xl font-black bg-white/40 focus:bg-white transition-all shadow-sm"
-                            />
-                        </div>
-                    </div>
-
-                    <Button type="submit" size="lg" className="w-full h-24 text-xs font-black shadow-2xl group" isLoading={isPending}>
-                        Complete Your Profile <CheckCircle2 className="ml-4 w-6 h-6 group-hover:scale-125 transition-transform" />
-                    </Button>
-                </form>
-
-                <div className="pt-10 border-t border-border/50 text-center space-y-8">
-                    <div className="flex items-center justify-center gap-2">
-                        {[1,2,3,4,5].map(s => <Star key={s} className="w-4 h-4 fill-primary text-primary opacity-50" />)}
-                    </div>
-                    <p className="text-muted-foreground text-sm font-medium">
-                        Joining the 1,200+ households who've discovered the <span className="text-foreground decoration-primary/30 decoration-2 underline-offset-4 hover:decoration-primary transition-all font-bold">Fab Clean Standard</span>.
-                    </p>
+                <div>
+                  <label className="mb-2 block text-sm font-bold text-foreground">Email (optional)</label>
+                  <div className="relative">
+                    <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input value={email} onChange={(event) => setEmail(event.target.value)} className="pl-11" placeholder="you@example.com" />
+                  </div>
                 </div>
-            </motion.div>
 
-            {/* Background Decor */}
-            <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-primary/5 rounded-full blur-[80px] group-hover:bg-primary/10 transition-colors pointer-events-none" />
-          </div>
-        </FadeIn>
+                <Button type="submit" size="lg" isLoading={updateProfile.isPending} className="w-full justify-center">
+                  Complete profile
+                  <CheckCircle2 className="h-4 w-4" />
+                </Button>
+              </form>
+            </Card>
+          </FadeIn>
+        </div>
       </div>
-
-      {/* Decorative page-wide light effects */}
-      <div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] bg-secondary/20 rounded-full blur-[120px] pointer-events-none" />
     </div>
   );
 }

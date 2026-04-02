@@ -2,7 +2,6 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import { useFadeIn } from "@/hooks/use-fade-in";
 
-// --- Button ---
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "outline" | "ghost" | "destructive" | "premium";
   size?: "sm" | "md" | "lg" | "icon";
@@ -11,98 +10,119 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "primary", size = "md", isLoading, children, ...props }, ref) => {
-    const baseStyles = "inline-flex items-center justify-center rounded-2xl font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50 active:scale-[0.95] active:brightness-110 active:shadow-inner uppercase tracking-[0.18em] text-[11px] touch-action-manipulation select-none cursor-pointer liquid-glass-highlight px-8 py-4 w-full md:w-auto";
-    
+    const baseStyles =
+      "inline-flex items-center justify-center gap-2 rounded-full font-bold transition-all duration-200 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98] touch-action-manipulation";
+
     const variants = {
-      primary: "bg-brand-gradient text-primary-foreground shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-1 transition-all duration-300",
-      secondary: "bg-gold-gradient text-[#0B1C3B] shadow-lg hover:brightness-95",
-      outline: "border-2 border-primary/20 bg-white/70 hover:border-primary/50 hover:text-primary transition-all duration-300",
-      ghost: "hover:bg-primary/10 hover:text-primary",
-      destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-      premium: "bg-[#0B1C3B] text-white hover:bg-[#122A56] shadow-2xl transition-all duration-500",
+      primary: "bg-brand-gradient text-white shadow-[0_18px_40px_-22px_rgba(38,119,219,0.65)] hover:-translate-y-0.5 hover:shadow-[0_24px_48px_-24px_rgba(38,119,219,0.7)]",
+      secondary: "bg-gold-gradient text-[#173a77] shadow-[0_18px_36px_-22px_rgba(245,171,60,0.45)] hover:-translate-y-0.5",
+      outline: "border border-border bg-white text-foreground hover:border-primary/40 hover:text-primary hover:shadow-[0_18px_40px_-28px_rgba(38,119,219,0.22)]",
+      ghost: "bg-transparent text-foreground hover:bg-primary/10 hover:text-primary",
+      destructive: "bg-destructive text-destructive-foreground hover:brightness-95",
+      premium: "bg-[#173a77] text-white shadow-[0_22px_50px_-28px_rgba(15,41,84,0.55)] hover:bg-[#123469]",
     };
 
     const sizes = {
-      sm: "h-10 px-5",
-      md: "h-14 px-8",
-      lg: "h-16 px-10 text-sm",
-      icon: "h-14 w-14",
+      sm: "h-10 px-5 text-[11px] uppercase tracking-[0.14em]",
+      md: "h-12 px-6 text-[11px] uppercase tracking-[0.16em]",
+      lg: "h-14 px-8 text-[12px] uppercase tracking-[0.18em]",
+      icon: "h-12 w-12",
     };
 
     return (
       <button
-        className={cn(baseStyles, variants[variant], sizes[size], className)}
         ref={ref}
+        className={cn(baseStyles, variants[variant], sizes[size], className)}
         disabled={isLoading || props.disabled}
         {...props}
       >
-        {isLoading ? (
-          <span className="mr-3 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent relative z-20" />
-        ) : null}
-        <span className="relative z-20 flex items-center justify-center gap-2">
-          {children}
-        </span>
+        {isLoading ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" /> : null}
+        <span className="flex items-center justify-center gap-2">{children}</span>
       </button>
     );
-  }
+  },
 );
 Button.displayName = "Button";
 
-// --- Card ---
 export function Card({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn("glass rounded-[3.5rem] overflow-hidden transition-all duration-[800ms] hover:shadow-[0_60px_140px_-40px_rgba(11,28,59,0.16)] hover:-translate-y-3 border border-white/70", className)} {...props}>
+    <div
+      className={cn(
+        "surface-card overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_26px_70px_-34px_rgba(18,54,112,0.28)]",
+        className,
+      )}
+      {...props}
+    >
       {children}
     </div>
   );
 }
 
-// --- Input ---
 export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(
   ({ className, type, ...props }, ref) => {
     return (
       <input
+        ref={ref}
         type={type}
         className={cn(
-          "flex h-16 w-full rounded-2xl border-2 border-border/70 bg-white/80 backdrop-blur-sm px-6 py-4 text-base font-medium placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:border-primary focus-visible:ring-8 focus-visible:ring-primary/10 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-300",
-          className
+          "flex h-12 w-full rounded-2xl border border-border bg-white px-4 py-3 text-sm text-foreground shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/12 focus-visible:border-primary/50 disabled:cursor-not-allowed disabled:opacity-50 transition-all",
+          className,
         )}
-        ref={ref}
         {...props}
       />
     );
-  }
+  },
 );
 Input.displayName = "Input";
 
-// --- Badge ---
-export function Badge({ className, variant = "default", ...props }: React.HTMLAttributes<HTMLDivElement> & { variant?: "default" | "outline" | "accent" }) {
+export function Badge({
+  className,
+  variant = "default",
+  ...props
+}: React.HTMLAttributes<HTMLDivElement> & { variant?: "default" | "outline" | "accent" }) {
   const variants = {
-    default: "bg-primary/12 text-primary border border-primary/20",
-    outline: "border border-border text-foreground",
-    accent: "bg-accent text-[#C45D0E] border border-[#F47B20]/20",
+    default: "border border-primary/12 bg-primary/10 text-primary",
+    outline: "border border-border bg-white text-foreground",
+    accent: "border border-amber-200 bg-amber-50 text-amber-700",
   };
-  
+
   return (
-    <div className={cn("inline-flex items-center rounded-xl px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] transition-colors", variants[variant], className)} {...props} />
+    <div
+      className={cn(
+        "inline-flex items-center rounded-full px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em]",
+        variants[variant],
+        className,
+      )}
+      {...props}
+    />
   );
 }
 
-// --- Section Heading ---
-export function SectionHeading({ title, subtitle, align = "center", className }: { title: string, subtitle?: string, align?: "left" | "center", className?: string }) {
+export function SectionHeading({
+  title,
+  subtitle,
+  align = "center",
+  className,
+}: {
+  title: string;
+  subtitle?: string;
+  align?: "left" | "center";
+  className?: string;
+}) {
   return (
-    <div className={cn(
-      "flex flex-col gap-8", 
-      align === "center" ? "items-center text-center mx-auto max-w-5xl" : "items-start text-left", 
-      className
-    )}>
-      {subtitle && <span className="text-secondary font-black tracking-[0.35em] uppercase text-[10px] bg-[#D6EBF7]/80 text-[#0B1C3B] px-8 py-3 rounded-full border border-[#1C88C7]/20 shadow-sm">{subtitle}</span>}
-      <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black font-display text-foreground leading-[1.05] -tracking-[0.02em]">{title}</h2>
+    <div
+      className={cn(
+        "flex flex-col gap-4",
+        align === "center" ? "mx-auto max-w-3xl items-center text-center" : "items-start text-left",
+        className,
+      )}
+    >
+      {subtitle ? <span className="eyebrow">{subtitle}</span> : null}
+      <h2 className="max-w-4xl text-balance text-4xl font-black sm:text-5xl lg:text-6xl">{title}</h2>
     </div>
   );
 }
 
-// --- Animations ---
 export function FadeIn({
   children,
   delay = 0,
@@ -111,6 +131,7 @@ export function FadeIn({
   ...props
 }: React.HTMLAttributes<HTMLDivElement> & { delay?: number }) {
   const ref = useFadeIn();
+
   return (
     <div
       ref={ref}

@@ -1,34 +1,31 @@
 import { useEffect, useMemo, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useLocation, useRoute } from "wouter";
+import { CheckCircle2, MessageSquareText, Search, Star } from "lucide-react";
 import { AppLayout } from "@/components/layout";
 import { SEO } from "@/components/seo";
 import { Badge, Button, Card, FadeIn, Input, SectionHeading } from "@/components/ui";
-import { lookupFeedbackOrder, submitPublicFeedback, type FeedbackLookupResponse, type FeedbackSubmitResponse } from "@/lib/public-api";
+import {
+  lookupFeedbackOrder,
+  submitPublicFeedback,
+  type FeedbackLookupResponse,
+  type FeedbackSubmitResponse,
+} from "@/lib/public-api";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle2, MessageSquareText, Search, Sparkles, Star } from "lucide-react";
 
-function RatingSelector({
-  value,
-  onChange,
-}: {
-  value: number;
-  onChange: (value: number) => void;
-}) {
+function RatingSelector({ value, onChange }: { value: number; onChange: (value: number) => void }) {
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex flex-wrap items-center gap-3">
       {[1, 2, 3, 4, 5].map((star) => (
         <button
           key={star}
           type="button"
           onClick={() => onChange(star)}
-          className={`flex h-14 w-14 items-center justify-center rounded-[1.4rem] border transition-all ${
-            star <= value
-              ? "border-[#F4B942]/40 bg-[#F4B942]/15 text-[#F4B942] shadow-lg shadow-[#F4B942]/10"
-              : "border-white/10 bg-white/5 text-white/35 hover:border-white/20 hover:text-white/60"
+          className={`flex h-12 w-12 items-center justify-center rounded-2xl border transition-all ${
+            star <= value ? "border-amber-200 bg-amber-50 text-amber-500" : "border-border bg-white text-slate-300 hover:border-primary/25 hover:text-primary"
           }`}
         >
-          <Star className={`h-6 w-6 ${star <= value ? "fill-current" : ""}`} />
+          <Star className={`h-5 w-5 ${star <= value ? "fill-current" : ""}`} />
         </button>
       ))}
     </div>
@@ -39,11 +36,7 @@ function formatReviewTimestamp(value?: string | null): string {
   if (!value) return "Just now";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "Just now";
-
-  return new Intl.DateTimeFormat("en-IN", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(date);
+  return new Intl.DateTimeFormat("en-IN", { dateStyle: "medium", timeStyle: "short" }).format(date);
 }
 
 export default function FeedbackPage() {
@@ -63,10 +56,10 @@ export default function FeedbackPage() {
   const sentimentTone = useMemo(() => {
     if (!submitted) return "";
     return submitted.insight.sentiment === "positive"
-      ? "bg-emerald-500/15 text-emerald-200 border border-emerald-300/20"
+      ? "border-emerald-200 bg-emerald-50 text-emerald-700"
       : submitted.insight.sentiment === "negative"
-        ? "bg-rose-500/15 text-rose-200 border border-rose-300/20"
-        : "bg-slate-500/15 text-slate-200 border border-slate-300/20";
+        ? "border-rose-200 bg-rose-50 text-rose-700"
+        : "border-slate-200 bg-slate-100 text-slate-700";
   }, [submitted]);
 
   async function loadOrder(rawIdentifier: string, options?: { syncUrl?: boolean; showErrors?: boolean }) {
@@ -86,9 +79,7 @@ export default function FeedbackPage() {
 
       if (options?.syncUrl !== false) {
         const nextPath = `/feedback/${encodeURIComponent(result.data.orderNumber || cleanIdentifier)}`;
-        if (window.location.pathname !== nextPath) {
-          setLocation(nextPath);
-        }
+        if (window.location.pathname !== nextPath) setLocation(nextPath);
       }
     } catch (error) {
       if (options?.showErrors !== false) {
@@ -107,10 +98,9 @@ export default function FeedbackPage() {
   async function handleLookup(event: React.FormEvent) {
     event.preventDefault();
     if (!identifier.trim()) {
-      toast({ title: "Order ID required", description: "Enter the order ID or order number first.", variant: "destructive" });
+      toast({ title: "Enter an order ID", description: "Load your order first.", variant: "destructive" });
       return;
     }
-
     await loadOrder(identifier, { syncUrl: true, showErrors: true });
   }
 
@@ -118,9 +108,7 @@ export default function FeedbackPage() {
     const params = new URLSearchParams(window.location.search);
     const initialIdentifier = routeIdentifier || params.get("orderId") || "";
     const normalizedIdentifier = initialIdentifier.trim();
-
     if (!normalizedIdentifier) return;
-
     setIdentifier(normalizedIdentifier);
     void loadOrder(normalizedIdentifier, { syncUrl: true, showErrors: true });
   }, [routeIdentifier]);
@@ -128,20 +116,11 @@ export default function FeedbackPage() {
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     if (!resolvedIdentifier) {
-      toast({
-        title: "Order required",
-        description: "Load your order before submitting feedback.",
-        variant: "destructive",
-      });
+      toast({ title: "Order required", description: "Load your order before submitting feedback.", variant: "destructive" });
       return;
     }
-
     if (!feedback.trim()) {
-      toast({
-        title: "Review required",
-        description: "Write a short review before submitting feedback.",
-        variant: "destructive",
-      });
+      toast({ title: "Review required", description: "Write a short review before submitting.", variant: "destructive" });
       return;
     }
 
@@ -168,150 +147,142 @@ export default function FeedbackPage() {
   return (
     <AppLayout>
       <SEO
-        title="Share Feedback | Fab Clean"
-        description="Submit service feedback for your Fab Clean order using the order ID."
+        title="Feedback | Fab Clean"
+        description="Load your order and leave service feedback for your Fab Clean order."
         canonical={`https://myfabclean.com${routeIdentifier ? `/feedback/${encodeURIComponent(routeIdentifier)}` : "/feedback"}`}
       />
-      <div className="relative overflow-hidden pt-32 pb-24">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(244,185,66,0.14),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(10,132,255,0.14),transparent_34%)]" />
-        <div className="container-wide relative z-10">
-          <SectionHeading
-            title="Voice Of The Garment Floor."
-            subtitle="Feedback Intelligence Console"
-            className="mb-14"
-          />
 
-          <div className="grid gap-10 lg:grid-cols-[0.95fr_1.05fr]">
+      <div className="page-shell">
+        <section className="container-wide section-padding">
+          <SectionHeading title="Leave feedback linked to the correct order" subtitle="Feedback" />
+          <p className="mx-auto mt-6 max-w-3xl text-center text-lg leading-8 text-muted-foreground">
+            First load the order. Then rate the service and leave a short review. Existing feedback is shown when the order already has a saved review.
+          </p>
+        </section>
+
+        <section className="container-wide pb-20">
+          <div className="grid gap-6 lg:grid-cols-[0.92fr_1.08fr]">
             <FadeIn>
-              <Card className="border-white/10 bg-[#08152e]/85 p-8 text-white">
-                <div className="mb-8 flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.32em] text-white/55">
-                  <Sparkles className="h-4 w-4 text-primary" />
-                  Find your order first
-                </div>
-                <form onSubmit={handleLookup} className="space-y-4">
+              <Card className="p-6 sm:p-8">
+                <p className="text-sm font-bold uppercase tracking-[0.16em] text-primary">Step 1</p>
+                <h2 className="mt-4 text-3xl font-black">Load your order</h2>
+                <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                  You can open this page directly with the order number in the URL or type it below.
+                </p>
+
+                <form onSubmit={handleLookup} className="mt-6 space-y-4">
                   <div className="relative">
-                    <Search className="pointer-events-none absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-white/35" />
+                    <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
                       value={identifier}
                       onChange={(event) => setIdentifier(event.target.value)}
                       placeholder="Enter order ID or order number"
-                      className="h-16 rounded-[1.8rem] border-white/10 bg-white/5 pl-14 text-white placeholder:text-white/35"
+                      className="pl-11"
                     />
                   </div>
-                  <Button type="submit" isLoading={isLookingUp} className="h-16 w-full rounded-[1.8rem]">
-                    Load Order
+                  <Button type="submit" isLoading={isLookingUp}>
+                    Load order
                   </Button>
                 </form>
 
-                <AnimatePresence mode="wait">
-                  {orderData ? (
-                    <motion.div
-                      key={orderData.orderId}
-                      initial={{ opacity: 0, y: 18 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 12 }}
-                      className="mt-8 rounded-[2rem] border border-white/10 bg-white/5 p-6"
-                    >
-                      <p className="text-[10px] font-black uppercase tracking-[0.32em] text-white/45">Order Matched</p>
-                      <h3 className="mt-3 text-2xl font-black text-white">{orderData.orderNumber}</h3>
-                      <p className="mt-2 text-white/55">{orderData.customerName || "Fab Clean Customer"}</p>
-                      <div className="mt-5 flex items-center gap-3">
-                        <Badge className="border-white/10 bg-white/10 text-white">{orderData.status.replace(/_/g, " ")}</Badge>
-                        {orderData.existingReview ? (
-                          <Badge className="border-primary/20 bg-primary/15 text-primary">Existing feedback found</Badge>
-                        ) : null}
-                      </div>
-                      {orderData.existingReview ? (
-                        <p className="mt-4 text-sm text-white/50">
-                          Reviewed by {orderData.existingReview.customer_name || orderData.customerName || "Fab Clean Customer"} on{" "}
-                          {formatReviewTimestamp(orderData.existingReview.created_at)}
-                        </p>
-                      ) : null}
-                    </motion.div>
-                  ) : null}
-                </AnimatePresence>
+                {orderData ? (
+                  <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mt-6 rounded-[1.5rem] border border-border bg-muted/60 p-5">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-primary">Order loaded</p>
+                    <h3 className="mt-3 break-all text-2xl font-black">{orderData.orderNumber}</h3>
+                    <p className="mt-2 text-sm text-muted-foreground">{orderData.customerName || "Fab Clean Customer"}</p>
+                    <div className="mt-4 flex flex-wrap gap-3">
+                      <Badge>{orderData.status.replace(/_/g, " ")}</Badge>
+                      {orderData.existingReview ? <Badge variant="accent">Existing feedback found</Badge> : null}
+                    </div>
+                    {orderData.existingReview ? (
+                      <p className="mt-4 text-sm leading-7 text-muted-foreground">
+                        Saved on {formatReviewTimestamp(orderData.existingReview.created_at)}
+                      </p>
+                    ) : null}
+                  </motion.div>
+                ) : null}
               </Card>
             </FadeIn>
 
-            <FadeIn delay={0.1}>
-              <Card className="border-white/10 bg-[#071126]/90 p-8 text-white">
+            <FadeIn delay={0.06}>
+              <Card className="p-6 sm:p-8">
                 <form onSubmit={handleSubmit}>
-                  <div className="mb-8">
-                    <p className="text-[10px] font-black uppercase tracking-[0.32em] text-white/45">Tell us how we performed</p>
-                    <h2 className="mt-3 text-3xl font-black text-white">Operational Feedback That Drives Better Service.</h2>
-                  </div>
+                  <p className="text-sm font-bold uppercase tracking-[0.16em] text-primary">Step 2</p>
+                  <h2 className="mt-4 text-3xl font-black">Rate the service and write the review</h2>
+                  <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                    Keep the feedback direct. Customers, store staff, and internal ranking tools all benefit from clear review text.
+                  </p>
 
-                  <div className="space-y-6">
+                  <div className="mt-8 space-y-6">
                     <div>
-                      <label className="mb-3 block text-sm font-black uppercase tracking-[0.16em] text-white/60">Rating</label>
+                      <label className="mb-3 block text-sm font-bold text-foreground">Star rating</label>
                       <RatingSelector value={rating} onChange={setRating} />
                     </div>
 
                     <div>
-                      <label className="mb-3 block text-sm font-black uppercase tracking-[0.16em] text-white/60">Review</label>
+                      <label className="mb-3 block text-sm font-bold text-foreground">Review</label>
                       <div className="relative">
-                        <MessageSquareText className="pointer-events-none absolute left-5 top-5 h-5 w-5 text-white/25" />
+                        <MessageSquareText className="pointer-events-none absolute left-4 top-4 h-4 w-4 text-muted-foreground" />
                         <textarea
                           value={feedback}
                           onChange={(event) => setFeedback(event.target.value)}
-                          placeholder="Tell us about quality, delivery speed, garment handling, staff, or anything we should improve."
-                          className="min-h-[220px] w-full rounded-[2rem] border border-white/10 bg-white/5 px-14 py-5 text-base text-white placeholder:text-white/30 outline-none transition focus:border-primary/40 focus:ring-4 focus:ring-primary/10"
+                          placeholder="Tell us what went well or what needs to improve."
+                          className="min-h-[220px] w-full rounded-[1.4rem] border border-border bg-white px-11 py-4 text-sm text-foreground shadow-sm outline-none transition focus:border-primary/40 focus:ring-4 focus:ring-primary/12"
                         />
                       </div>
                     </div>
 
-                    <Button
-                      type="submit"
-                      isLoading={isSubmitting}
-                      disabled={!orderData || !feedback.trim()}
-                      className="h-16 w-full rounded-[1.8rem] disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      Submit Feedback
+                    <Button type="submit" size="lg" isLoading={isSubmitting} disabled={!orderData || !feedback.trim()}>
+                      Submit feedback
                     </Button>
                   </div>
                 </form>
 
                 <AnimatePresence mode="wait">
                   {submitted ? (
-                    <motion.div
-                      key={submitted.reviewId}
-                      initial={{ opacity: 0, y: 18 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 12 }}
-                      className="mt-8 rounded-[2rem] border border-white/10 bg-white/5 p-6"
-                    >
-                      <div className="flex items-start justify-between gap-4">
+                    <motion.div key={submitted.reviewId} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="mt-8 rounded-[1.5rem] border border-border bg-muted/60 p-5">
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                         <div>
                           <div className="flex items-center gap-3">
                             <CheckCircle2 className="h-5 w-5 text-primary" />
-                            <p className="text-lg font-black text-white">Feedback captured</p>
+                            <p className="text-lg font-black text-foreground">Feedback saved</p>
                           </div>
-                          <p className="mt-3 text-white/55">{submitted.insight.summary}</p>
-                          <p className="mt-3 text-sm text-white/45">
+                          <p className="mt-3 text-sm leading-7 text-muted-foreground">{submitted.insight.summary}</p>
+                          <p className="mt-3 text-sm text-muted-foreground">
                             {submitted.customerName || orderData?.customerName || "Fab Clean Customer"} • {formatReviewTimestamp(submitted.reviewCreatedAt)}
                           </p>
                         </div>
                         <Badge className={sentimentTone}>{submitted.insight.sentiment}</Badge>
                       </div>
 
-                      <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                        <div className="rounded-[1.4rem] border border-white/10 bg-[#0d1c3a] px-5 py-4">
-                          <p className="text-xs uppercase tracking-[0.16em] text-white/45">Category</p>
-                          <p className="mt-2 text-lg font-bold text-white">{submitted.insight.category}</p>
+                      <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                        <div className="rounded-[1.2rem] border border-border bg-white px-4 py-4">
+                          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-primary">Category</p>
+                          <p className="mt-2 text-base font-black text-foreground">{submitted.insight.category}</p>
                         </div>
-                        <div className="rounded-[1.4rem] border border-white/10 bg-[#0d1c3a] px-5 py-4">
-                          <p className="text-xs uppercase tracking-[0.16em] text-white/45">AI Score</p>
-                          <p className="mt-2 text-lg font-bold text-white">{Math.round(submitted.insight.score * 100)} / 100</p>
+                        <div className="rounded-[1.2rem] border border-border bg-white px-4 py-4">
+                          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-primary">AI score</p>
+                          <p className="mt-2 text-base font-black text-foreground">{Math.round(submitted.insight.score * 100)} / 100</p>
                         </div>
                       </div>
-
+                    </motion.div>
+                  ) : orderData?.existingReview ? (
+                    <motion.div key="existing-review" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="mt-8 rounded-[1.5rem] border border-border bg-muted/60 p-5">
+                      <p className="text-lg font-black text-foreground">Existing review on this order</p>
+                      <div className="mt-3 flex items-center gap-1 text-amber-500">
+                        {Array.from({ length: orderData.existingReview.rating }, (_, starIndex) => (
+                          <Star key={starIndex} className="h-4 w-4 fill-current" />
+                        ))}
+                      </div>
+                      <p className="mt-4 text-sm leading-7 text-foreground">{orderData.existingReview.feedback || "No review text saved."}</p>
+                      <p className="mt-3 text-sm text-muted-foreground">{formatReviewTimestamp(orderData.existingReview.created_at)}</p>
                     </motion.div>
                   ) : null}
                 </AnimatePresence>
               </Card>
             </FadeIn>
           </div>
-        </div>
+        </section>
       </div>
     </AppLayout>
   );

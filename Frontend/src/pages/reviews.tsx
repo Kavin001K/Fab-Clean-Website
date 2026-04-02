@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
+import { Star } from "lucide-react";
 import { AppLayout } from "@/components/layout";
 import { SEO } from "@/components/seo";
-import { Card, FadeIn, SectionHeading, Badge } from "@/components/ui";
+import { Badge, Card, FadeIn, SectionHeading } from "@/components/ui";
 import { fetchHomepageReviews, type HomepageReview } from "@/lib/public-api";
-import { Star } from "lucide-react";
 
 function formatReviewTimestamp(value?: string | null): string {
   if (!value) return "Just now";
@@ -12,7 +12,7 @@ function formatReviewTimestamp(value?: string | null): string {
   return new Intl.DateTimeFormat("en-IN", { dateStyle: "medium", timeStyle: "short" }).format(date);
 }
 
-function ReviewGrid({
+function ReviewSection({
   title,
   subtitle,
   reviews,
@@ -21,52 +21,41 @@ function ReviewGrid({
   subtitle: string;
   reviews: HomepageReview[];
 }) {
-  if (!reviews.length) {
-    return (
-      <section className="space-y-8">
-        <div>
-          <p className="text-[10px] font-black uppercase tracking-[0.32em] text-white/45">{subtitle}</p>
-          <h2 className="mt-2 text-3xl font-black text-white">{title}</h2>
-        </div>
-        <Card className="border-white/10 bg-[#08152e]/85 p-8 text-white">
-          <p className="text-lg font-bold">Fresh reviews will appear here soon.</p>
-          <p className="mt-2 max-w-2xl text-white/55">
-            This section reads directly from the live Supabase review views, so it updates automatically when new feedback is approved.
-          </p>
-        </Card>
-      </section>
-    );
-  }
-
   return (
     <section className="space-y-8">
-      <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-[10px] font-black uppercase tracking-[0.32em] text-white/45">{subtitle}</p>
-          <h2 className="mt-2 text-3xl font-black text-white">{title}</h2>
+          <p className="text-sm font-bold uppercase tracking-[0.16em] text-primary">{subtitle}</p>
+          <h2 className="mt-2 text-3xl font-black sm:text-4xl">{title}</h2>
         </div>
+        <Badge>{reviews.length} reviews</Badge>
       </div>
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-        {reviews.map((review, index) => (
-          <FadeIn key={review.id} delay={index * 0.05}>
-            <Card className="border-white/10 bg-[#08152e]/85 p-8 text-white">
-              <div className="mb-6 flex items-center gap-1">
-                {Array.from({ length: Number(review.rating || 5) }, (_, starIndex) => (
-                  <Star key={starIndex} className="h-4 w-4 fill-[#F4B942] text-[#F4B942]" />
-                ))}
-              </div>
-              <p className="text-lg font-medium leading-8 text-white/88">"{review.feedback || "Exceptional Fab Clean service."}"</p>
-              <div className="mt-8 flex items-center justify-between gap-4">
-                <div>
-                  <p className="text-base font-black text-white">{review.customer_name || "Fab Clean Customer"}</p>
-                  <p className="mt-1 text-xs uppercase tracking-[0.16em] text-white/45">{formatReviewTimestamp(review.created_at)}</p>
+
+      {reviews.length ? (
+        <div className="grid gap-5 lg:grid-cols-3">
+          {reviews.map((review, index) => (
+            <FadeIn key={review.id} delay={index * 0.05}>
+              <Card className="h-full p-6">
+                <div className="flex items-center gap-1 text-amber-500">
+                  {Array.from({ length: Number(review.rating || 5) }, (_, starIndex) => (
+                    <Star key={starIndex} className="h-4 w-4 fill-current" />
+                  ))}
                 </div>
-                <Badge className="border-white/10 bg-white/10 text-white">{review.ai_category || "overall"}</Badge>
-              </div>
-            </Card>
-          </FadeIn>
-        ))}
-      </div>
+                <p className="mt-5 text-lg leading-8 text-foreground">“{review.feedback || "Great service from Fab Clean."}”</p>
+                <div className="mt-6">
+                  <p className="font-black text-foreground">{review.customer_name || "Fab Clean Customer"}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">{formatReviewTimestamp(review.created_at)}</p>
+                </div>
+              </Card>
+            </FadeIn>
+          ))}
+        </div>
+      ) : (
+        <Card className="p-6">
+          <p className="text-lg font-black">Fresh reviews will appear here soon.</p>
+          <p className="mt-3 text-sm leading-7 text-muted-foreground">This section reads from the live review views, so new approved feedback will show up automatically.</p>
+        </Card>
+      )}
     </section>
   );
 }
@@ -79,38 +68,45 @@ export default function ReviewsPage() {
   });
 
   useEffect(() => {
-    void fetchHomepageReviews().then((result) => setSections(result.data)).catch(() => {
-      setSections({ topReviews: [], bestReviews: [], latestReviews: [] });
-    });
+    void fetchHomepageReviews()
+      .then((result) => setSections(result.data))
+      .catch(() => setSections({ topReviews: [], bestReviews: [], latestReviews: [] }));
   }, []);
 
   return (
     <AppLayout>
       <SEO
-        title="Customer Reviews | Fab Clean"
-        description="Browse AI-ranked Fab Clean customer reviews with ratings, review text, and timestamps."
+        title="Reviews | Fab Clean"
+        description="Read top, best, and latest Fab Clean reviews with customer name, star rating, review text, and timestamp."
         canonical="https://myfabclean.com/reviews"
       />
-      <div className="relative overflow-hidden pt-32 pb-24">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(10,132,255,0.18),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(244,185,66,0.12),transparent_25%)]" />
-        <div className="container-wide relative z-10 space-y-14">
-          <SectionHeading title="Proof In Every Press." subtitle="Customer Reviews" className="mb-6" />
-          <div className="grid gap-4 md:grid-cols-3">
+
+      <div className="page-shell">
+        <section className="container-wide section-padding">
+          <SectionHeading title="Real reviews from real orders" subtitle="Customer reviews" />
+          <p className="mx-auto mt-6 max-w-3xl text-center text-lg leading-8 text-muted-foreground">
+            Reviews displayed here come from feedback saved against real orders. We show the customer name, rating, review text, and review time. Phone numbers stay private.
+          </p>
+
+          <div className="mt-10 grid gap-4 sm:grid-cols-3">
             {[
-              { label: "Top Reviews", value: sections.topReviews.length },
-              { label: "Best Reviews", value: sections.bestReviews.length },
-              { label: "Latest Reviews", value: sections.latestReviews.length },
+              { label: "Top reviews", value: sections.topReviews.length },
+              { label: "Best reviews", value: sections.bestReviews.length },
+              { label: "Latest reviews", value: sections.latestReviews.length },
             ].map((item) => (
-              <Card key={item.label} className="border-white/10 bg-[#08152e]/85 p-5 text-white">
-                <p className="text-[10px] font-black uppercase tracking-[0.24em] text-white/45">{item.label}</p>
+              <Card key={item.label} className="p-5 text-center">
+                <p className="text-sm font-bold uppercase tracking-[0.16em] text-primary">{item.label}</p>
                 <p className="mt-3 text-3xl font-black">{item.value}</p>
               </Card>
             ))}
           </div>
-          <ReviewGrid title="Top Reviews" subtitle="AI Ranked" reviews={sections.topReviews} />
-          <ReviewGrid title="Best Reviews" subtitle="Featured Excellence" reviews={sections.bestReviews} />
-          <ReviewGrid title="Latest Reviews" subtitle="Most Recent Feedback" reviews={sections.latestReviews} />
-        </div>
+        </section>
+
+        <section className="container-wide space-y-16 pb-20">
+          <ReviewSection title="Top reviews" subtitle="AI ranked" reviews={sections.topReviews} />
+          <ReviewSection title="Best reviews" subtitle="Featured feedback" reviews={sections.bestReviews} />
+          <ReviewSection title="Latest reviews" subtitle="Recent customer feedback" reviews={sections.latestReviews} />
+        </section>
       </div>
     </AppLayout>
   );

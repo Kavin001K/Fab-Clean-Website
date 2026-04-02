@@ -1,19 +1,19 @@
-import { AppLayout } from "@/components/layout";
-import { SEO } from "@/components/seo";
-import { SectionHeading, FadeIn, Card, Input, Button } from "@/components/ui";
-import { useSubmitContact } from "@workspace/api-client-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import { useSubmitContact } from "@workspace/api-client-react";
+import { AppLayout } from "@/components/layout";
+import { SEO } from "@/components/seo";
+import { Button, Card, FadeIn, Input, SectionHeading } from "@/components/ui";
 import { useToast } from "@/hooks/use-toast";
-import { Mail, MapPin, Phone } from "lucide-react";
 
 const contactSchema = z.object({
-  name: z.string().min(2, "Name is required"),
-  email: z.string().email("Invalid email address"),
+  name: z.string().min(2, "Please enter your name"),
+  email: z.string().email("Enter a valid email"),
   phone: z.string().optional(),
   subject: z.string().optional(),
-  message: z.string().min(10, "Message must be at least 10 characters"),
+  message: z.string().min(10, "Please enter a short message"),
 });
 
 type ContactForm = z.infer<typeof contactSchema>;
@@ -23,142 +23,138 @@ export default function Contact() {
   const { mutate: submitForm, isPending } = useSubmitContact({
     mutation: {
       onSuccess: () => {
-        toast({ title: "Message Sent", description: "We'll get back to you shortly." });
+        toast({ title: "Message sent", description: "The team will get back to you shortly." });
         reset();
       },
       onError: () => {
-        toast({ title: "Error", description: "Failed to send message.", variant: "destructive" });
-      }
-    }
+        toast({ title: "Unable to send message", description: "Please try again in a moment.", variant: "destructive" });
+      },
+    },
   });
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<ContactForm>({
-    resolver: zodResolver(contactSchema)
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<ContactForm>({
+    resolver: zodResolver(contactSchema),
   });
 
-  const onSubmit = (data: ContactForm) => {
-    submitForm({ data });
+  const onSubmit = (values: ContactForm) => {
+    submitForm({ data: values });
   };
 
   return (
     <AppLayout>
       <SEO
-        title="Contact Fab Clean — Book Pickup in Pollachi | 93630 59595"
-        description="Contact Fab Clean Pollachi. Call or WhatsApp 93630 59595. Two branches: Mahalingapuram Pollachi & Kinathukadavu. Free doorstep pickup available."
+        title="Contact Fab Clean"
+        description="Call, WhatsApp, visit, or message Fab Clean from one clear contact page."
         canonical="https://myfabclean.com/contact"
-        schema={{
-          "@context": "https://schema.org",
-          "@type": "ContactPage",
-          "url": "https://myfabclean.com/contact",
-          "name": "Contact Fab Clean",
-          "mainEntity": { "@id": "https://myfabclean.com/#business" }
-        }}
       />
-      <div className="relative pt-32 pb-24 container-wide overflow-hidden">
-        <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-          <div className="absolute top-0 right-0 w-[900px] h-[900px] bg-primary/10 rounded-full blur-[200px] translate-x-1/2 -translate-y-1/2" />
-          <div className="absolute bottom-0 left-0 w-[700px] h-[700px] bg-secondary/7 rounded-full blur-[180px] -translate-x-1/2 translate-y-1/2" />
-        </div>
 
-        <div className="relative z-10">
-          <SectionHeading 
-            title="Get in Touch" 
-            subtitle="We're here to help"
-            className="mb-16"
-          />
+      <div className="page-shell">
+        <section className="container-wide section-padding">
+          <SectionHeading title="Contact options that are easy to use" subtitle="Support" />
+          <p className="mx-auto mt-6 max-w-3xl text-center text-lg leading-8 text-muted-foreground">
+            Use the form if the message can wait. Use phone or WhatsApp if you need help with pickup, order status, or store timing.
+          </p>
+        </section>
 
-          <div className="grid lg:grid-cols-2 gap-12">
+        <section className="container-wide pb-20">
+          <div className="grid gap-6 lg:grid-cols-[1fr_0.9fr]">
             <FadeIn>
-              <Card className="p-8 border-border shadow-sm">
-                <h3 className="text-2xl font-display font-bold text-foreground mb-6">Send us a message</h3>
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+              <Card className="p-7 sm:p-8">
+                <h2 className="text-3xl font-black sm:text-4xl">Send a message</h2>
+                <p className="mt-3 text-base leading-7 text-muted-foreground">
+                  Keep the message short and clear. The team can follow up by phone or email.
+                </p>
+
+                <form onSubmit={handleSubmit(onSubmit)} className="mt-8 grid gap-4">
+                  <div className="grid gap-4 sm:grid-cols-2">
                     <div>
-                      <Input placeholder="Your Name *" {...register("name")} />
-                      {errors.name && <p className="text-destructive text-xs mt-1">{errors.name.message}</p>}
+                      <Input placeholder="Your name" {...register("name")} />
+                      {errors.name ? <p className="mt-2 text-sm text-destructive">{errors.name.message}</p> : null}
                     </div>
                     <div>
-                      <Input placeholder="Your Email *" {...register("email")} />
-                      {errors.email && <p className="text-destructive text-xs mt-1">{errors.email.message}</p>}
+                      <Input placeholder="Your email" {...register("email")} />
+                      {errors.email ? <p className="mt-2 text-sm text-destructive">{errors.email.message}</p> : null}
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <Input placeholder="Phone Number" {...register("phone")} />
-                    <Input placeholder="Subject" {...register("subject")} />
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Input placeholder="Phone number (optional)" {...register("phone")} />
+                    <Input placeholder="Subject (optional)" {...register("subject")} />
                   </div>
+
                   <div>
-                    <textarea 
-                      className="flex min-h-[120px] w-full rounded-xl border-2 border-border bg-background/50 px-4 py-3 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-primary/10 transition-all resize-none"
-                      placeholder="Your Message *"
+                    <textarea
+                      className="min-h-[180px] w-full rounded-[1.4rem] border border-border bg-white px-4 py-3 text-sm text-foreground shadow-sm outline-none transition focus:border-primary/40 focus:ring-4 focus:ring-primary/12"
+                      placeholder="Tell us how we can help"
                       {...register("message")}
                     />
-                    {errors.message && <p className="text-destructive text-xs mt-1">{errors.message.message}</p>}
+                    {errors.message ? <p className="mt-2 text-sm text-destructive">{errors.message.message}</p> : null}
                   </div>
-                  <Button type="submit" isLoading={isPending} className="w-full">Send Message</Button>
+
+                  <Button type="submit" size="lg" isLoading={isPending} className="w-full sm:w-fit">
+                    Send message
+                  </Button>
                 </form>
               </Card>
             </FadeIn>
 
-            <FadeIn delay={0.2} className="space-y-8">
-              <Card className="p-8 border-border/70 bg-white/80">
-                <div className="space-y-8">
-                  <div className="flex gap-4">
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                      <Phone className="w-6 h-6" />
+            <FadeIn delay={0.06} className="space-y-6">
+              {[
+                {
+                  icon: Phone,
+                  title: "Call the team",
+                  lines: ["Pollachi: 93630 59595", "Kinathukadavu: 93637 19595"],
+                },
+                {
+                  icon: Mail,
+                  title: "Email",
+                  lines: ["info@myfabclean.in", "myfabclean@gmail.com"],
+                },
+                {
+                  icon: MapPin,
+                  title: "Store hours",
+                  lines: ["Monday to Saturday", "10:00 AM to 8:00 PM"],
+                },
+              ].map((item) => (
+                <Card key={item.title} className="p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                      <item.icon className="h-5 w-5" />
                     </div>
                     <div>
-                      <h4 className="text-foreground font-bold text-lg mb-1">Call Us</h4>
-                      <p className="text-muted-foreground">Pollachi: 93630 59595</p>
-                      <p className="text-muted-foreground">Kinathukadavu: 93637 19595</p>
+                      <h3 className="text-xl font-black">{item.title}</h3>
+                      <div className="mt-3 space-y-1 text-sm leading-7 text-muted-foreground">
+                        {item.lines.map((line) => (
+                          <p key={line}>{line}</p>
+                        ))}
+                      </div>
                     </div>
                   </div>
+                </Card>
+              ))}
 
-                  <div className="flex gap-4">
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                      <Mail className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h4 className="text-foreground font-bold text-lg mb-1">Email Us</h4>
-                      <p className="text-muted-foreground">info@myfabclean.in</p>
-                      <p className="text-muted-foreground">myfabclean@gmail.com</p>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-4">
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                      <MapPin className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h4 className="text-foreground font-bold text-lg mb-1">Visit Us</h4>
-                      <p className="text-muted-foreground">Monday – Saturday: 10:00 AM – 8:00 PM</p>
-                      <p className="text-muted-foreground">Sunday: Closed</p>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-
-              <Card className="overflow-hidden border-border/70 bg-white/90">
-                <div className="h-64 w-full">
-                  <iframe
-                    title="Fab Clean Pollachi Map"
-                    className="w-full h-full border-0"
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    src="https://www.google.com/maps?q=Pollachi%20Tamil%20Nadu&output=embed"
-                  />
-                </div>
-                <div className="p-6 space-y-4">
-                  <a href="https://wa.me/919363059595" target="_blank" rel="noopener noreferrer">
-                    <Button className="w-full h-14">WhatsApp Us</Button>
-                  </a>
-                  <a href="tel:+919363059595">
-                    <Button variant="outline" className="w-full h-14">Call the Team</Button>
+              <Card className="p-6">
+                <h3 className="text-xl font-black">WhatsApp support</h3>
+                <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                  Best for quick pickup questions, branch timing, or order follow-up.
+                </p>
+                <div className="mt-5">
+                  <a href="https://wa.me/919363059595" target="_blank" rel="noreferrer">
+                    <Button className="w-full">
+                      <MessageCircle className="h-4 w-4" />
+                      Open WhatsApp
+                    </Button>
                   </a>
                 </div>
               </Card>
             </FadeIn>
           </div>
-        </div>
+        </section>
       </div>
     </AppLayout>
   );

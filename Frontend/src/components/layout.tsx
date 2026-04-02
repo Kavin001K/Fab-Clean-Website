@@ -1,188 +1,152 @@
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
-import { cn } from "@/lib/utils";
+import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "./ui";
 import { useAuth } from "@/hooks/use-auth";
-import { 
-  Menu, X, Home, List, 
-  User, MapPin, Phone, Mail, Instagram, Facebook, Twitter, Package, ArrowUpRight,
+import {
+  ArrowUpRight,
+  Clock3,
+  Mail,
+  Menu,
+  MessageCircle,
+  Phone,
+  ShieldCheck,
+  X,
 } from "lucide-react";
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { SteamCursor } from "@/components/cursor";
+import { cn } from "@/lib/utils";
+
+const NAV_LINKS = [
+  { name: "Home", path: "/" },
+  { name: "Services", path: "/services" },
+  { name: "Pricing", path: "/pricing" },
+  { name: "Track Order", path: "/track-order" },
+  { name: "Reviews", path: "/reviews" },
+  { name: "About", path: "/about" },
+  { name: "Contact", path: "/contact" },
+];
+
+function isActivePath(location: string, path: string) {
+  return location === path || (path !== "/" && location.startsWith(path));
+}
 
 export function Navbar() {
   const [location] = useLocation();
   const { isAuthenticated } = useAuth();
+  const [open, setOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    const onScroll = () => setIsScrolled(window.scrollY > 12);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const navLinks = [
-    { name: "Home", path: "/" },
-    { name: "Services", path: "/services" },
-    { name: "Pricing", path: "/pricing" },
-    { name: "Track", path: "/track-order" },
-    { name: "Reviews", path: "/reviews" },
-    { name: "About", path: "/about" },
-    { name: "Contact", path: "/contact" },
-  ];
-
-  const isHomePage = location === "/";
-  const shouldShowBackground = isScrolled || !isHomePage;
-  const isLinkActive = (path: string) => location === path || (path !== "/" && location.startsWith(path));
+  useEffect(() => {
+    setOpen(false);
+  }, [location]);
 
   return (
-    <header className="fixed top-2.5 md:top-6 inset-x-0 z-50 pointer-events-none px-4 md:px-8 pt-[env(safe-area-inset-top)]">
-      <div className="flex justify-center mx-auto pointer-events-auto w-full">
-        <div className={cn(
-          "navbar",
-          shouldShowBackground && "scrolled"
-        )}>
-          {/* Left Section: Logo */}
-          <div className="flex-1 flex items-center">
-            <Link href="/" className="inline-block group transition-all duration-300 hover:scale-105">
-              <img
-                src={`${import.meta.env.BASE_URL}logo.webp`}
-                alt="Fab Clean logo"
-                className="h-[26px] w-auto opacity-95 transition-all duration-300 logo-img"
-              />
-            </Link>
-          </div>
+    <header className="fixed inset-x-0 top-0 z-50 px-4 pt-[max(12px,env(safe-area-inset-top))] sm:px-6">
+      <div className="container-wide">
+        <div
+          className={cn(
+            "mx-auto flex max-w-[1160px] items-center justify-between rounded-full border px-4 py-3 transition-all sm:px-5",
+            isScrolled
+              ? "border-border bg-white/92 shadow-[0_18px_48px_-30px_rgba(15,41,84,0.32)] backdrop-blur-xl"
+              : "border-white/70 bg-white/80 shadow-[0_14px_40px_-34px_rgba(15,41,84,0.2)] backdrop-blur-xl",
+          )}
+        >
+          <Link href="/" className="flex items-center gap-3">
+            <img
+              src={`${import.meta.env.BASE_URL}logo.webp`}
+              alt="Fab Clean logo"
+              className="h-8 w-auto sm:h-9"
+            />
+          </Link>
 
-          {/* Center Section: Nav Links (Pill Style) */}
-          <nav aria-label="Primary navigation" className="hidden lg:flex items-center nav-menu px-1 py-1">
-            <div className="relative flex items-center gap-1">
-              {navLinks.map((link) => {
-                const isActive = isLinkActive(link.path);
-                return (
-                  <Link
-                    key={link.name}
-                    href={link.path}
-                    className={cn(
-                      "nav-item text-[10px] font-black uppercase tracking-[0.2em] transition-all px-6 py-2.5 rounded-full relative liquid-glass-highlight",
-                      isActive ? "text-white" : "text-white/70 hover:text-white"
-                    )}
-                  >
-                    <motion.span 
-                      className="relative z-20 flex items-center justify-center"
-                      whileHover={{ scale: 1.1, x: 2, y: -1 }}
-                      whileTap={{ scale: 0.9 }}
-                    >
-                      {link.name}
-                    </motion.span>
-                    {isActive && (
-                      <motion.div
-                        layoutId="nav-liquid-indicator"
-                        className="nav-indicator absolute inset-0 w-full h-full"
-                        transition={{ 
-                          type: "spring", 
-                          stiffness: 350, 
-                          damping: 30,
-                          mass: 0.8
-                        }}
-                      />
-                    )}
-                  </Link>
-                );
-              })}
-            </div>
+          <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary">
+            {NAV_LINKS.map((item) => {
+              const active = isActivePath(location, item.path);
+              return (
+                <Link
+                  key={item.path}
+                  href={item.path}
+                  className={cn(
+                    "rounded-full px-4 py-2 text-[12px] font-bold transition-colors",
+                    active ? "bg-primary/10 text-primary" : "text-foreground/70 hover:bg-primary/10 hover:text-primary",
+                  )}
+                >
+                  {item.name}
+                </Link>
+              );
+            })}
           </nav>
 
-          {/* Right Section: Actions */}
-          <div className="flex-1 flex items-center justify-end gap-6">
-            <Link 
-              href={isAuthenticated ? "/dashboard" : "/login"}
-              className={cn(
-                "hidden lg:block text-[10px] font-black uppercase tracking-[0.2em] transition-colors",
-                shouldShowBackground ? "text-slate-900" : "text-white/70 hover:text-white"
-              )}
-            >
-              {isAuthenticated ? "Dashboard" : "Sign In"}
-            </Link>
-            
-            <Link href="/schedule-pickup" className="hidden lg:block">
-              <Button size="sm" className="bg-primary hover:bg-primary/90 text-white rounded-full px-8 py-5 text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-primary/20">
-                Book Pickup
+          <div className="hidden items-center gap-3 lg:flex">
+            <Link href={isAuthenticated ? "/dashboard/orders" : "/login"}>
+              <Button variant="ghost" size="sm">
+                {isAuthenticated ? "Dashboard" : "Sign In"}
               </Button>
             </Link>
-
-            {/* Mobile Menu Toggle */}
-            <div className="lg:hidden flex items-center">
-              <button
-                className="menu-toggle p-4 z-20 active:scale-90 flex items-center justify-center text-white"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
-                aria-expanded={mobileMenuOpen}
-              >
-                {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
-              </button>
-            </div>
+            <Link href="/schedule-pickup">
+              <Button size="sm">Book Pickup</Button>
+            </Link>
           </div>
+
+          <button
+            type="button"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-white text-foreground shadow-sm lg:hidden"
+            aria-expanded={open}
+            aria-label={open ? "Close menu" : "Open menu"}
+            onClick={() => setOpen((value) => !value)}
+          >
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
         </div>
       </div>
 
       <AnimatePresence>
-        {mobileMenuOpen && (
+        {open ? (
           <motion.div
-            initial={{ opacity: 0, y: -20, x: "-50%" }}
-            animate={{ opacity: 1, y: 0, x: "-50%" }}
-            exit={{ opacity: 0, y: -20, x: "-50%" }}
-            transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="menu-panel md:hidden"
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            className="container-wide mt-3 lg:hidden"
           >
-            <div className="flex flex-col gap-2">
-              <button
-                className="menu-toggle self-end mb-4 text-black"
-                onClick={() => setMobileMenuOpen(false)}
-                aria-label="Close navigation menu"
-              >
-                <X size={24} />
-              </button>
-              <div className="flex flex-col gap-1 relative z-10">
-                {navLinks.map((link) => {
-                  const isActive = isLinkActive(link.path);
+            <div className="surface-card max-w-[1160px] p-4">
+              <div className="grid gap-2">
+                {NAV_LINKS.map((item) => {
+                  const active = isActivePath(location, item.path);
                   return (
                     <Link
-                      key={link.name}
-                      href={link.path}
-                      onClick={() => setMobileMenuOpen(false)}
+                      key={item.path}
+                      href={item.path}
                       className={cn(
-                        "px-6 py-4 rounded-2xl text-xl font-bold font-display transition-all flex items-center justify-between group touch-action-manipulation select-none active:scale-95",
-                        isActive ? "bg-primary/5 text-primary" : "text-slate-600 hover:text-slate-900"
+                        "flex items-center justify-between rounded-2xl px-4 py-3 text-sm font-bold",
+                        active ? "bg-primary/10 text-primary" : "text-foreground/80 hover:bg-muted",
                       )}
                     >
-                      <motion.div 
-                        className="flex items-center justify-between w-full"
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        {link.name}
-                        <ArrowUpRight className={cn("w-6 h-6 transition-all", isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100")} />
-                      </motion.div>
+                      <span>{item.name}</span>
+                      <ArrowUpRight className="h-4 w-4" />
                     </Link>
                   );
                 })}
-                <div className="h-px bg-black/5 my-6 mx-4" />
-                <div className="grid grid-cols-2 gap-4">
-                  <Link href={isAuthenticated ? "/dashboard" : "/login"} onClick={() => setMobileMenuOpen(false)}>
-                    <Button variant="outline" className="w-full rounded-[2rem] h-20 text-xs font-black">
-                      {isAuthenticated ? "Portal" : "Account"}
-                    </Button>
-                  </Link>
-                  <Link href="/schedule-pickup" onClick={() => setMobileMenuOpen(false)}>
-                    <Button className="w-full rounded-[2rem] h-20 text-xs font-black">
-                      Book Now
-                    </Button>
-                  </Link>
-                </div>
+              </div>
+
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                <Link href={isAuthenticated ? "/dashboard/orders" : "/login"}>
+                  <Button variant="outline" className="w-full">
+                    {isAuthenticated ? "Open Dashboard" : "Customer Sign In"}
+                  </Button>
+                </Link>
+                <Link href="/schedule-pickup">
+                  <Button className="w-full">Book Pickup</Button>
+                </Link>
               </div>
             </div>
           </motion.div>
-        )}
+        ) : null}
       </AnimatePresence>
     </header>
   );
@@ -190,115 +154,84 @@ export function Navbar() {
 
 export function Footer() {
   return (
-    <footer className="bg-[#0B1C3B] text-white pt-40 pb-28 relative overflow-hidden border-t border-white/5 rounded-t-[4rem]">
-      {/* Texture overlay */}
-      <div className="absolute inset-0 opacity-[0.06] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.6) 1.2px, transparent 1.2px)', backgroundSize: '48px 48px' }} />
-      
-      <div className="container-wide relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-20 lg:gap-32">
-
-          <div className="lg:col-span-4 space-y-12">
-            <Link href="/" className="inline-block group">
-              <img
-                src={`${import.meta.env.BASE_URL}logo.webp`}
-                alt="Fab Clean logo"
-                loading="lazy"
-                className="h-11 w-auto brightness-0 invert"
-              />
-            </Link>
-            <p className="text-white/70 text-2xl font-medium leading-relaxed max-w-sm">
-              Crafting a state-of-the-art cleaning science for your most cherished garments. 
+    <footer className="mt-16 border-t border-border/80 bg-white/70">
+      <div className="container-wide py-12 sm:py-14">
+        <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr_0.9fr_1fr]">
+          <div className="space-y-5">
+            <img src={`${import.meta.env.BASE_URL}logo.webp`} alt="Fab Clean logo" className="h-9 w-auto" />
+            <p className="max-w-sm text-sm leading-7 text-muted-foreground">
+              Reliable garment care for daily wear, occasion wear, shoes, and household linen. Pickup, tracking, and support are all available from one simple website.
             </p>
-            <div className="flex gap-5">
-              {[Instagram, Facebook, Twitter].map((Icon, i) => (
-                <motion.a 
-                  key={i} 
-                  href="#" 
-                  whileHover={{ y: -8, scale: 1.1 }}
-                  className="w-16 h-16 rounded-[1.5rem] bg-white/10 flex items-center justify-center text-white/80 hover:bg-gold-gradient hover:text-[#0B1C3B] transition-all border border-white/10"
-                >
-                  <Icon className="w-7 h-7" />
-                </motion.a>
-              ))}
+            <div className="flex flex-wrap gap-2">
+              <span className="info-chip">Pickup in Pollachi</span>
+              <span className="info-chip">Live order tracking</span>
+              <span className="info-chip">Customer feedback reviewed</span>
             </div>
           </div>
 
-          <div className="lg:col-span-2">
-            <h4 className="text-[#F4B942] font-black mb-10 text-[10px] uppercase tracking-[0.4em]">Explore</h4>
-            <ul className="space-y-6">
-              {[
-                { label: "Our Services", path: "/services" },
-                { label: "Pricing List", path: "/pricing" },
-                { label: "Track Order", path: "/track-order" },
-                { label: "Reviews", path: "/reviews" },
-                { label: "Book Pickup", path: "/schedule-pickup" },
-                { label: "Tech & Science", path: "/about" },
-              ].map((item) => (
-                <li key={item.label}>
-                  <Link href={item.path} className="text-white/70 hover:text-white hover:translate-x-3 transition-all inline-block font-bold text-lg">
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          <div>
+            <p className="text-sm font-black text-foreground">Quick links</p>
+            <div className="mt-4 grid gap-3 text-sm text-muted-foreground">
+              <Link href="/services" className="hover:text-primary">Services</Link>
+              <Link href="/pricing" className="hover:text-primary">Pricing</Link>
+              <Link href="/track-order" className="hover:text-primary">Track order</Link>
+              <Link href="/reviews" className="hover:text-primary">Reviews</Link>
+              <Link href="/schedule-pickup" className="hover:text-primary">Schedule pickup</Link>
+            </div>
           </div>
 
-          <div className="lg:col-span-3">
-            <h4 className="text-[#F4B942] font-black mb-10 text-[10px] uppercase tracking-[0.4em]">Get in Touch</h4>
-            <div className="space-y-10">
-              <div className="flex gap-6 items-center">
-                <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center border border-white/10">
-                  <Phone size={24} className="text-[#F4B942]" />
-                </div>
+          <div>
+            <p className="text-sm font-black text-foreground">Support</p>
+            <div className="mt-4 space-y-4 text-sm text-muted-foreground">
+              <div className="flex items-start gap-3">
+                <Phone className="mt-0.5 h-4 w-4 text-primary" />
                 <div>
-                  <div className="text-[10px] text-white/50 font-black uppercase tracking-widest mb-1.5">Direct Line</div>
-                  <a href="tel:9363059595" className="text-xl font-black text-white hover:text-[#F4B942] transition-colors block leading-none">93630 59595</a>
+                  <a href="tel:+919363059595" className="block hover:text-primary">93630 59595</a>
+                  <a href="tel:+919363719595" className="block hover:text-primary">93637 19595</a>
                 </div>
               </div>
-              <div className="flex gap-6 items-center">
-                <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center border border-white/10">
-                  <Mail size={24} className="text-[#F4B942]" />
-                </div>
+              <div className="flex items-start gap-3">
+                <Mail className="mt-0.5 h-4 w-4 text-primary" />
                 <div>
-                  <div className="text-[10px] text-white/50 font-black uppercase tracking-widest mb-1.5">Email Hub</div>
-                  <a href="mailto:info@myfabclean.in" className="text-xl font-black text-white hover:text-[#F4B942] transition-colors block leading-none">info@myfabclean.in</a>
+                  <a href="mailto:info@myfabclean.in" className="block hover:text-primary">info@myfabclean.in</a>
+                  <span>Mon to Sat, 10:00 AM to 8:00 PM</span>
                 </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <Clock3 className="mt-0.5 h-4 w-4 text-primary" />
+                <span>Pickup service available across Pollachi and nearby areas.</span>
               </div>
             </div>
           </div>
 
-          <div className="lg:col-span-3">
-            <h4 className="text-[#F4B942] font-black mb-10 text-[10px] uppercase tracking-[0.4em]">Pickup Locations</h4>
-            <div className="space-y-6">
-              {[
-                { name: "Pollachi", addr: "Mahalingapuram, Opp Naturals Salon" },
-                { name: "Kinathukadavu", addr: "MLA Office Rd, Krishnasampuram" }
-              ].map(branch => (
-                <div key={branch.name} className="bg-white/10 p-8 rounded-[2rem] border border-white/10">
-                   <div className="flex gap-4">
-                     <MapPin size={24} className="text-[#F4B942] shrink-0" />
-                     <div>
-                       <div className="text-lg font-black text-white mb-1">{branch.name}</div>
-                       <p className="text-sm text-white/70 leading-relaxed font-medium">{branch.addr}</p>
-                     </div>
-                   </div>
-                </div>
-              ))}
+          <div className="surface-soft p-5">
+            <p className="text-sm font-black text-foreground">Need help fast?</p>
+            <p className="mt-3 text-sm leading-7 text-muted-foreground">
+              Use WhatsApp for pickup requests, delivery questions, or urgent order help.
+            </p>
+            <div className="mt-5 grid gap-3">
+              <a href="https://wa.me/919363059595?text=Hi%2C%20I%20need%20help%20with%20my%20Fab%20Clean%20order." target="_blank" rel="noreferrer">
+                <Button className="w-full">
+                  <MessageCircle className="h-4 w-4" />
+                  Chat on WhatsApp
+                </Button>
+              </a>
+              <div className="flex items-start gap-3 rounded-2xl bg-primary/10 px-4 py-3 text-sm text-muted-foreground">
+                <ShieldCheck className="mt-0.5 h-4 w-4 text-primary" />
+                <span>Phone OTP login and customer data access stay limited to the signed-in customer scope.</span>
+              </div>
             </div>
           </div>
-
         </div>
 
-        <div className="mt-32 pt-12 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-10">
-          <p className="text-white/60 text-[10px] font-black uppercase tracking-[0.3em]">
-            © {new Date().getFullYear()} Fab Clean. High Fashion Preservation.
-          </p>
-          <div className="flex gap-6 lg:gap-12 flex-wrap justify-center text-[10px] font-black uppercase tracking-[0.3em] text-white/50">
-            <Link href="/sitemap" className="hover:text-white transition-colors">Sitemap</Link>
-            <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
-            <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
-            <Link href="/refund" className="hover:text-white transition-colors">Refund</Link>
-            <Link href="/cookies" className="hover:text-white transition-colors">Cookies</Link>
+        <div className="mt-10 flex flex-col gap-4 border-t border-border/80 pt-6 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
+          <p>© {new Date().getFullYear()} Fab Clean. Clear service, careful handling, and live tracking.</p>
+          <div className="flex flex-wrap gap-4">
+            <Link href="/privacy" className="hover:text-primary">Privacy</Link>
+            <Link href="/terms" className="hover:text-primary">Terms</Link>
+            <Link href="/refund" className="hover:text-primary">Refund</Link>
+            <Link href="/cookies" className="hover:text-primary">Cookies</Link>
+            <Link href="/sitemap" className="hover:text-primary">Sitemap</Link>
           </div>
         </div>
       </div>
@@ -306,79 +239,28 @@ export function Footer() {
   );
 }
 
-export function BottomTabBar() {
-  const [location] = useLocation();
-  const { isAuthenticated } = useAuth();
-
-  const tabs = [
-    { name: "Home", icon: Home, path: "/" },
-    { name: "Track", icon: Package, path: "/track-order" },
-    { name: "Care", icon: List, path: "/services" },
-    { name: "Me", icon: User, path: isAuthenticated ? "/dashboard" : "/login" },
-  ];
-
-  return (
-    <nav aria-label="Bottom navigation" className="lg:hidden fixed bottom-[88px] inset-x-8 z-50 max-w-md mx-auto left-0 right-0">
-      <div className="bg-white/95 backdrop-blur-2xl border border-border/70 rounded-[2.5rem] shadow-[0_20px_50px_rgba(11,28,59,0.18)] overflow-hidden px-6 h-20 flex justify-between items-center">
-          {tabs.map((tab) => {
-            const isActive = location === tab.path || (tab.path !== "/" && location.startsWith(tab.path));
-            return (
-              <Link
-                key={tab.name}
-                href={tab.path}
-                className={cn(
-                  "flex flex-col items-center justify-center flex-1 h-full gap-2 transition-all relative",
-                  isActive ? "text-primary" : "text-muted-foreground/70 hover:text-primary"
-                )}
-              >
-                <div className="relative">
-                  <tab.icon className={cn("w-6 h-6", isActive && "stroke-[2.5px]")} />
-                  {isActive && (
-                    <motion.div
-                      layoutId="tab-active"
-                      className="absolute -top-3 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_12px_rgba(180,197,36,0.8)]"
-                    />
-                  )}
-                </div>
-                <span className={cn("text-[8px] font-black uppercase tracking-[0.2em] opacity-60")}>
-                  {tab.name}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
-    </nav>
-  );
-}
-
 export function AppLayout({ children }: { children: React.ReactNode }) {
-  const { pathname } = window.location;
-  
+  const [location] = useLocation();
+
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }, [location]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-transparent font-sans overflow-x-hidden relative isolate">
-      <SteamCursor />
-      <div className="fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-transparent" />
-        <div className="absolute inset-0 page-fabric opacity-[0.2]" />
-      </div>
+    <div className="relative min-h-screen overflow-x-hidden">
+      <div className="pointer-events-none fixed inset-0 -z-10 page-backdrop" />
+      <div className="pointer-events-none fixed inset-0 -z-10 page-fabric opacity-30" />
       <Navbar />
-      <main className="flex-1 w-full pt-16 lg:pt-0">{children}</main>
+      <main className="relative z-10">{children}</main>
       <Footer />
       <a
-        href="https://wa.me/919363059595?text=Hi%2C%20I%27d%20like%20to%20book%20a%20laundry%20pickup."
+        href="https://wa.me/919363059595?text=Hi%2C%20I%27d%20like%20to%20book%20a%20Fab%20Clean%20pickup."
         target="_blank"
-        rel="noopener noreferrer"
+        rel="noreferrer"
         aria-label="Chat with Fab Clean on WhatsApp"
-        className="fixed right-6 bottom-8 z-50 w-16 h-16 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-2xl animate-whatsapp-pulse hover:scale-110 active:scale-95 transition-all"
+        className="fixed bottom-5 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-[0_20px_40px_-22px_rgba(37,211,102,0.72)] transition-transform hover:scale-105 animate-whatsapp-pulse"
       >
-        <svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32" aria-hidden="true">
-          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-          <path d="M12 0C5.374 0 0 5.373 0 12c0 2.117.554 4.103 1.527 5.836L.057 23.859l6.204-1.448A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.005-1.368l-.359-.214-3.72.869.9-3.61-.235-.375A9.818 9.818 0 0112 2.182c5.42 0 9.818 4.398 9.818 9.818S17.42 21.818 12 21.818z"/>
-        </svg>
+        <MessageCircle className="h-6 w-6" />
       </a>
     </div>
   );

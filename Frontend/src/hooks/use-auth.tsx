@@ -60,7 +60,7 @@ export function useAuth() {
 
 export function useRequireAuth() {
   const { isAuthenticated } = useAuth();
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const { data: profile, isLoading } = useGetProfile({
     query: {
       enabled: isAuthenticated,
@@ -71,12 +71,13 @@ export function useRequireAuth() {
   useEffect(() => {
     if (!isLoading && (!isAuthenticated || !profile)) {
       const t = setTimeout(() => {
-        setLocation(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
+        const redirectTarget = location.split("?")[0] || "/";
+        setLocation(`/login?redirect=${encodeURIComponent(redirectTarget)}`);
       }, 100);
       return () => clearTimeout(t);
     }
     return () => {};
-  }, [isAuthenticated, profile, isLoading, setLocation]);
+  }, [isAuthenticated, location, profile, isLoading, setLocation]);
 
   return { profile: profile?.data, isLoading };
 }
