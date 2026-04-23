@@ -5,20 +5,24 @@ import { Button } from "@/components/ui";
 export default function NotFound() {
   return (
     <AppLayout>
-      <div className="min-h-[80vh] flex flex-col items-center justify-center px-4 text-center">
-        <div className="text-[150px] font-black font-display text-primary/10 leading-none select-none relative">
-          404
-          <div className="absolute inset-0 flex items-center justify-center text-4xl font-bold text-white">
-            Oops!
+      <div className="page-shell">
+        <section className="container-tight section-padding">
+          <div className="visual-card p-10 text-center">
+            <p className="eyebrow justify-center">404</p>
+            <h1 className="mt-6 font-display text-6xl text-ink">This page got lost between pickup and delivery.</h1>
+            <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
+              The route does not exist or has moved. The redesign keeps the error state cleaner and gives the customer a fast route back to the primary actions.
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+              <Link href="/">
+                <Button>Back home</Button>
+              </Link>
+              <Link href="/schedule-pickup">
+                <Button variant="outline">Book pickup</Button>
+              </Link>
+            </div>
           </div>
-        </div>
-        <h2 className="text-2xl font-bold text-white mb-4 mt-8">We lost this page in the wash.</h2>
-        <p className="text-muted-foreground max-w-md mb-8">
-          The page you are looking for doesn't exist or has been moved to another basket.
-        </p>
-        <Link href="/">
-          <Button size="lg">Back to Home</Button>
-        </Link>
+        </section>
       </div>
     </AppLayout>
   );

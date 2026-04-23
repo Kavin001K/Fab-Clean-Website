@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/use-auth";
 import { lazy, Suspense } from "react";
+import { PointerFeedbackProvider } from "@/components/site";
 
 // Pages
 const Home = lazy(() => import("@/pages/home"));
@@ -74,6 +75,7 @@ function App() {
       <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} forcedTheme="light">
         <AuthProvider>
           <TooltipProvider>
+            <PointerFeedbackProvider />
             <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
               <Router />
             </WouterRouter>

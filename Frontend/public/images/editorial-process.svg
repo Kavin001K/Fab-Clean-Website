@@ -1,0 +1,23 @@
+<svg width="1400" height="1200" viewBox="0 0 1400 1200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1400" height="1200" rx="48" fill="#F5F0E8"/>
+  <rect width="1400" height="1200" rx="48" fill="url(#paint0_radial_7_2)"/>
+  <circle cx="1152" cy="215" r="170" fill="#FFF8EC"/>
+  <circle cx="269" cy="903" r="192" fill="#CFAE7A" fill-opacity="0.14"/>
+  <rect x="181" y="332" width="298" height="470" rx="42" fill="#FFF8EC"/>
+  <rect x="551" y="252" width="298" height="550" rx="42" fill="#201B18"/>
+  <rect x="921" y="412" width="298" height="390" rx="42" fill="#FFF8EC"/>
+  <circle cx="331" cy="564" r="88" fill="#B58A44"/>
+  <circle cx="700" cy="489" r="88" fill="#EFE0CC"/>
+  <circle cx="1070" cy="564" r="88" fill="#B58A44"/>
+  <path d="M382 564H620" stroke="#B58A44" stroke-width="10" stroke-linecap="round" stroke-dasharray="16 18"/>
+  <path d="M780 564H1018" stroke="#B58A44" stroke-width="10" stroke-linecap="round" stroke-dasharray="16 18"/>
+  <path d="M308 548L331 572L358 523" stroke="#FFF8EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M662 506L688 532L739 456" stroke="#B58A44" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M1047 548L1070 572L1097 523" stroke="#FFF8EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <defs>
+    <radialGradient id="paint0_radial_7_2" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(700 600) rotate(90) scale(600 700)">
+      <stop stop-color="#FBF8F2"/>
+      <stop offset="1" stop-color="#EDE4D7"/>
+    </radialGradient>
+  </defs>
+</svg>

@@ -5,9 +5,6 @@ import { format } from "date-fns";
 import { useForm } from "react-hook-form";
 import { useGetOrder, useListOrders, useUpdateProfile } from "@workspace/api-client-react";
 import {
-  ArrowRight,
-  CheckCircle2,
-  Clock3,
   CreditCard,
   Loader2,
   LogOut,
@@ -20,6 +17,7 @@ import {
 import { AppLayout } from "@/components/layout";
 import { useAuth, useRequireAuth } from "@/hooks/use-auth";
 import { Badge, Button, Card, FadeIn, Input, SectionHeading } from "@/components/ui";
+import { StatusTimeline } from "@/components/site";
 import { fetchWalletSummary } from "@/lib/portal-api";
 
 type ProfileFormValues = {
@@ -31,7 +29,7 @@ const ORDER_STAGES = ["pending", "processing", "ready_for_pickup", "out_for_deli
 
 const ORDER_STAGE_LABELS: Record<(typeof ORDER_STAGES)[number], string> = {
   pending: "Order received",
-  processing: "In cleaning process",
+  processing: "In cleaning",
   ready_for_pickup: "Ready for pickup",
   out_for_delivery: "Out for delivery",
   delivered: "Delivered",
@@ -53,54 +51,44 @@ function DashboardSidebar() {
   const { logout } = useAuth();
 
   const links = [
-    { name: "Orders", path: "/dashboard/orders", icon: Package, blurb: "See all customer orders" },
-    { name: "Profile", path: "/dashboard/profile", icon: User, blurb: "Update your visible details" },
-    { name: "Wallet", path: "/dashboard/wallet", icon: Wallet, blurb: "Check wallet and credit" },
+    { name: "Orders", path: "/dashboard/orders", blurb: "Live order list and details" },
+    { name: "Profile", path: "/dashboard/profile", blurb: "Customer record fields" },
+    { name: "Wallet", path: "/dashboard/wallet", blurb: "Balance and spending summary" },
   ];
 
   return (
-    <aside className="w-full lg:w-[280px]">
-      <Card className="p-4">
-        <p className="px-2 text-sm font-black uppercase tracking-[0.16em] text-primary">Customer portal</p>
-        <div className="mt-4 grid gap-2">
+    <aside className="w-full lg:w-[290px]">
+      <div className="visual-card p-5">
+        <p className="eyebrow">Portal navigation</p>
+        <div className="mt-6 grid gap-2">
           {links.map((link) => {
             const active = location.startsWith(link.path) || (location === "/dashboard" && link.path === "/dashboard/orders");
             return (
               <Link
                 key={link.path}
                 href={link.path}
-                className={`rounded-[1.3rem] px-4 py-4 transition-colors ${active ? "bg-primary/10 text-primary" : "text-foreground/70 hover:bg-muted"}`}
+                className={`rounded-[1.35rem] border px-4 py-4 transition-colors ${active ? "border-primary/20 bg-primary/10" : "border-line bg-background/70"}`}
               >
-                <div className="flex items-center gap-3">
-                  <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${active ? "bg-white text-primary" : "bg-white text-foreground/70"}`}>
-                    <link.icon className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-black">{link.name}</p>
-                    <p className="text-xs text-muted-foreground">{link.blurb}</p>
-                  </div>
-                </div>
+                <p className="font-medium text-ink">{link.name}</p>
+                <p className="mt-2 text-sm text-muted-foreground">{link.blurb}</p>
               </Link>
             );
           })}
-
           <button
             type="button"
             onClick={logout}
-            className="rounded-[1.3rem] px-4 py-4 text-left text-foreground/70 transition-colors hover:bg-muted"
+            className="rounded-[1.35rem] border border-line bg-background/70 px-4 py-4 text-left"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-foreground/70">
-                <LogOut className="h-5 w-5" />
-              </div>
+              <LogOut className="h-4 w-4 text-primary" />
               <div>
-                <p className="text-sm font-black">Sign out</p>
-                <p className="text-xs text-muted-foreground">End this customer session</p>
+                <p className="font-medium text-ink">Sign out</p>
+                <p className="mt-1 text-sm text-muted-foreground">End this customer session</p>
               </div>
             </div>
           </button>
         </div>
-      </Card>
+      </div>
     </aside>
   );
 }
@@ -117,34 +105,34 @@ function DashboardOverview() {
     const spend = orders.reduce((sum, order) => sum + Number(order.totalAmount ?? 0), 0);
 
     return [
-      { label: "Total orders", value: total.toString(), hint: "Orders visible in your portal", icon: Package },
-      { label: "Active orders", value: active.toString(), hint: "Orders still in progress", icon: Clock3 },
-      { label: "Delivered", value: delivered.toString(), hint: "Orders completed successfully", icon: CheckCircle2 },
-      { label: "Tracked spend", value: formatMoney(spend), hint: "Visible order total", icon: CreditCard },
+      { label: "Total orders", value: total.toString(), hint: "Orders linked to this portal", icon: Package },
+      { label: "Active", value: active.toString(), hint: "Still in progress", icon: Package },
+      { label: "Delivered", value: delivered.toString(), hint: "Completed successfully", icon: CreditCard },
+      { label: "Tracked spend", value: formatMoney(spend), hint: "Visible order total", icon: Wallet },
     ];
   }, [ordersQuery.data?.data]);
 
   return (
     <div className="space-y-6">
-      <Card className="p-6 sm:p-7">
+      <Card className="lux-card p-7">
         <Badge>Signed in customer</Badge>
-        <h2 className="mt-4 text-3xl font-black sm:text-4xl">Welcome, {profile?.name || "Fab Clean Customer"}</h2>
-        <p className="mt-3 max-w-3xl text-base leading-7 text-muted-foreground">
-          Your portal is tied to the same customer record used by operations. That keeps order progress, customer identity, and feedback linked without exposing other customer data.
+        <h2 className="mt-5 font-display text-4xl text-ink">Welcome, {profile?.name || "Fab Clean Customer"}</h2>
+        <p className="mt-4 max-w-3xl text-base leading-8 text-muted-foreground">
+          The dashboard redesign keeps the backend behavior intact while making the portal less noisy and easier to scan.
         </p>
       </Card>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {stats.map((stat, index) => (
           <FadeIn key={stat.label} delay={index * 0.04}>
-            <Card className="p-5">
+            <Card className="lux-card p-5">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-primary">{stat.label}</p>
-                  <p className="mt-3 text-3xl font-black">{stat.value}</p>
+                  <p className="text-sm uppercase tracking-[0.16em] text-muted-foreground">{stat.label}</p>
+                  <p className="mt-3 text-3xl font-semibold text-ink">{stat.value}</p>
                   <p className="mt-2 text-sm text-muted-foreground">{stat.hint}</p>
                 </div>
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                <div className="flex h-11 w-11 items-center justify-center rounded-full border border-primary/20 bg-primary/10 text-primary">
                   <stat.icon className="h-5 w-5" />
                 </div>
               </div>
@@ -169,8 +157,8 @@ function OrdersList() {
 
   if (error) {
     return (
-      <Card className="p-6">
-        <p className="text-lg font-black">Unable to load orders right now.</p>
+      <Card className="lux-card p-6">
+        <p className="font-display text-3xl text-ink">Unable to load orders right now.</p>
         <p className="mt-3 text-sm leading-7 text-muted-foreground">Please try again shortly.</p>
       </Card>
     );
@@ -178,8 +166,8 @@ function OrdersList() {
 
   if (!data?.data?.length) {
     return (
-      <Card className="p-6">
-        <p className="text-lg font-black">No orders yet.</p>
+      <Card className="lux-card p-6">
+        <p className="font-display text-3xl text-ink">No orders yet.</p>
         <p className="mt-3 text-sm leading-7 text-muted-foreground">Book a pickup to start using order tracking and feedback history.</p>
         <div className="mt-6">
           <Link href="/schedule-pickup">
@@ -193,31 +181,24 @@ function OrdersList() {
   return (
     <div className="grid gap-4">
       {data.data.map((order, index) => (
-        <FadeIn key={order.id} delay={index * 0.04}>
+        <FadeIn key={order.id} delay={index * 0.03}>
           <Link href={`/dashboard/track/${order.id}`}>
-            <Card className="p-5 sm:p-6">
+            <Card className="lux-card p-6">
               <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-                <div className="min-w-0">
+                <div>
                   <div className="flex flex-wrap items-center gap-3">
-                    <p className="break-all text-xl font-black sm:text-2xl">{order.reference}</p>
-                    <Badge>{order.status.replace(/_/g, " ")}</Badge>
+                    <p className="text-2xl font-semibold text-ink">{order.reference}</p>
+                    <Badge variant="outline">{order.status.replace(/_/g, " ")}</Badge>
                   </div>
-                  <div className="mt-4 grid gap-2 text-sm text-muted-foreground md:grid-cols-2 xl:grid-cols-3">
+                  <div className="mt-4 grid gap-2 text-sm text-muted-foreground md:grid-cols-3">
                     <p>{formatDateTime(order.createdAt)}</p>
                     <p>Branch: {order.branch || "Pickup"}</p>
                     <p>Services: {order.services.length || 0}</p>
                   </div>
                 </div>
-
-                <div className="grid gap-3 sm:min-w-[220px]">
-                  <div className="rounded-[1.3rem] bg-muted/70 p-4">
-                    <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-primary">Total</p>
-                    <p className="mt-2 text-2xl font-black">{formatMoney(order.totalAmount)}</p>
-                  </div>
-                  <Button variant="outline" className="justify-center">
-                    View order
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
+                <div className="rounded-[1.4rem] border border-line bg-background/70 px-5 py-5 text-right">
+                  <p className="text-sm uppercase tracking-[0.16em] text-muted-foreground">Total</p>
+                  <p className="mt-3 text-2xl font-semibold text-ink">{formatMoney(order.totalAmount)}</p>
                 </div>
               </div>
             </Card>
@@ -241,8 +222,8 @@ function OrderTrack({ id }: { id: string }) {
 
   if (error || !data?.data) {
     return (
-      <Card className="p-6">
-        <p className="text-lg font-black">Order not found.</p>
+      <Card className="lux-card p-6">
+        <p className="font-display text-3xl text-ink">Order not found.</p>
         <p className="mt-3 text-sm leading-7 text-muted-foreground">This order is not available in your portal scope.</p>
       </Card>
     );
@@ -253,47 +234,39 @@ function OrderTrack({ id }: { id: string }) {
 
   return (
     <div className="space-y-6">
-      <Card className="p-6 sm:p-7">
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+      <Card className="lux-card p-7">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <Badge>Order detail</Badge>
-            <h2 className="mt-4 break-all text-3xl font-black sm:text-4xl">{order.reference}</h2>
-            <p className="mt-3 max-w-2xl text-sm leading-7 text-muted-foreground">
-              This timeline is read from the operations database, so the customer portal stays aligned with the live store status.
+            <h2 className="mt-5 font-display text-4xl text-ink">{order.reference}</h2>
+            <p className="mt-3 text-sm leading-7 text-muted-foreground">
+              This timeline mirrors the live store status so the customer portal stays aligned with operations.
             </p>
           </div>
-          <Badge>{order.status.replace(/_/g, " ")}</Badge>
+          <Badge variant="outline">{order.status.replace(/_/g, " ")}</Badge>
         </div>
 
-        <div className="mt-8 grid gap-4 md:grid-cols-5">
-          {ORDER_STAGES.map((stage, index) => {
-            const complete = index <= currentIndex;
-            return (
-              <div key={stage} className={`rounded-[1.25rem] border p-4 ${complete ? "border-primary/20 bg-primary/10" : "border-border bg-white"}`}>
-                <div className={`flex h-10 w-10 items-center justify-center rounded-full ${complete ? "bg-primary text-white" : "bg-muted text-muted-foreground"}`}>
-                  <span className="text-sm font-bold">{index + 1}</span>
-                </div>
-                <p className="mt-4 text-sm font-black uppercase tracking-[0.14em] text-foreground">{ORDER_STAGE_LABELS[stage]}</p>
-                <p className="mt-1 text-xs text-muted-foreground">{stage.replace(/_/g, " ")}</p>
-              </div>
-            );
-          })}
+        <div className="mt-8">
+          <StatusTimeline
+            activeIndex={currentIndex}
+            steps={ORDER_STAGES.map((stage) => ({ label: ORDER_STAGE_LABELS[stage], meta: stage.replace(/_/g, " ") }))}
+          />
         </div>
       </Card>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_0.88fr]">
-        <Card className="p-6">
-          <p className="text-sm font-black uppercase tracking-[0.16em] text-primary">Services and timeline</p>
-          <div className="mt-5 grid gap-4 md:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-[1fr_0.9fr]">
+        <Card className="lux-card p-7">
+          <p className="eyebrow">Services and timeline</p>
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
             <div className="space-y-3">
               {(order.services.length ? order.services : ["Service details unavailable"]).map((service, idx) => (
-                <div key={`${service}-${idx}`} className="rounded-[1.2rem] border border-border bg-white px-4 py-3 text-sm font-semibold text-foreground">
+                <div key={`${service}-${idx}`} className="rounded-[1.3rem] border border-line bg-background/70 px-4 py-4 text-sm text-ink">
                   {service}
                 </div>
               ))}
             </div>
-            <div className="rounded-[1.3rem] bg-muted/70 p-5">
-              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-primary">Lifecycle snapshot</p>
+            <div className="rounded-[1.4rem] border border-line bg-background/70 p-5">
+              <p className="text-sm uppercase tracking-[0.16em] text-muted-foreground">Lifecycle snapshot</p>
               <dl className="mt-4 space-y-3 text-sm text-muted-foreground">
                 <div className="flex items-center justify-between gap-4">
                   <dt>Placed</dt>
@@ -305,23 +278,23 @@ function OrderTrack({ id }: { id: string }) {
                 </div>
                 <div className="flex items-center justify-between gap-4">
                   <dt>Status</dt>
-                  <dd className="font-bold text-foreground">{order.status.replace(/_/g, " ")}</dd>
+                  <dd className="font-medium text-ink">{order.status.replace(/_/g, " ")}</dd>
                 </div>
               </dl>
             </div>
           </div>
         </Card>
 
-        <Card className="p-6">
-          <p className="text-sm font-black uppercase tracking-[0.16em] text-primary">Commercial summary</p>
-          <div className="mt-5 space-y-4">
-            <div className="rounded-[1.25rem] bg-muted/70 p-4">
-              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-primary">Total amount</p>
-              <p className="mt-2 text-3xl font-black">{formatMoney(order.totalAmount)}</p>
+        <Card className="lux-card p-7">
+          <p className="eyebrow">Commercial summary</p>
+          <div className="mt-6 space-y-4">
+            <div className="rounded-[1.4rem] border border-line bg-background/70 p-5">
+              <p className="text-sm uppercase tracking-[0.16em] text-muted-foreground">Total amount</p>
+              <p className="mt-3 text-3xl font-semibold text-ink">{formatMoney(order.totalAmount)}</p>
             </div>
-            <div className="rounded-[1.25rem] bg-muted/70 p-4">
-              <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-primary">Order ID</p>
-              <p className="mt-2 break-all text-sm text-muted-foreground">{order.id}</p>
+            <div className="rounded-[1.4rem] border border-line bg-background/70 p-5">
+              <p className="text-sm uppercase tracking-[0.16em] text-muted-foreground">Order ID</p>
+              <p className="mt-3 break-all text-sm text-muted-foreground">{order.id}</p>
             </div>
             <Link href={`/feedback/${order.reference}`}>
               <Button className="w-full">Leave feedback</Button>
@@ -359,18 +332,18 @@ function ProfilePanel() {
   });
 
   return (
-    <Card className="p-6 sm:p-7">
+    <Card className="lux-card p-7">
       <div className="mb-8">
         <Badge>Profile</Badge>
-        <h2 className="mt-4 text-3xl font-black">Your customer identity</h2>
+        <h2 className="mt-5 font-display text-4xl text-ink">Customer identity</h2>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-muted-foreground">
-          Phone remains locked because sign-in uses OTP. Name and email can be updated here and kept aligned with the linked customer profile.
+          Phone stays locked because sign-in uses OTP. Name and email can be updated here and kept aligned with the linked customer profile.
         </p>
       </div>
 
       <form className="grid gap-5 md:grid-cols-2" onSubmit={form.handleSubmit((values) => updateProfile.mutate({ data: values }))}>
         <div className="md:col-span-2">
-          <label className="mb-2 block text-sm font-bold text-foreground">Phone</label>
+          <label className="mb-2 block text-sm font-medium text-ink">Phone</label>
           <div className="relative">
             <Phone className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input value={profile?.phone || ""} readOnly className="pl-11 text-muted-foreground" />
@@ -378,7 +351,7 @@ function ProfilePanel() {
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-bold text-foreground">Name</label>
+          <label className="mb-2 block text-sm font-medium text-ink">Name</label>
           <div className="relative">
             <User className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input {...form.register("name")} className="pl-11" />
@@ -386,7 +359,7 @@ function ProfilePanel() {
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-bold text-foreground">Email</label>
+          <label className="mb-2 block text-sm font-medium text-ink">Email</label>
           <div className="relative">
             <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input {...form.register("email")} className="pl-11" />
@@ -394,10 +367,8 @@ function ProfilePanel() {
         </div>
 
         <div className="md:col-span-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm leading-7 text-muted-foreground">Address and date of birth can be surfaced here once the typed portal contract is expanded.</p>
-          <Button type="submit" isLoading={updateProfile.isPending}>
-            Save profile
-          </Button>
+          <p className="text-sm leading-7 text-muted-foreground">Additional customer fields can be exposed later without reworking the layout structure again.</p>
+          <Button type="submit" isLoading={updateProfile.isPending}>Save profile</Button>
         </div>
       </form>
     </Card>
@@ -422,8 +393,8 @@ function WalletPanel() {
 
   if (walletQuery.isError || !walletQuery.data?.data) {
     return (
-      <Card className="p-6">
-        <p className="text-lg font-black">Wallet summary is temporarily unavailable.</p>
+      <Card className="lux-card p-6">
+        <p className="font-display text-3xl text-ink">Wallet summary is temporarily unavailable.</p>
         <p className="mt-3 text-sm leading-7 text-muted-foreground">Please try again in a moment.</p>
       </Card>
     );
@@ -440,18 +411,18 @@ function WalletPanel() {
         { label: "Total spent", value: formatMoney(wallet.totalSpent), hint: "Visible order spend" },
       ].map((item, index) => (
         <FadeIn key={item.label} delay={index * 0.04}>
-          <Card className="p-5">
-            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-primary">{item.label}</p>
-            <p className="mt-3 text-3xl font-black">{item.value}</p>
+          <Card className="lux-card p-5">
+            <p className="text-sm uppercase tracking-[0.16em] text-muted-foreground">{item.label}</p>
+            <p className="mt-3 text-3xl font-semibold text-ink">{item.value}</p>
             <p className="mt-2 text-sm text-muted-foreground">{item.hint}</p>
           </Card>
         </FadeIn>
       ))}
 
-      <Card className="p-6 md:col-span-2 xl:col-span-4">
-        <p className="text-lg font-black">Wallet history can expand later.</p>
+      <Card className="lux-card p-6 md:col-span-2 xl:col-span-4">
+        <p className="font-display text-3xl text-ink">Wallet history can expand later.</p>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-muted-foreground">
-          This release focuses on wallet summary visibility and portal stability. The current screen keeps the customer-facing data simple while the backend structure stays secure.
+          This release focuses on a clearer wallet snapshot while leaving deeper wallet history and credits detail for a later backend expansion.
         </p>
       </Card>
     </div>
@@ -472,11 +443,11 @@ export default function Dashboard() {
         <section className="container-wide section-padding">
           <SectionHeading align="left" title={`Hello, ${greeting}`} subtitle="Customer dashboard" />
           <p className="mt-5 max-w-3xl text-lg leading-8 text-muted-foreground">
-            Track orders, update your profile, and review wallet status from one lighter, easier-to-read dashboard.
+            Orders, profile, and wallet status now sit inside a more composed portal shell without changing the backend contract.
           </p>
         </section>
 
-        <section className="container-wide pb-20">
+        <section className="container-wide pb-24">
           <DashboardOverview />
 
           <div className="mt-8 flex flex-col gap-8 lg:flex-row lg:items-start">

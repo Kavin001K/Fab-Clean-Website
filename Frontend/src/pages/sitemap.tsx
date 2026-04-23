@@ -1,94 +1,69 @@
-import { SEO } from "@/components/seo";
-import { AppLayout } from "@/components/layout";
-import { SectionHeading, FadeIn, Card } from "@/components/ui";
 import { Link } from "wouter";
-import { 
-  Home, List, Tag, Info, Phone, 
-  User, UserPlus, Calendar, LayoutDashboard,
-  Shield, Scale, Cookie, MapPin, ExternalLink
-} from "lucide-react";
+import { AppLayout } from "@/components/layout";
+import { SEO } from "@/components/seo";
+import { Button, FadeIn, SectionHeading } from "@/components/ui";
+import { SupportBand } from "@/components/site";
 
-const sitemapGroups = [
+const groups = [
   {
-    title: "Main Navigation",
+    title: "Main pages",
     links: [
-      { name: "Home", path: "/", icon: Home, description: "Premium laundry & dry cleaning homepage." },
-      { name: "Services", path: "/services", icon: List, description: "Explore our expert cleaning solutions." },
-      { name: "Pricing", path: "/pricing", icon: Tag, description: "Affordable rates for luxury garment care." },
-      { name: "About Us", path: "/about", icon: Info, description: "Our science, our story, and our mission." },
-      { name: "Contact", path: "/contact", icon: Phone, description: "Get in touch with our Pollachi & Kinathukadavu hubs." },
-    ]
+      { name: "Home", href: "/" },
+      { name: "Services", href: "/services" },
+      { name: "Pricing", href: "/pricing" },
+      { name: "About", href: "/about" },
+      { name: "Contact", href: "/contact" },
+    ],
   },
   {
-    title: "Services & Bookings",
+    title: "Customer actions",
     links: [
-      { name: "Schedule Pickup", path: "/schedule-pickup", icon: Calendar, description: "Book a free doorstep collection." },
-      { name: "Our Locations", path: "/contact#locations", icon: MapPin, description: "Find our physical branches." },
-    ]
+      { name: "Schedule Pickup", href: "/schedule-pickup" },
+      { name: "Track Order", href: "/track-order" },
+      { name: "Feedback", href: "/feedback" },
+      { name: "Reviews", href: "/reviews" },
+    ],
   },
   {
-    title: "Account & Portal",
+    title: "Portal and legal",
     links: [
-      { name: "Customer Login", path: "/login", icon: User, description: "Access your orders and profile." },
-      { name: "Register", path: "/register", icon: UserPlus, description: "Join the Fab Clean community." },
-      { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard, description: "Manage your active cleaning orders." },
-    ]
+      { name: "Login", href: "/login" },
+      { name: "Register", href: "/register" },
+      { name: "Dashboard", href: "/dashboard/orders" },
+      { name: "Privacy", href: "/privacy" },
+      { name: "Terms", href: "/terms" },
+      { name: "Refund", href: "/refund" },
+      { name: "Cookies", href: "/cookies" },
+    ],
   },
-  {
-    title: "Legal & Privacy",
-    links: [
-      { name: "Privacy Policy", path: "#", icon: Shield, description: "How we protect your data." },
-      { name: "Terms of Service", path: "#", icon: Scale, description: "Our service agreement." },
-      { name: "Cookie Policy", path: "#", icon: Cookie, description: "Managing your website preferences." },
-    ]
-  }
 ];
 
 export default function Sitemap() {
   return (
     <AppLayout>
-      <SEO 
-        title="Sitemap — Fab Clean" 
-        description="Navigate through Fab Clean's premium dry cleaning and laundry services in Pollachi. Find all our pages, services, and policies in one place."
-        canonical={`${window.location.origin}/sitemap`}
+      <SEO
+        title="Sitemap | Fab Clean"
+        description="A clean directory of Fab Clean's primary pages, actions, and portal routes."
+        canonical="https://myfabclean.com/sitemap"
       />
 
-      <section className="section-padding pt-40 pb-32">
-        <div className="container-wide">
-          <SectionHeading 
-            title="Sitemap" 
-            subtitle="Explore our Digital Hub" 
-            align="left"
-            className="mb-24"
-          />
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16">
-            {sitemapGroups.map((group, groupIndex) => (
-              <FadeIn key={group.title} delay={groupIndex * 0.1}>
-                <div className="space-y-8">
-                  <h3 className="text-sm font-black uppercase tracking-[0.4em] text-primary/60 border-l-4 border-primary pl-6 py-1">
-                    {group.title}
-                  </h3>
-                  
-                  <div className="grid grid-cols-1 gap-4">
-                    {group.links.map((link) => (
-                      <Link key={link.name} href={link.path}>
-                        <Card className="p-6 hover:bg-white/50 transition-all group border-transparent hover:border-primary/10">
-                          <div className="flex items-center gap-6">
-                            <div className="w-12 h-12 rounded-xl bg-primary/5 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all duration-500">
-                              <link.icon className="w-6 h-6" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2">
-                                <span className="text-lg font-black text-foreground group-hover:text-primary transition-colors">
-                                  {link.name}
-                                </span>
-                                <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-40 transition-opacity" />
-                              </div>
-                              <p className="text-sm text-muted-foreground line-clamp-1">{link.description}</p>
-                            </div>
-                          </div>
-                        </Card>
+      <div className="page-shell">
+        <section className="container-wide section-padding">
+          <SectionHeading title="A sitemap should still look considered." subtitle="Sitemap" />
+          <p className="mx-auto mt-6 max-w-3xl text-center text-lg leading-8 text-muted-foreground">
+            The redesigned sitemap keeps route discovery simple without dropping back to placeholder styling.
+          </p>
+          <div className="mt-12 grid gap-6 lg:grid-cols-3">
+            {groups.map((group, index) => (
+              <FadeIn key={group.title} delay={index * 0.05}>
+                <div className="visual-card p-7">
+                  <p className="eyebrow">{group.title}</p>
+                  <div className="mt-6 grid gap-3">
+                    {group.links.map((item) => (
+                      <Link key={item.href} href={item.href}>
+                        <div className="rounded-[1.35rem] border border-line bg-background/70 px-4 py-4 text-sm text-ink transition-colors hover:border-primary/20 hover:bg-primary/10">
+                          {item.name}
+                        </div>
                       </Link>
                     ))}
                   </div>
@@ -96,31 +71,17 @@ export default function Sitemap() {
               </FadeIn>
             ))}
           </div>
-        </div>
-      </section>
+          <div className="mt-10 flex justify-center">
+            <Link href="/schedule-pickup">
+              <Button>Book pickup</Button>
+            </Link>
+          </div>
+        </section>
 
-      {/* Quick Help Section */}
-      <section className="pb-32">
-        <div className="container-wide">
-          <FadeIn delay={0.4}>
-            <div className="bg-primary/5 rounded-[3.5rem] p-12 md:p-20 text-center border border-primary/10">
-              <h2 className="text-3xl md:text-4xl font-black mb-6">Need help finding something?</h2>
-              <p className="text-muted-foreground text-lg mb-10 max-w-2xl mx-auto">
-                Our support team is available 9 AM – 8 PM to assist you with order tracking, 
-                special fabric care queries, or pickup scheduling.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-6 justify-center">
-                <a href="tel:9363059595" className="px-10 py-5 bg-foreground text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-all">
-                  Call 93630 59595
-                </a>
-                <a href="https://wa.me/919363059595" target="_blank" rel="noopener noreferrer" className="px-10 py-5 bg-[#25D366] text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 transition-all">
-                  WhatsApp Support
-                </a>
-              </div>
-            </div>
-          </FadeIn>
-        </div>
-      </section>
+        <section className="container-wide pb-24">
+          <SupportBand title="Still not sure where to go?" description="Use the main navigation for the polished route, or contact the team directly for help." />
+        </section>
+      </div>
     </AppLayout>
   );
 }

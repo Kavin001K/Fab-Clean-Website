@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => {
   }
 
   return {
-    logLevel: "error",
+    logLevel: "info",
     plugins: [
       react(),
       tailwindcss(),
@@ -46,8 +46,8 @@ export default defineConfig(({ mode }) => {
       reportCompressedSize: true,
     },
     server: {
-      port: 3001,
-      host: "0.0.0.0",
+      port: 5173,
+      host: "127.0.0.1",
       allowedHosts: true,
       proxy: {
         "/api": {
@@ -61,8 +61,8 @@ export default defineConfig(({ mode }) => {
       },
     },
     preview: {
-      port: 3001,
-      host: "0.0.0.0",
+      port: 5173,
+      host: "127.0.0.1",
       allowedHosts: true,
     },
   };

@@ -1,11 +1,13 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import { Mail, MessageCircle, Phone } from "lucide-react";
 import { useSubmitContact } from "@workspace/api-client-react";
 import { AppLayout } from "@/components/layout";
 import { SEO } from "@/components/seo";
-import { Button, Card, FadeIn, Input, SectionHeading } from "@/components/ui";
+import { Button, FadeIn, Input, SectionHeading, Textarea } from "@/components/ui";
+import { ActionList, SupportBand } from "@/components/site";
+import { BRAND, BRANCHES } from "@/lib/brand";
 import { useToast } from "@/hooks/use-toast";
 
 const contactSchema = z.object({
@@ -41,119 +43,102 @@ export default function Contact() {
     resolver: zodResolver(contactSchema),
   });
 
-  const onSubmit = (values: ContactForm) => {
-    submitForm({ data: values });
-  };
-
   return (
     <AppLayout>
       <SEO
         title="Contact Fab Clean"
-        description="Call, WhatsApp, visit, or message Fab Clean from one clear contact page."
+        description="Reach Fab Clean by phone, WhatsApp, email, or branch visit with a cleaner support layout."
         canonical="https://myfabclean.com/contact"
       />
 
       <div className="page-shell">
         <section className="container-wide section-padding">
-          <SectionHeading title="Contact options that are easy to use" subtitle="Support" />
+          <SectionHeading title="A contact page should feel direct, calm, and easy to act on." subtitle="Contact" />
           <p className="mx-auto mt-6 max-w-3xl text-center text-lg leading-8 text-muted-foreground">
-            Use the form if the message can wait. Use phone or WhatsApp if you need help with pickup, order status, or store timing.
+            Use the form for non-urgent questions. Use phone or WhatsApp when the customer needs pickup timing, branch availability, or order help right away.
           </p>
         </section>
 
         <section className="container-wide pb-20">
-          <div className="grid gap-6 lg:grid-cols-[1fr_0.9fr]">
+          <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
             <FadeIn>
-              <Card className="p-7 sm:p-8">
-                <h2 className="text-3xl font-black sm:text-4xl">Send a message</h2>
-                <p className="mt-3 text-base leading-7 text-muted-foreground">
-                  Keep the message short and clear. The team can follow up by phone or email.
+              <div className="visual-card p-7">
+                <h2 className="font-display text-4xl text-ink">Send a message</h2>
+                <p className="mt-4 text-base leading-8 text-muted-foreground">
+                  Keep it short, clear, and easy to route. The form layout is lighter, more structured, and faster to complete on mobile.
                 </p>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="mt-8 grid gap-4">
+                <form
+                  onSubmit={handleSubmit((values) => submitForm({ data: values }))}
+                  className="mt-8 grid gap-4"
+                >
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
                       <Input placeholder="Your name" {...register("name")} />
-                      {errors.name ? <p className="mt-2 text-sm text-destructive">{errors.name.message}</p> : null}
+                      {errors.name ? <p className="mt-2 text-sm text-red-700">{errors.name.message}</p> : null}
                     </div>
                     <div>
                       <Input placeholder="Your email" {...register("email")} />
-                      {errors.email ? <p className="mt-2 text-sm text-destructive">{errors.email.message}</p> : null}
+                      {errors.email ? <p className="mt-2 text-sm text-red-700">{errors.email.message}</p> : null}
                     </div>
                   </div>
-
                   <div className="grid gap-4 sm:grid-cols-2">
-                    <Input placeholder="Phone number (optional)" {...register("phone")} />
-                    <Input placeholder="Subject (optional)" {...register("subject")} />
+                    <Input placeholder="Phone number" {...register("phone")} />
+                    <Input placeholder="Subject" {...register("subject")} />
                   </div>
-
                   <div>
-                    <textarea
-                      className="min-h-[180px] w-full rounded-[1.4rem] border border-border bg-white px-4 py-3 text-sm text-foreground shadow-sm outline-none transition focus:border-primary/40 focus:ring-4 focus:ring-primary/12"
-                      placeholder="Tell us how we can help"
-                      {...register("message")}
-                    />
-                    {errors.message ? <p className="mt-2 text-sm text-destructive">{errors.message.message}</p> : null}
+                    <Textarea placeholder="Tell us how we can help." {...register("message")} />
+                    {errors.message ? <p className="mt-2 text-sm text-red-700">{errors.message.message}</p> : null}
                   </div>
-
-                  <Button type="submit" size="lg" isLoading={isPending} className="w-full sm:w-fit">
+                  <Button type="submit" isLoading={isPending} className="w-full sm:w-fit">
                     Send message
                   </Button>
                 </form>
-              </Card>
+              </div>
             </FadeIn>
 
-            <FadeIn delay={0.06} className="space-y-6">
-              {[
-                {
-                  icon: Phone,
-                  title: "Call the team",
-                  lines: ["Pollachi: 93630 59595", "Kinathukadavu: 93637 19595"],
-                },
-                {
-                  icon: Mail,
-                  title: "Email",
-                  lines: ["info@myfabclean.in", "myfabclean@gmail.com"],
-                },
-                {
-                  icon: MapPin,
-                  title: "Store hours",
-                  lines: ["Monday to Saturday", "10:00 AM to 8:00 PM"],
-                },
-              ].map((item) => (
-                <Card key={item.title} className="p-6">
-                  <div className="flex items-start gap-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                      <item.icon className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-black">{item.title}</h3>
-                      <div className="mt-3 space-y-1 text-sm leading-7 text-muted-foreground">
-                        {item.lines.map((line) => (
-                          <p key={line}>{line}</p>
-                        ))}
+            <div className="space-y-6">
+              <FadeIn delay={0.05}>
+                <ActionList
+                  items={[
+                    {
+                      icon: Phone,
+                      title: "Call the team",
+                      body: `${BRAND.phoneMain} for Pollachi or ${BRAND.phoneSecondary} for Kinathukadavu.`,
+                    },
+                    {
+                      icon: Mail,
+                      title: "Email support",
+                      body: `${BRAND.email} or ${BRAND.emailAlt} for formal support communication.`,
+                    },
+                    {
+                      icon: MessageCircle,
+                      title: "WhatsApp first",
+                      body: "Best for quick pickup questions, branch timing, and order follow-up.",
+                    },
+                  ]}
+                />
+              </FadeIn>
+
+              <FadeIn delay={0.1}>
+                <div className="visual-card p-7">
+                  <p className="eyebrow">Branch coverage</p>
+                  <div className="mt-6 space-y-5">
+                    {BRANCHES.map((branch) => (
+                      <div key={branch.slug} className="rounded-[1.5rem] border border-line bg-background/70 px-5 py-5">
+                        <p className="font-medium text-ink">{branch.title}</p>
+                        <p className="mt-2 text-sm leading-7 text-muted-foreground">{branch.address}</p>
                       </div>
-                    </div>
+                    ))}
                   </div>
-                </Card>
-              ))}
-
-              <Card className="p-6">
-                <h3 className="text-xl font-black">WhatsApp support</h3>
-                <p className="mt-3 text-sm leading-7 text-muted-foreground">
-                  Best for quick pickup questions, branch timing, or order follow-up.
-                </p>
-                <div className="mt-5">
-                  <a href="https://wa.me/919363059595" target="_blank" rel="noreferrer">
-                    <Button className="w-full">
-                      <MessageCircle className="h-4 w-4" />
-                      Open WhatsApp
-                    </Button>
-                  </a>
                 </div>
-              </Card>
-            </FadeIn>
+              </FadeIn>
+            </div>
           </div>
+        </section>
+
+        <section className="container-wide pb-24">
+          <SupportBand title="Prefer the faster route?" description="Message Fab Clean on WhatsApp for pickup timing, basic pricing, or a quick branch question." />
         </section>
       </div>
     </AppLayout>

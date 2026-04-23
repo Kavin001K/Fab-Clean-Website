@@ -1,44 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import { Link, useLocation, useRoute } from "wouter";
-import { ArrowRight, Clock3, FileText, Package2, Search, Truck } from "lucide-react";
+import { ArrowRight, FileText, Search, Truck } from "lucide-react";
 import { AppLayout } from "@/components/layout";
 import { SEO } from "@/components/seo";
 import { Badge, Button, Card, FadeIn, Input, SectionHeading } from "@/components/ui";
+import { ActionList, StatusTimeline, SupportBand } from "@/components/site";
 import { trackOrderById, type PublicTrackedOrder } from "@/lib/public-api";
 import { formatCurrency } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 
-const statusTone: Record<string, string> = {
-  pending: "border-amber-200 bg-amber-50 text-amber-700",
-  processing: "border-sky-200 bg-sky-50 text-sky-700",
-  ready_for_pickup: "border-emerald-200 bg-emerald-50 text-emerald-700",
-  out_for_delivery: "border-violet-200 bg-violet-50 text-violet-700",
-  delivered: "border-green-200 bg-green-50 text-green-700",
-  completed: "border-green-200 bg-green-50 text-green-700",
-};
-
-function StageRail({ order }: { order: PublicTrackedOrder }) {
-  return (
-    <div className="grid gap-4 md:grid-cols-5">
-      {order.stages.map((stage, index) => (
-        <motion.div
-          key={stage.stage}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: index * 0.05 }}
-          className={`rounded-[1.4rem] border p-4 ${stage.completed ? "border-primary/20 bg-primary/10" : "border-border bg-white"}`}
-        >
-          <div className={`flex h-9 w-9 items-center justify-center rounded-full ${stage.completed ? "bg-primary text-white" : "bg-muted text-muted-foreground"}`}>
-            <span className="text-sm font-bold">{index + 1}</span>
-          </div>
-          <p className="mt-4 text-sm font-black uppercase tracking-[0.14em] text-foreground">{stage.label}</p>
-          <p className="mt-1 text-xs text-muted-foreground">{stage.stage.replace(/_/g, " ")}</p>
-        </motion.div>
-      ))}
-    </div>
-  );
-}
+const stageLabels = ["Order received", "In cleaning", "Ready for pickup", "Out for delivery", "Delivered"];
 
 export default function TrackOrder() {
   const [, setLocation] = useLocation();
@@ -50,9 +21,13 @@ export default function TrackOrder() {
   const { toast } = useToast();
 
   const routeIdentifier = matchesIdentifierRoute ? decodeURIComponent(routeParams.identifier || "") : "";
-
-  const statusClass = useMemo(
-    () => (order ? statusTone[order.status] || "border-border bg-muted text-foreground" : ""),
+  const activeIndex = useMemo(
+    () =>
+      order
+        ? Math.max(order.stages.findIndex((stage) => stage.completed === false) - 1, 0) >= 0
+          ? Math.max(order.stages.findIndex((stage) => stage.completed === false) - 1, 0)
+          : order.stages.length - 1
+        : 0,
     [order],
   );
 
@@ -86,54 +61,48 @@ export default function TrackOrder() {
     }
   }
 
-  async function handleTrack(event: React.FormEvent) {
-    event.preventDefault();
-    if (!identifier.trim()) {
-      toast({ title: "Enter an order ID", description: "Use your receipt order number or the ERP order ID.", variant: "destructive" });
-      return;
-    }
-    await lookupOrder(identifier, { syncUrl: true, showErrors: true });
-  }
-
   useEffect(() => {
     const legacyIdentifier = new URLSearchParams(window.location.search).get("orderId") || "";
     const initialIdentifier = routeIdentifier || legacyIdentifier;
-    const normalizedIdentifier = initialIdentifier.trim();
-    if (!normalizedIdentifier) return;
-
-    setIdentifier(normalizedIdentifier);
-    if (lastRequestedIdentifier.current === normalizedIdentifier.toUpperCase()) return;
-    void lookupOrder(normalizedIdentifier, { syncUrl: true, showErrors: true });
+    if (!initialIdentifier.trim()) return;
+    setIdentifier(initialIdentifier);
+    if (lastRequestedIdentifier.current === initialIdentifier.toUpperCase()) return;
+    void lookupOrder(initialIdentifier, { syncUrl: true, showErrors: true });
   }, [routeIdentifier]);
 
   return (
     <AppLayout>
       <SEO
         title="Track Order | Fab Clean"
-        description="Track your Fab Clean order using the order ID or order number."
+        description="Track your Fab Clean order with a clearer status hierarchy and order summary."
         canonical={`https://myfabclean.com${routeIdentifier ? `/track-order/${encodeURIComponent(routeIdentifier)}` : "/track-order"}`}
       />
 
       <div className="page-shell">
         <section className="container-wide section-padding">
-          <SectionHeading title="Track your order in one quick view" subtitle="Track order" />
+          <SectionHeading title="Tracking should feel credible in one glance." subtitle="Track order" />
           <p className="mx-auto mt-6 max-w-3xl text-center text-lg leading-8 text-muted-foreground">
-            Enter the order number from your receipt to check the current progress of your garments and access your invoice.
+            The new page puts the identifier, status, stage progression, and next actions in a cleaner reading order.
           </p>
 
-          <FadeIn className="mx-auto mt-10 max-w-5xl">
-            <Card className="p-6 sm:p-8">
-              <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
+          <FadeIn className="mx-auto mt-10 max-w-6xl">
+            <Card className="lux-card p-7">
+              <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
                 <div>
-                  <form onSubmit={handleTrack} className="flex flex-col gap-4 sm:flex-row">
+                  <form
+                    onSubmit={(event) => {
+                      event.preventDefault();
+                      if (!identifier.trim()) {
+                        toast({ title: "Enter an order ID", description: "Use your receipt order number or ERP order ID.", variant: "destructive" });
+                        return;
+                      }
+                      void lookupOrder(identifier, { syncUrl: true, showErrors: true });
+                    }}
+                    className="flex flex-col gap-4 sm:flex-row"
+                  >
                     <div className="relative flex-1">
                       <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      <Input
-                        value={identifier}
-                        onChange={(event) => setIdentifier(event.target.value)}
-                        placeholder="Enter order ID or order number"
-                        className="pl-11"
-                      />
+                      <Input value={identifier} onChange={(event) => setIdentifier(event.target.value)} className="pl-11" placeholder="Enter order ID or order number" />
                     </div>
                     <Button type="submit" size="lg" isLoading={isLoading}>
                       Track order
@@ -141,96 +110,92 @@ export default function TrackOrder() {
                     </Button>
                   </form>
 
-                  <div className="mt-5 flex flex-wrap gap-3">
-                    <span className="info-chip">Real-time status updates</span>
-                    <span className="info-chip">Order history and details</span>
+                  <div className="mt-6 flex flex-wrap gap-3">
+                    <span className="info-chip">Real-time order updates</span>
+                    <span className="info-chip">Invoice access when available</span>
                   </div>
                 </div>
 
-                <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
-                  {[
-                    { icon: Package2, title: "Order progress", body: "View exactly which stage your order is in, from pickup to delivery." },
-                    { icon: Truck, title: "Delivery updates", body: "Get notified when your garments are ready or out for delivery." },
-                    { icon: FileText, title: "Digital invoices", body: "Access and download your service invoices directly from your order page." },
-                  ].map((item) => (
-                    <div key={item.title} className="surface-soft p-4">
-                      <item.icon className="h-5 w-5 text-primary" />
-                      <p className="mt-3 font-black text-foreground">{item.title}</p>
-                      <p className="mt-2 text-sm leading-7 text-muted-foreground">{item.body}</p>
-                    </div>
-                  ))}
-                </div>
+                <ActionList
+                  items={[
+                    { icon: Truck, title: "Status visibility", body: "See where the order sits in the cleaning and delivery cycle." },
+                    { icon: FileText, title: "Invoice access", body: "Open the invoice directly when it is attached to the tracked order." },
+                  ]}
+                />
               </div>
             </Card>
           </FadeIn>
         </section>
 
-        <AnimatePresence mode="wait">
-          {order ? (
-            <motion.section key={order.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }} className="container-wide pb-20">
-              <Card className="p-6 sm:p-8">
-                <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+        {order ? (
+          <section className="container-wide pb-24">
+            <div className="grid gap-6">
+              <Card className="lux-card p-7">
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                   <div>
-                    <p className="text-sm font-bold uppercase tracking-[0.16em] text-primary">Order identifier</p>
-                    <h2 className="mt-3 break-all text-3xl font-black sm:text-4xl">{order.reference}</h2>
-                    <p className="mt-3 text-sm leading-7 text-muted-foreground">ERP order ID: {order.orderId}</p>
+                    <p className="eyebrow">Tracked order</p>
+                    <h2 className="mt-5 font-display text-4xl text-ink">{order.reference}</h2>
+                    <p className="mt-3 text-sm text-muted-foreground">ERP order ID: {order.orderId}</p>
                   </div>
-                  <div className="flex flex-col items-start gap-3 lg:items-end">
-                    <Badge className={statusClass}>{order.status.replace(/_/g, " ")}</Badge>
-                    <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Clock3 className="h-4 w-4 text-primary" />
-                      Last updated {new Date(order.updatedAt).toLocaleString("en-IN")}
-                    </p>
-                  </div>
+                  <Badge variant="outline">{order.status.replace(/_/g, " ")}</Badge>
                 </div>
-
                 <div className="mt-8">
-                  <StageRail order={order} />
+                  <StatusTimeline
+                    activeIndex={activeIndex}
+                    steps={stageLabels.map((label, index) => ({
+                      label,
+                      meta: `Stage ${index + 1}`,
+                    }))}
+                  />
                 </div>
+              </Card>
 
-                <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_0.9fr]">
-                  <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-6 lg:grid-cols-[1fr_0.95fr]">
+                <Card className="lux-card p-7">
+                  <p className="eyebrow">Order summary</p>
+                  <div className="mt-6 grid gap-4 md:grid-cols-2">
                     {[
                       { label: "Customer", value: order.customerName || "Fab Clean Customer" },
                       { label: "Total", value: formatCurrency(order.totalAmount || 0) },
                       { label: "Payment", value: order.paymentStatus || "pending" },
-                      {
-                        label: "Pickup date",
-                        value: order.scheduledDate ? new Date(order.scheduledDate).toLocaleDateString("en-IN") : "Awaiting schedule",
-                      },
+                      { label: "Pickup date", value: order.scheduledDate ? new Date(order.scheduledDate).toLocaleDateString("en-IN") : "Awaiting schedule" },
                     ].map((item) => (
-                      <div key={item.label} className="surface-soft p-5">
-                        <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-primary">{item.label}</p>
-                        <p className="mt-3 text-lg font-black text-foreground">{item.value}</p>
+                      <div key={item.label} className="rounded-[1.4rem] border border-line bg-background/70 px-5 py-5">
+                        <p className="text-sm uppercase tracking-[0.16em] text-muted-foreground">{item.label}</p>
+                        <p className="mt-3 font-medium text-ink">{item.value}</p>
                       </div>
                     ))}
                   </div>
+                </Card>
 
-                  <div className="surface-soft p-5">
-                    <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-primary">Services and actions</p>
-                    <div className="mt-4 space-y-3">
-                      {(order.services.length ? order.services : ["Laundry service"]).map((service, index) => (
-                        <div key={`${service}-${index}`} className="rounded-2xl border border-border bg-white px-4 py-3 text-sm font-semibold text-foreground">
-                          {service}
-                        </div>
-                      ))}
-                    </div>
-                    <div className="mt-6 grid gap-3">
-                      {order.invoiceUrl ? (
-                        <a href={order.invoiceUrl} target="_blank" rel="noreferrer">
-                          <Button className="w-full">Open invoice</Button>
-                        </a>
-                      ) : null}
-                      <Link href={`/feedback/${encodeURIComponent(order.reference || order.orderId)}`}>
-                        <Button variant="outline" className="w-full">Leave feedback</Button>
-                      </Link>
-                    </div>
+                <Card className="lux-card p-7">
+                  <p className="eyebrow">Services and actions</p>
+                  <div className="mt-6 space-y-3">
+                    {(order.services.length ? order.services : ["Laundry service"]).map((service, index) => (
+                      <div key={`${service}-${index}`} className="rounded-[1.3rem] border border-line bg-background/70 px-4 py-4 text-sm text-ink">
+                        {service}
+                      </div>
+                    ))}
                   </div>
-                </div>
-              </Card>
-            </motion.section>
-          ) : null}
-        </AnimatePresence>
+                  <div className="mt-8 grid gap-3">
+                    {order.invoiceUrl ? (
+                      <a href={order.invoiceUrl} target="_blank" rel="noreferrer">
+                        <Button className="w-full">Open invoice</Button>
+                      </a>
+                    ) : null}
+                    <Link href={`/feedback/${encodeURIComponent(order.reference || order.orderId)}`}>
+                      <Button variant="outline" className="w-full">Leave feedback</Button>
+                    </Link>
+                  </div>
+                </Card>
+              </div>
+            </div>
+          </section>
+        ) : null}
+
+        <section className="container-wide pb-24">
+          <SupportBand title="Need help with a missing status?" description="If the order cannot be found or the state looks wrong, contact the branch with your receipt number." />
+        </section>
       </div>
     </AppLayout>
   );
