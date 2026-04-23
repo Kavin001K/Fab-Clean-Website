@@ -7,8 +7,14 @@ import crypto from "crypto";
 
 const router: IRouter = Router();
 
-const JWT_SECRET = process.env.JWT_SECRET ?? "fab-clean-dev-secret-2025";
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET && process.env.NODE_ENV === "production") {
+  throw new Error("JWT_SECRET environment variable is required in production");
+}
+const ACTUAL_JWT_SECRET = JWT_SECRET ?? "fab-clean-dev-secret-2025";
+
 const otpStore = new Map<string, { otp: string; expires: number; attempts: number }>();
+const lastOtpRequest = new Map<string, number>(); // Simple per-phone rate limit
 const otpRequests = new Map<string, string>(); // Store reqId from MSG91 Widget API
 
 
@@ -28,6 +34,17 @@ router.post("/auth/send-otp", async (req, res) => {
     });
     return;
   }
+
+  // Per-phone rate limit: 1 minute between OTP requests
+  const lastRequest = lastOtpRequest.get(phone);
+  if (lastRequest && Date.now() - lastRequest < 60 * 1000) {
+    res.status(429).json({
+      success: false,
+      error: { code: "TOO_MANY_REQUESTS", message: "Please wait 60 seconds before requesting another OTP" },
+    });
+    return;
+  }
+  lastOtpRequest.set(phone, Date.now());
 
   try {
     const authKey = process.env.MSG91_AUTH_KEY;
@@ -218,11 +235,15 @@ router.post("/auth/verify-otp", async (req, res) => {
 
     const accessToken = jwt.sign(
       { userId: user.id, phone: user.phone, customerId: user.customerId },
-      JWT_SECRET,
+      ACTUAL_JWT_SECRET,
       { expiresIn: "1h" } // Increased to 1h for better UX
     );
 
-    const refreshToken = crypto.randomBytes(32).toString("hex");
+    const refreshToken = jwt.sign(
+      { userId: user.id },
+      ACTUAL_JWT_SECRET,
+      { expiresIn: "30d" }
+    );
 
     res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
@@ -255,7 +276,7 @@ router.post("/auth/verify-otp", async (req, res) => {
   }
 });
 
-router.post("/auth/refresh", (req, res) => {
+router.post("/auth/refresh", async (req, res) => {
   const token = req.cookies?.refresh_token;
   if (!token) {
     res.status(401).json({
@@ -264,8 +285,31 @@ router.post("/auth/refresh", (req, res) => {
     });
     return;
   }
-  const accessToken = jwt.sign({ refreshed: true }, JWT_SECRET, { expiresIn: "15m" });
-  res.json({ success: true, data: { accessToken } });
+
+  try {
+    const decoded = jwt.verify(token, ACTUAL_JWT_SECRET) as { userId: string };
+    const user = await db.query.usersTable.findFirst({
+      where: eq(usersTable.id, decoded.userId),
+    });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const accessToken = jwt.sign(
+      { userId: user.id, phone: user.phone, customerId: user.customerId },
+      ACTUAL_JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    res.json({ success: true, data: { accessToken } });
+  } catch (err) {
+    res.clearCookie("refresh_token");
+    res.status(401).json({
+      success: false,
+      error: { code: "UNAUTHORIZED", message: "Invalid or expired refresh token" },
+    });
+  }
 });
 
 router.post("/auth/logout", (req, res) => {
