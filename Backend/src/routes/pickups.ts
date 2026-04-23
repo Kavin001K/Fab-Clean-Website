@@ -1,7 +1,7 @@
 import { Router, type IRouter } from "express";
 import { db } from "@workspace/db";
-import { pickupsTable } from "@workspace/db";
-import { eq } from "drizzle-orm";
+import { pickupsTable, storesTable } from "@workspace/db";
+import { and, eq } from "drizzle-orm";
 
 const router: IRouter = Router();
 
@@ -34,6 +34,18 @@ router.post("/pickups", async (req, res) => {
       return;
     }
 
+    const store = await db.query.storesTable.findFirst({
+      where: and(eq(storesTable.slug, String(branch)), eq(storesTable.isActive, true)),
+    });
+
+    if (!store) {
+      res.status(400).json({
+        success: false,
+        error: { code: "VALIDATION_ERROR", message: "Select a valid store" },
+      });
+      return;
+    }
+
     const bookingReference = generateBookingRef();
 
     await db.insert(pickupsTable).values({
@@ -47,7 +59,7 @@ router.post("/pickups", async (req, res) => {
       specialInstructions: specialInstructions ?? null,
       preferredDate,
       timeSlot,
-      branch,
+      branch: store.slug,
     });
 
     res.status(201).json({

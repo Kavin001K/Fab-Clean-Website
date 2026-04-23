@@ -5,6 +5,7 @@ import { MapPin, Menu, X } from "lucide-react";
 import { BRAND, BRANCHES } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui";
+import { useAuth } from "@/hooks/use-auth";
 
 const NAV_LINKS = [
   { name: "Home", path: "/" },
@@ -21,6 +22,7 @@ function isActivePath(location: string, path: string) {
 
 export function Navbar() {
   const [location] = useLocation();
+  const { isAuthenticated } = useAuth();
   const [open, setOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -71,8 +73,8 @@ export function Navbar() {
           </nav>
 
           <div className="hidden items-center gap-2 lg:flex">
-            <Link href="/track-order" data-cursor-label="Track">
-              <Button variant="outline" size="sm">Track Order</Button>
+            <Link href={isAuthenticated ? "/dashboard/orders" : "/login"} data-cursor-label={isAuthenticated ? "Dashboard" : "Login"}>
+              <Button variant="ghost" size="sm">{isAuthenticated ? "Dashboard" : "Login"}</Button>
             </Link>
             <Link href="/schedule-pickup" data-cursor-label="Book">
               <Button size="sm">Book Pickup</Button>
@@ -114,8 +116,8 @@ export function Navbar() {
                 ))}
               </div>
               <div className="mt-4 grid gap-2 sm:grid-cols-2">
-                <Link href="/track-order">
-                  <Button variant="outline" className="w-full">Track Order</Button>
+                <Link href={isAuthenticated ? "/dashboard/orders" : "/login"}>
+                  <Button variant="ghost" className="w-full">{isAuthenticated ? "Dashboard" : "Login"}</Button>
                 </Link>
                 <Link href="/schedule-pickup">
                   <Button className="w-full">Book Pickup</Button>

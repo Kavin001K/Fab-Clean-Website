@@ -4,12 +4,14 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Link } from "wouter";
-import { CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react";
+import { CheckCircle2, ChevronLeft, ChevronRight, Sparkles, Scale, Footprints, Briefcase, Home, Shirt } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { useListServices, useSchedulePickup } from "@workspace/api-client-react";
 import { AppLayout } from "@/components/layout";
 import { SEO } from "@/components/seo";
 import { Button, Input, Textarea } from "@/components/ui";
 import { FormPanel } from "@/components/site";
+import { LocationInput } from "@/components/location-input";
 import { useToast } from "@/hooks/use-toast";
 
 const pickupSchema = z.object({
@@ -43,6 +45,7 @@ export default function SchedulePickup() {
     handleSubmit,
     watch,
     trigger,
+    setValue,
     formState: { errors, isValid },
   } = useForm<PickupForm>({
     resolver: zodResolver(pickupSchema),
@@ -163,8 +166,14 @@ export default function SchedulePickup() {
                       </div>
                     </div>
                     <div>
-                      <Textarea placeholder="Pickup address with landmark." {...register("address")} />
-                      {errors.address ? <p className="mt-2 text-sm text-red-700">{errors.address.message}</p> : null}
+                      <LocationInput
+                        name="address"
+                        placeholder="Pickup address with landmark."
+                        register={register}
+                        setValue={setValue}
+                        watch={watch}
+                        error={errors.address}
+                      />
                     </div>
                   </motion.div>
                 ) : null}
@@ -175,18 +184,47 @@ export default function SchedulePickup() {
                       name="services"
                       control={control}
                       render={({ field }) => (
-                        <div className="grid gap-4 sm:grid-cols-2">
+                        <div className="grid gap-4 grid-cols-2 sm:grid-cols-3">
                           {servicesData?.data?.map((service) => {
                             const selected = field.value.includes(service.id);
+                            
+                            // Map service names to icons dynamically
+                            const getIcon = () => {
+                              const n = service.name.toLowerCase();
+                              if (n.includes("dry")) return <Sparkles className="h-6 w-6" />;
+                              if (n.includes("kilogram") || n.includes("kilo")) return <Scale className="h-6 w-6" />;
+                              if (n.includes("shoe")) return <Footprints className="h-6 w-6" />;
+                              if (n.includes("bag")) return <Briefcase className="h-6 w-6" />;
+                              if (n.includes("curtain")) return <Home className="h-6 w-6" />;
+                              return <Shirt className="h-6 w-6" />;
+                            };
+
                             return (
                               <button
                                 key={service.id}
                                 type="button"
                                 onClick={() => field.onChange(selected ? field.value.filter((value) => value !== service.id) : [...field.value, service.id])}
-                                className={`rounded-[1.5rem] border px-5 py-5 text-left transition-colors ${selected ? "border-primary/20 bg-primary/10" : "border-line bg-background/70"}`}
+                                className={cn(
+                                  "relative flex flex-col items-center justify-center gap-3 rounded-[1.25rem] border p-5 text-center transition-all duration-200",
+                                  selected
+                                    ? "border-primary bg-primary/10 shadow-sm ring-1 ring-primary/20"
+                                    : "border-line bg-background/50 hover:border-primary/40 hover:bg-background/80"
+                                )}
                               >
-                                <p className="font-medium text-ink">{service.name}</p>
-                                <p className="mt-2 text-sm leading-7 text-muted-foreground">{service.description}</p>
+                                {selected && (
+                                  <div className="absolute right-3 top-3">
+                                    <CheckCircle2 className="h-4 w-4 fill-primary text-background" />
+                                  </div>
+                                )}
+                                <div className={cn(
+                                  "flex h-12 w-12 items-center justify-center rounded-full transition-colors",
+                                  selected ? "bg-primary text-background" : "bg-panel border border-line text-muted-foreground"
+                                )}>
+                                  {getIcon()}
+                                </div>
+                                <p className={cn("text-sm font-medium leading-tight", selected ? "text-primary" : "text-ink")}>
+                                  {service.name}
+                                </p>
                               </button>
                             );
                           })}

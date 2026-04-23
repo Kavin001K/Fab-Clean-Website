@@ -3,7 +3,6 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
 export const timeSlotEnum = pgEnum("time_slot", ["morning", "afternoon", "evening"]);
-export const branchEnum = pgEnum("branch", ["pollachi", "kinathukadavu"]);
 export const pickupStatusEnum = pgEnum("pickup_status", [
   "pending",
   "confirmed",
@@ -28,7 +27,7 @@ export const pickupsTable = pgTable("pickups", {
   specialInstructions: text("special_instructions"),
   preferredDate: text("preferred_date").notNull(),
   timeSlot: timeSlotEnum("time_slot").notNull(),
-  branch: branchEnum("branch").notNull(),
+  branch: text("branch").notNull(),
   status: pickupStatusEnum("status").notNull().default("pending"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),

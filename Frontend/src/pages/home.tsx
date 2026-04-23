@@ -155,7 +155,12 @@ export default function Home() {
           <div className="grid gap-10 lg:grid-cols-[0.92fr_1.08fr] lg:items-center">
             <FadeIn>
               <div className="visual-card min-h-[520px]">
-                <img src={`${import.meta.env.BASE_URL}images/editorial-garment.svg`} alt="Fab Clean garment care illustration" loading="lazy" />
+                <img
+                  src={`${import.meta.env.BASE_URL}images/service-chapter-scene.svg`}
+                  alt="Luxury garment care scene showing folded premium garments, a hanger, and Fab Clean finishing details"
+                  className="h-full min-h-[520px] w-full object-cover"
+                  loading="lazy"
+                />
               </div>
             </FadeIn>
             <div>
@@ -169,7 +174,7 @@ export default function Home() {
               </p>
               <div className="mt-8 grid gap-5 md:grid-cols-3">
                 {SERVICE_HIGHLIGHTS.map((item, index) => (
-                  <FadeIn key={item.title} delay={index * 0.05}>
+                  <FadeIn key={item.title} delay={index * 0.05} className="h-full">
                     <StoryCard {...item} />
                   </FadeIn>
                 ))}
@@ -187,7 +192,12 @@ export default function Home() {
             <ProcessRail steps={PROCESS_STEPS} />
             <FadeIn>
               <div className="visual-card min-h-[420px]">
-                <img src={`${import.meta.env.BASE_URL}images/editorial-process.svg`} alt="Fab Clean service process illustration" loading="lazy" />
+                <img
+                  src={`${import.meta.env.BASE_URL}images/pickup-process-scene.svg`}
+                  alt="Fab Clean pickup and delivery scene with garment bag, route line, and ready-to-wear package"
+                  className="h-full min-h-[420px] w-full object-cover"
+                  loading="lazy"
+                />
               </div>
             </FadeIn>
           </div>
@@ -212,7 +222,7 @@ export default function Home() {
           <SectionHeading title="Trust is earned in the details customers actually notice." subtitle="Why customers stay" />
           <div className="mt-12 grid gap-5 lg:grid-cols-3">
             {OPERATING_PILLARS.map((item, index) => (
-              <FadeIn key={item.title} delay={index * 0.05}>
+              <FadeIn key={item.title} delay={index * 0.05} className="h-full">
                 <StoryCard {...item} />
               </FadeIn>
             ))}

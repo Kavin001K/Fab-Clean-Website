@@ -138,13 +138,15 @@ export function StoryCard({
   className?: string;
 }) {
   return (
-    <Card className={cn("lux-card p-6", className)}>
+    <motion.div whileHover={{ y: -5 }} transition={{ type: "spring", stiffness: 300, damping: 20 }} className="h-full">
+      <Card className={cn("lux-card p-6 h-full flex flex-col", className)}>
       <div className="flex h-12 w-12 items-center justify-center rounded-full border border-primary/20 bg-primary/10 text-primary">
         <Icon className="h-5 w-5" />
       </div>
       <h3 className="mt-6 font-display text-2xl text-ink">{title}</h3>
       <p className="mt-3 text-sm leading-7 text-muted-foreground">{description}</p>
     </Card>
+    </motion.div>
   );
 }
 
@@ -156,15 +158,17 @@ export function ProcessRail({
   return (
     <div className="grid gap-5 lg:grid-cols-3">
       {steps.map((item, index) => (
-        <FadeIn key={item.step} delay={index * 0.06}>
-          <Card className="lux-card relative overflow-hidden p-6">
+        <FadeIn key={item.step} delay={index * 0.06} className="h-full">
+          <motion.div whileHover={{ y: -5, scale: 1.01 }} transition={{ type: "spring", stiffness: 300, damping: 20 }} className="h-full">
+            <Card className="lux-card relative overflow-hidden p-6 h-full flex flex-col">
             <div className="absolute right-5 top-5 text-5xl font-semibold text-primary/12">{item.step}</div>
             <div className="flex h-12 w-12 items-center justify-center rounded-full border border-primary/20 bg-primary/10 text-primary">
               <item.icon className="h-5 w-5" />
             </div>
             <h3 className="mt-8 font-display text-2xl text-ink">{item.title}</h3>
             <p className="mt-3 text-sm leading-7 text-muted-foreground">{item.description}</p>
-          </Card>
+            </Card>
+          </motion.div>
         </FadeIn>
       ))}
     </div>
@@ -200,17 +204,18 @@ export function PricingTable({
   }>;
 }) {
   return (
-    <div className="grid gap-5 xl:grid-cols-3">
+    <div className="grid gap-6 items-start md:grid-cols-2 xl:grid-cols-3">
       {sections.map((section, index) => (
         <FadeIn key={section.title} delay={index * 0.04}>
-          <Card className="lux-card h-full p-6">
+          <motion.div whileHover={{ y: -4 }} transition={{ type: "spring", stiffness: 300, damping: 20 }}>
+            <Card className="lux-card p-7">
             <div className="flex items-center justify-between gap-3">
               <h3 className="font-display text-2xl text-ink">{section.title}</h3>
               <Badge variant="outline">{section.items.length} items</Badge>
             </div>
             <div className="mt-6 space-y-4">
               {section.items.map((item) => (
-                <div key={`${section.title}-${item.name}`} className="rounded-2xl border border-line bg-background/70 px-4 py-4">
+                <div key={`${section.title}-${item.name}`} className="rounded-[1.25rem] border border-line bg-background/70 px-5 py-4 transition-colors hover:bg-background/90">
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <p className="font-medium text-ink">{item.name}</p>
@@ -221,7 +226,8 @@ export function PricingTable({
                 </div>
               ))}
             </div>
-          </Card>
+            </Card>
+          </motion.div>
         </FadeIn>
       ))}
     </div>

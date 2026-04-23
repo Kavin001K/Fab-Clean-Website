@@ -1,0 +1,32 @@
+<svg width="1400" height="1100" viewBox="0 0 1400 1100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1400" height="1100" rx="40" fill="#F8F3EA"/>
+  <rect width="1400" height="1100" rx="40" fill="url(#bg)"/>
+  <circle cx="1130" cy="180" r="170" fill="#FFF8EC"/>
+  <circle cx="270" cy="915" r="180" fill="#D7BC8E" fill-opacity="0.22"/>
+  <rect x="160" y="180" width="1080" height="760" rx="44" fill="#FFFDF8" stroke="#E1D5C6" stroke-width="3"/>
+  <rect x="230" y="650" width="360" height="170" rx="28" fill="#F4E7D2"/>
+  <rect x="285" y="610" width="250" height="55" rx="26" fill="#B88C46"/>
+  <rect x="670" y="645" width="465" height="185" rx="32" fill="#1D1815"/>
+  <rect x="718" y="692" width="368" height="90" rx="24" fill="#29211C"/>
+  <path d="M465 302C465 267.758 492.758 240 527 240H877C911.242 240 939 267.758 939 302V575H465V302Z" fill="#F5E9D6"/>
+  <path d="M524 215C524 182.968 549.968 157 582 157H822C854.032 157 880 182.968 880 215V242H524V215Z" fill="#C9A46A"/>
+  <path d="M542 278C542 257.013 559.013 240 580 240H824C844.987 240 862 257.013 862 278V575H542V278Z" fill="#FFF8EC"/>
+  <path d="M602 324L553 384V504C553 541.003 582.997 571 620 571H785C822.003 571 852 541.003 852 504V384L803 324H602Z" fill="#B88C46"/>
+  <path d="M634 349L603 396V497C603 515.778 618.222 531 637 531H767C785.778 531 801 515.778 801 497V396L770 349H634Z" fill="#FFFDF8"/>
+  <path d="M642 326C642 292.863 668.863 266 702 266V266C735.137 266 762 292.863 762 326V350H642V326Z" fill="#FFFDF8"/>
+  <path d="M740 307C740 286.565 756.565 270 777 270H791C811.435 270 828 286.565 828 307V324H740V307Z" fill="#D8C09A"/>
+  <path d="M248 514C248 466.503 286.503 428 334 428H433C480.497 428 519 466.503 519 514V598H248V514Z" fill="#EAD8BB"/>
+  <path d="M990 490C990 452.997 1019.97 423 1057 423H1127C1164 423 1194 452.997 1194 490V578H990V490Z" fill="#EAD8BB"/>
+  <rect x="924" y="251" width="184" height="88" rx="24" fill="#FFF8EC" stroke="#E1D5C6" stroke-width="2"/>
+  <text x="1016" y="304" text-anchor="middle" fill="#B88C46" font-family="Georgia, serif" font-size="28" font-weight="700">Fab Clean</text>
+  <path d="M1006 726H1079" stroke="#B88C46" stroke-width="10" stroke-linecap="round"/>
+  <path d="M973 770H1113" stroke="#B88C46" stroke-width="10" stroke-linecap="round"/>
+  <path d="M947 286C966.971 270.604 998.299 273.361 1014.9 292.171" stroke="#B88C46" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="1031" cy="273" r="10" fill="#B88C46"/>
+  <defs>
+    <radialGradient id="bg" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(700 550) rotate(90) scale(650 700)">
+      <stop stop-color="#FFFDF8"/>
+      <stop offset="1" stop-color="#EFE6D7"/>
+    </radialGradient>
+  </defs>
+</svg>
