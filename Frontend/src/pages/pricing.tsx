@@ -53,9 +53,9 @@ export default function Pricing() {
 
       <div className="page-shell">
         <section className="container-wide section-padding">
-          <SectionHeading title="Pricing should remove uncertainty, not create more of it." subtitle="Pricing" />
+          <SectionHeading title="Clear pricing, no surprises." subtitle="Pricing" />
           <p className="mx-auto mt-6 max-w-3xl text-center text-lg leading-8 text-muted-foreground">
-            Categories are simplified, tables are easier to scan, and the primary action stays in view. Final billing still depends on garment condition and actual item count at pickup.
+            Our pricing is transparent and easy to understand. Final billing depends on garment condition and actual item count at pickup.
           </p>
 
           <div className="mt-10 flex flex-wrap justify-center gap-3">

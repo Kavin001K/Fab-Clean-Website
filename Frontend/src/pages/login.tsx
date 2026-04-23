@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, Clock3, RefreshCw, ShieldCheck } from "lucide-react";
+import { ArrowRight, RefreshCw } from "lucide-react";
 import { useSendOtp, useVerifyOtp } from "@workspace/api-client-react";
 import { Button, Input } from "@/components/ui";
 import { BRAND } from "@/lib/brand";
@@ -27,7 +27,7 @@ export default function Login() {
       onSuccess: () => {
         setStep("otp");
         setResendTimer(60);
-        toast({ title: "Code sent", description: "Check your messages for the 6-digit OTP." });
+        toast({ title: "Code sent", description: "Check your messages for the 4-digit OTP." });
       },
       onError: (error: any) => {
         toast({
@@ -81,39 +81,22 @@ export default function Login() {
         canonical="https://myfabclean.com/login"
       />
       <div className="site-frame min-h-screen px-4 py-6 sm:px-6">
-        <div className="mx-auto flex min-h-[calc(100vh-3rem)] max-w-6xl items-center">
-          <div className="grid w-full gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+        <div className="mx-auto flex min-h-[calc(100vh-3rem)] max-w-md items-center">
+          <div className="w-full">
             <div className="visual-card p-8 lg:p-10">
-              <Link href="/" className="inline-flex items-center gap-3">
-                <img src={`${import.meta.env.BASE_URL}logo.webp`} alt="Fab Clean" className="h-9 w-auto" />
-                <span className="eyebrow">Customer portal</span>
-              </Link>
-              <h1 className="mt-8 font-display text-5xl text-ink">Sign in without friction.</h1>
-              <p className="mt-4 max-w-xl text-base leading-8 text-muted-foreground">
-                OTP keeps sign-in simple while the presentation stays premium and calm. One phone number, one code, one direct path into the dashboard.
-              </p>
-              <div className="mt-8 grid gap-4">
-                {[
-                  { icon: ShieldCheck, title: "Secure OTP access", body: "Phone-based sign-in keeps the flow short and keeps customer data tied to the right account." },
-                  { icon: Clock3, title: "Faster repeat visits", body: "Return customers can move straight from sign-in to order tracking or pickup activity." },
-                ].map((item) => (
-                  <div key={item.title} className="rounded-[1.5rem] border border-line bg-background/70 px-5 py-5">
-                    <item.icon className="h-5 w-5 text-primary" />
-                    <p className="mt-4 font-medium text-ink">{item.title}</p>
-                    <p className="mt-2 text-sm leading-7 text-muted-foreground">{item.body}</p>
-                  </div>
-                ))}
+              <div className="flex justify-center mb-10">
+                <Link href="/" className="inline-flex items-center gap-3">
+                  <img src={`${import.meta.env.BASE_URL}logo.webp`} alt="Fab Clean" className="h-10 w-auto" />
+                </Link>
               </div>
-            </div>
 
-            <div className="visual-card p-8 lg:p-10">
-              <p className="eyebrow">Portal sign-in</p>
+              <p className="eyebrow text-center">Customer portal</p>
               <AnimatePresence mode="wait">
                 {step === "phone" ? (
-                  <motion.div key="phone" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}>
-                    <h2 className="mt-6 font-display text-4xl text-ink">Enter your mobile number.</h2>
-                    <p className="mt-4 text-base leading-8 text-muted-foreground">
-                      We will send a one-time code to the number linked with your customer profile.
+                  <motion.div key="phone" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} className="text-center">
+                    <h2 className="mt-4 font-display text-3xl text-ink">Sign in</h2>
+                    <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                      We will send a one-time code to your mobile number.
                     </p>
                     <form
                       onSubmit={(event) => {
@@ -122,35 +105,35 @@ export default function Login() {
                       }}
                       className="mt-8 space-y-5"
                     >
-                      <div className="relative">
+                      <div className="relative text-left">
                         <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium text-muted-foreground">+91</span>
                         <Input
                           value={phone}
                           onChange={(event) => setPhone(event.target.value.replace(/\D/g, "").slice(0, 10))}
                           placeholder="10-digit number"
-                          className="pl-14"
+                          className="pl-14 text-center"
                         />
                       </div>
-                      <Button type="submit" size="lg" isLoading={sendOtp.isPending}>
+                      <Button type="submit" className="w-full" size="lg" isLoading={sendOtp.isPending}>
                         Send OTP
                         <ArrowRight className="h-4 w-4" />
                       </Button>
                     </form>
                   </motion.div>
                 ) : (
-                  <motion.div key="otp" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}>
+                  <motion.div key="otp" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} className="text-center">
                     <button type="button" onClick={() => setStep("phone")} className="text-sm font-medium text-primary">
                       Change number
                     </button>
-                    <h2 className="mt-6 font-display text-4xl text-ink">Enter the OTP.</h2>
-                    <p className="mt-4 text-base leading-8 text-muted-foreground">
-                      We sent a 6-digit code to <span className="font-medium text-ink">+91 {phone}</span>.
+                    <h2 className="mt-4 font-display text-3xl text-ink">Enter code</h2>
+                    <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                      We sent a 4-digit code to <span className="font-medium text-ink">+91 {phone}</span>.
                     </p>
                     <form
                       onSubmit={(event) => {
                         event.preventDefault();
-                        if (otp.length !== 6) {
-                          toast({ title: "Enter the 6-digit OTP", variant: "destructive" });
+                        if (otp.length !== 4) {
+                          toast({ title: "Enter the 4-digit OTP", variant: "destructive" });
                           return;
                         }
                         verifyOtp.mutate({ data: { phone, otp } });
@@ -159,13 +142,13 @@ export default function Login() {
                     >
                       <Input
                         value={otp}
-                        onChange={(event) => setOtp(event.target.value.replace(/\D/g, "").slice(0, 6))}
-                        placeholder="6-digit code"
+                        onChange={(event) => setOtp(event.target.value.replace(/\D/g, "").slice(0, 4))}
+                        placeholder="4-digit code"
                         className="text-center text-lg tracking-[0.28em]"
                       />
-                      <Button type="submit" size="lg" isLoading={verifyOtp.isPending}>Verify and sign in</Button>
+                      <Button type="submit" className="w-full" size="lg" isLoading={verifyOtp.isPending}>Verify and sign in</Button>
                     </form>
-                    <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="mt-6 flex flex-col items-center gap-3">
                       <p className="text-sm text-muted-foreground">
                         {resendTimer ? `Resend available in ${resendTimer}s` : "Need a new code?"}
                       </p>
@@ -178,8 +161,8 @@ export default function Login() {
                 )}
               </AnimatePresence>
 
-              <p className="mt-10 text-sm leading-7 text-muted-foreground">
-                New to {BRAND.name}? After OTP verification you can complete your profile and move into the portal immediately.
+              <p className="mt-10 text-center text-sm leading-7 text-muted-foreground">
+                New to {BRAND.name}? We'll create your account automatically.
               </p>
             </div>
           </div>

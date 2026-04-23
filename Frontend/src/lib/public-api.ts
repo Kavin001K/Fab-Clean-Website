@@ -108,6 +108,23 @@ export type HomepageReviewsResponse = {
   latestReviews: HomepageReview[];
 };
 
+export type Store = {
+  id: string;
+  slug: string;
+  name: string;
+  address: string;
+  phone: string;
+  email?: string;
+  latitude: number;
+  longitude: number;
+  coverageRadiusKm: number;
+  mapHref?: string;
+};
+
+export async function fetchStores() {
+  return request<{ success: boolean; data: Store[] }>("/stores");
+}
+
 export async function trackOrderById(identifier: string) {
   return request<{ success: boolean; data: PublicTrackedOrder }>(
     `/orders/track/by-id/${encodeURIComponent(identifier)}`,

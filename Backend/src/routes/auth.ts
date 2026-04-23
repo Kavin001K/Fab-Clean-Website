@@ -1,7 +1,7 @@
 import { Router, type IRouter } from "express";
 import { db } from "@workspace/db";
-import { usersTable } from "@workspace/db";
-import { eq } from "drizzle-orm";
+import { usersTable, erpCustomers } from "@workspace/db/schema";
+import { eq, sql } from "drizzle-orm";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 
@@ -9,12 +9,16 @@ const router: IRouter = Router();
 
 const JWT_SECRET = process.env.JWT_SECRET ?? "fab-clean-dev-secret-2025";
 const otpStore = new Map<string, { otp: string; expires: number; attempts: number }>();
+const otpRequests = new Map<string, string>(); // Store reqId from MSG91 Widget API
+
+
 
 function generateOtp(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  // Use 4-digit OTP as per frontend requirement
+  return Math.floor(1000 + Math.random() * 9000).toString();
 }
 
-router.post("/auth/send-otp", (req, res) => {
+router.post("/auth/send-otp", async (req, res) => {
   const { phone } = req.body;
 
   if (!phone) {
@@ -25,19 +29,101 @@ router.post("/auth/send-otp", (req, res) => {
     return;
   }
 
-  const otp = generateOtp();
-  const expires = Date.now() + 5 * 60 * 1000;
-  otpStore.set(phone, { otp, expires, attempts: 0 });
+  try {
+    const authKey = process.env.MSG91_AUTH_KEY;
 
-  req.log.info({ phone: phone.slice(-4) }, "OTP sent");
+    if (!authKey) {
+      req.log.warn("MSG91 configuration is missing. OTP not sent.");
+      res.status(500).json({
+        success: false,
+        error: { code: "SERVER_ERROR", message: "OTP service is not configured properly." },
+      });
+      return;
+    }
 
-  res.json({
-    success: true,
-    data: {
-      message: `OTP sent to ${phone}. Valid for 5 minutes.`,
-      expiresIn: 300,
-    },
-  });
+    // Generate our own OTP
+    const otp = generateOtp();
+    otpStore.set(phone, { otp, expires: Date.now() + 5 * 60 * 1000, attempts: 0 }); // 5 minutes expiry
+
+    // Send via Direct WhatsApp Template API
+    const whatsappIntegratedNumber = process.env.MSG91_WHATSAPP_NUMBER || "15559458542";
+    const whatsappTemplateName = process.env.MSG91_WHATSAPP_TEMPLATE_NAME || "verification_code_template";
+    const whatsappNamespace = process.env.MSG91_WHATSAPP_NAMESPACE || "5b9c340a_3221_42e3_9b9f_98b402c0c8ac";
+
+    const rawPayload = JSON.stringify({
+      "integrated_number": whatsappIntegratedNumber,
+      "content_type": "template",
+      "payload": {
+        "messaging_product": "whatsapp",
+        "type": "template",
+        "template": {
+          "name": whatsappTemplateName,
+          "language": {
+            "code": "en",
+            "policy": "deterministic"
+          },
+          "namespace": whatsappNamespace,
+          "to_and_components": [
+            {
+              "to": [
+                "91" + phone
+              ],
+              "components": {
+                "body_1": {
+                  "type": "text",
+                  "value": otp
+                },
+                "button_1": {
+                  "subtype": "url",
+                  "type": "text",
+                  "value": otp
+                }
+              }
+            }
+          ]
+        }
+      }
+    });
+
+    const response = await fetch("https://api.msg91.com/api/v5/whatsapp/whatsapp-outbound-message/bulk/", {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json",
+        "authkey": authKey
+      },
+      body: rawPayload
+    });
+
+    const responseData = await response.text();
+    req.log.info({ 
+      phone: phone.slice(-4), 
+      status: response.status,
+      response: responseData,
+      otp: process.env.NODE_ENV === 'development' ? otp : '****'
+    }, "Direct WhatsApp OTP Request Sent");
+
+    if (!response.ok) {
+      throw new Error(`MSG91 API error: ${response.status} ${responseData}`);
+    }
+
+    res.json({
+      success: true,
+      data: {
+        message: `OTP sent successfully.`,
+        expiresIn: 300,
+      },
+    });
+  } catch (error) {
+
+
+
+
+    req.log.error({ phone: phone.slice(-4), error }, "Failed to send OTP");
+    res.status(500).json({
+      success: false,
+      error: { code: "INTERNAL_ERROR", message: "Failed to send OTP. Please try again." },
+    });
+  }
 });
 
 router.post("/auth/verify-otp", async (req, res) => {
@@ -51,49 +137,42 @@ router.post("/auth/verify-otp", async (req, res) => {
     return;
   }
 
-  const stored = otpStore.get(phone);
-
-  if (!stored) {
-    res.status(400).json({
-      success: false,
-      error: { code: "OTP_EXPIRED", message: "OTP expired or not sent. Please request a new one." },
-    });
-    return;
-  }
-
-  if (Date.now() > stored.expires) {
-    otpStore.delete(phone);
-    res.status(400).json({
-      success: false,
-      error: { code: "OTP_EXPIRED", message: "OTP has expired. Please request a new one." },
-    });
-    return;
-  }
-
-  if (stored.attempts >= 3) {
-    otpStore.delete(phone);
-    res.status(423).json({
-      success: false,
-      error: { code: "ACCOUNT_LOCKED", message: "Too many failed attempts. Please try again later." },
-    });
-    return;
-  }
-
-  if (stored.otp !== otp) {
-    stored.attempts++;
-    res.status(400).json({
-      success: false,
-      error: {
-        code: "INVALID_OTP",
-        message: `Invalid OTP. ${3 - stored.attempts} attempts remaining.`,
-      },
-    });
-    return;
-  }
-
-  otpStore.delete(phone);
-
   try {
+    const storedData = otpStore.get(phone);
+
+    if (!storedData) {
+      res.status(400).json({
+        success: false,
+        error: { code: "RETRY_REQUIRED", message: "OTP expired or not requested. Please request a new one." },
+      });
+      return;
+    }
+
+    if (Date.now() > storedData.expires) {
+      otpStore.delete(phone);
+      res.status(400).json({
+        success: false,
+        error: { code: "EXPIRED_OTP", message: "OTP has expired. Please request a new one." },
+      });
+      return;
+    }
+
+    if (storedData.otp !== otp) {
+      storedData.attempts += 1;
+      if (storedData.attempts >= 3) {
+        otpStore.delete(phone); // Lock out after 3 attempts
+      }
+      res.status(400).json({
+        success: false,
+        error: { code: "INVALID_OTP", message: "Invalid OTP code." },
+      });
+      return;
+    }
+
+    // OTP Verification Successful
+    otpStore.delete(phone); // Cleanup
+
+    // 1. Find or create website user
     let user = await db.query.usersTable.findFirst({
       where: eq(usersTable.phone, phone),
     });
@@ -101,17 +180,46 @@ router.post("/auth/verify-otp", async (req, res) => {
     const isNewUser = !user;
 
     if (!user) {
+      // Try to find a matching ERP customer first
+      // We use the normalize_phone_e164 function we ensured exists in the DB
+      const erpCustomer = await db.query.erpCustomers.findFirst({
+        where: sql`normalize_phone_e164(${erpCustomers.phone}) = normalize_phone_e164(${phone})`
+      });
+
+      console.log(`Linking new website user to ERP customer: ${erpCustomer?.id || 'none'}`);
+
       const [created] = await db
         .insert(usersTable)
-        .values({ phone })
+        .values({ 
+          phone,
+          customerId: erpCustomer?.id || null,
+          name: erpCustomer?.name || null,
+          email: erpCustomer?.email || null
+        })
         .returning();
       user = created;
+    } else if (!user.customerId) {
+       // If user exists but isn't linked, try linking now
+       const erpCustomer = await db.query.erpCustomers.findFirst({
+         where: sql`normalize_phone_e164(${erpCustomers.phone}) = normalize_phone_e164(${phone})`
+       });
+       if (erpCustomer) {
+         console.log(`Linking existing website user to ERP customer: ${erpCustomer.id}`);
+         await db.update(usersTable)
+           .set({ 
+             customerId: erpCustomer.id,
+             name: user.name || erpCustomer.name,
+             email: user.email || erpCustomer.email
+           })
+           .where(eq(usersTable.id, user.id));
+         user.customerId = erpCustomer.id;
+       }
     }
 
     const accessToken = jwt.sign(
-      { userId: user.id, phone: user.phone },
+      { userId: user.id, phone: user.phone, customerId: user.customerId },
       JWT_SECRET,
-      { expiresIn: "15m" }
+      { expiresIn: "1h" } // Increased to 1h for better UX
     );
 
     const refreshToken = crypto.randomBytes(32).toString("hex");
@@ -131,6 +239,7 @@ router.post("/auth/verify-otp", async (req, res) => {
         user: {
           id: user.id,
           phone: user.phone,
+          customerId: user.customerId ?? undefined,
           name: user.name ?? undefined,
           email: user.email ?? undefined,
           createdAt: user.createdAt.toISOString(),

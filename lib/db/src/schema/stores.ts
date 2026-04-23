@@ -2,7 +2,7 @@ import { boolean, integer, pgTable, real, text, timestamp, uuid } from "drizzle-
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
-export const storesTable = pgTable("stores", {
+export const storesTable = pgTable("website_stores", {
   id: uuid("id").primaryKey().defaultRandom(),
   slug: text("slug").notNull().unique(),
   name: text("name").notNull(),

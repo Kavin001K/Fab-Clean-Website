@@ -47,9 +47,9 @@ export default function Services() {
 
       <div className="page-shell">
         <section className="container-wide section-padding">
-          <SectionHeading title="Service architecture that feels premium before the booking even starts." subtitle="Services" />
+          <SectionHeading title="Premium care for every fabric." subtitle="Services" />
           <p className="mx-auto mt-6 max-w-3xl text-center text-lg leading-8 text-muted-foreground">
-            Every category is clearer, less repetitive, and easier to scan. Customers can move from service discovery to pickup without hitting a dead end.
+            Explore our curated selection of services. From daily wear to delicate fabrics, we ensure the highest standard of care.
           </p>
 
           <div className="mt-10 flex flex-wrap justify-center gap-3">

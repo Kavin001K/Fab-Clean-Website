@@ -3,7 +3,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
+import { fetchStores } from "@/lib/public-api";
 import { CheckCircle2, ChevronLeft, ChevronRight, Sparkles, Scale, Footprints, Briefcase, Home, Shirt } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useListServices, useSchedulePickup } from "@workspace/api-client-react";
@@ -21,7 +23,7 @@ const pickupSchema = z.object({
   services: z.array(z.string()).min(1, "Select at least one service"),
   preferredDate: z.string().min(1, "Pick a date"),
   timeSlot: z.enum(["morning", "afternoon", "evening"]),
-  branch: z.enum(["pollachi", "kinathukadavu"]),
+  branch: z.string().min(1, "Select a branch"),
   specialInstructions: z.string().optional(),
 });
 
@@ -52,10 +54,44 @@ export default function SchedulePickup() {
     mode: "onChange",
     defaultValues: {
       services: [],
-      branch: "pollachi",
+      branch: "",
       timeSlot: "morning",
     },
   });
+
+  const { data: storesResponse } = useQuery({
+    queryKey: ["stores"],
+    queryFn: fetchStores,
+  });
+  const storesData = storesResponse?.data || [];
+
+  const handleLocationDetected = (lat: number, lon: number) => {
+    if (!storesData.length) return;
+    
+    // Find nearest store
+    let nearest = storesData[0];
+    let minDistance = Infinity;
+
+    const getDist = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+      const R = 6371;
+      const dLat = (lat2 - lat1) * (Math.PI / 180);
+      const dLon = (lon2 - lon1) * (Math.PI / 180);
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * 
+        Math.sin(dLon/2) * Math.sin(dLon/2); 
+      return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
+    };
+
+    for (const store of storesData) {
+      const d = getDist(lat, lon, store.latitude, store.longitude);
+      if (d < minDistance) {
+        minDistance = d;
+        nearest = store;
+      }
+    }
+
+    setValue("branch", nearest.slug, { shouldValidate: true });
+  };
 
   const values = watch();
 
@@ -127,8 +163,8 @@ export default function SchedulePickup() {
         <section className="container-wide section-padding">
           <FormPanel
             eyebrow="Schedule pickup"
-            title="A premium booking flow should still be fast."
-            description="The new form reduces visual clutter, clarifies each step, and keeps the customer summary visible while they complete the request."
+            title="Book your service."
+            description="Complete the form below to schedule a pickup. We will confirm your request shortly."
             sideNote={
               <div className="space-y-3">
                 {steps.map((item, index) => (
@@ -173,6 +209,7 @@ export default function SchedulePickup() {
                         setValue={setValue}
                         watch={watch}
                         error={errors.address}
+                        onLocationDetected={handleLocationDetected}
                       />
                     </div>
                   </motion.div>
@@ -250,14 +287,14 @@ export default function SchedulePickup() {
                           control={control}
                           render={({ field }) => (
                             <div className="grid grid-cols-2 gap-3">
-                              {["pollachi", "kinathukadavu"].map((branch) => (
+                              {storesData.map((store) => (
                                 <button
-                                  key={branch}
+                                  key={store.slug}
                                   type="button"
-                                  onClick={() => field.onChange(branch)}
-                                  className={`rounded-[1.2rem] border px-4 py-3 text-sm capitalize ${field.value === branch ? "border-primary/20 bg-primary/10 text-primary" : "border-line bg-background/70 text-ink"}`}
+                                  onClick={() => field.onChange(store.slug)}
+                                  className={`rounded-[1.2rem] border px-4 py-3 text-sm capitalize ${field.value === store.slug ? "border-primary/20 bg-primary/10 text-primary" : "border-line bg-background/70 text-ink"}`}
                                 >
-                                  {branch}
+                                  {store.name}
                                 </button>
                               ))}
                             </div>
@@ -301,7 +338,7 @@ export default function SchedulePickup() {
               <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
                 <div className="rounded-[1.5rem] border border-line bg-background/70 p-5 text-sm text-muted-foreground">
                   <p className="font-medium text-ink">Pickup summary</p>
-                  <p className="mt-2">Branch: {values.branch || "pollachi"} • Slot: {values.timeSlot || "morning"}</p>
+                  <p className="mt-2">Branch: {storesData.find(s => s.slug === values.branch)?.name || values.branch || "Not selected"} • Slot: {values.timeSlot || "morning"}</p>
                   <p className="mt-1">Selected services: {values.services?.length || 0}</p>
                 </div>
 

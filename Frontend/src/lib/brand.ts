@@ -23,31 +23,12 @@ export const BRAND = {
   hours: "Mon to Sat, 10:00 AM to 8:00 PM",
   heroTitle: "Premium garment care for wardrobes that should arrive flawless.",
   heroLead:
-    "Fab Clean brings polished laundry, dry cleaning, and specialty care to Pollachi and Kinathukadavu with free pickup, clear communication, and precise finishing.",
+    "Fab Clean brings polished laundry, dry cleaning, and specialty care with free pickup, clear communication, and precise finishing.",
   shortBlurb:
     "Premium laundry and dry cleaning with free pickup, clear pricing, and a cleaner customer experience.",
 };
 
-export const BRANCHES = [
-  {
-    slug: "pollachi",
-    title: "Pollachi flagship",
-    address:
-      "#16, Venkatramana Round Road, Opposite Naturals Salon / HDFC Bank, Mahalingapuram, Pollachi - 642002",
-    phone: BRAND.phoneMain,
-    mapHref:
-      "https://www.google.com/maps/search/?api=1&query=16%20Venkatramana%20Round%20Road%20Pollachi%20642002",
-  },
-  {
-    slug: "kinathukadavu",
-    title: "Kinathukadavu branch",
-    address:
-      "#442/11, Opposite MLA Office, Krishnasamypuram, Kinathukadavu - 642109",
-    phone: BRAND.phoneSecondary,
-    mapHref:
-      "https://www.google.com/maps/search/?api=1&query=442%2F11%20Krishnasamypuram%20Kinathukadavu%20642109",
-  },
-] as const;
+
 
 export const TRUST_STATS = [
   { value: "2023", label: "Established" },

@@ -16,5 +16,21 @@
   "dependencies": {
     "eslint": "^10.2.1",
     "framer-motion": "^12.38.0"
-  }
+  },
+  "description": "pnpm workspace monorepo using TypeScript. Each package manages its own dependencies.",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kavin001K/Fab-Clean-Website.git"
+  },
+  "keywords": [],
+  "author": "",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Kavin001K/Fab-Clean-Website/issues"
+  },
+  "homepage": "https://github.com/Kavin001K/Fab-Clean-Website#readme"
 }

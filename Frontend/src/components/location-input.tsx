@@ -11,7 +11,8 @@ export function LocationInput({
   register,
   setValue,
   watch,
-  error
+  error,
+  onLocationDetected
 }: { 
   name: string; 
   placeholder?: string;
@@ -19,11 +20,12 @@ export function LocationInput({
   setValue: UseFormSetValue<any>;
   watch: UseFormWatch<any>;
   error?: any;
+  onLocationDetected?: (lat: number, lon: number) => void;
 }) {
   const value = watch(name) as string;
   const { toast } = useToast();
 
-  const [suggestions, setSuggestions] = useState<Array<{ place_id: number; display_name: string }>>([]);
+  const [suggestions, setSuggestions] = useState<Array<{ place_id: number; display_name: string; lat: string; lon: string }>>([]);
   const [isFetchingLocation, setIsFetchingLocation] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -76,6 +78,9 @@ export function LocationInput({
           if (response.ok) {
             const data = await response.json();
             setValue(name, data.display_name, { shouldValidate: true });
+            if (onLocationDetected) {
+              onLocationDetected(latitude, longitude);
+            }
             setShowSuggestions(false);
             toast({ title: "Location found", description: "Your address has been updated successfully." });
           }
@@ -126,6 +131,9 @@ export function LocationInput({
                   className="flex w-full items-start gap-3 px-4 py-3 text-left text-sm transition-colors hover:bg-background/80"
                   onClick={() => {
                     setValue(name, suggestion.display_name, { shouldValidate: true });
+                    if (onLocationDetected && suggestion.lat && suggestion.lon) {
+                      onLocationDetected(parseFloat(suggestion.lat), parseFloat(suggestion.lon));
+                    }
                     setShowSuggestions(false);
                   }}
                 >

@@ -2,11 +2,12 @@ import { pgTable, text, timestamp, uuid, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
-export const usersTable = pgTable("users", {
+export const usersTable = pgTable("website_users", {
   id: uuid("id").primaryKey().defaultRandom(),
   phone: text("phone").notNull().unique(),
   name: text("name"),
   email: text("email"),
+  customerId: text("customer_id"), // Links to ERP customers table
   isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),

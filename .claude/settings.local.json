@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/kavin/.claude/skills/ui-ux-pro-max/**)",
+      "Bash(python3 scripts/search.py \"dry cleaning laundry service professional modern\" --design-system -p \"Fab Clean\")",
+      "Bash(python3 scripts/search.py \"dry cleaning laundry service modern clean professional ultra-modern\" --design-system --persist -p \"Fab Clean\")",
+      "Bash(python3 scripts/search.py \"animation scroll reveal entrance framer-motion\" --domain ux)",
+      "Bash(python3 scripts/search.py \"modern clean minimal ultra-modern\" --domain style)",
+      "Bash(python3 scripts/search.py \"homepage landing ultra-modern clean service\" --design-system --persist -p \"Fab Clean\" --page \"home\")",
+      "Bash(npm run *)",
+      "Bash(sed -i '' \"s/”/\\\\\"/g\" home.tsx)",
+      "Bash(sed -i '' \"s/“/\\\\\"/g\" home.tsx)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173)",
+      "Bash(python3 scripts/search.py \"services page dry cleaning laundry categories pricing\" --design-system --persist -p \"Fab Clean\" --page \"services\")",
+      "Bash(python3 scripts/search.py \"dry cleaning laundry service premium professional trustworthy modern clean\" --design-system --persist -p \"Fab Clean\")",
+      "Bash(pkill -f \"vite.*config\")",
+      "Bash(tee /tmp/vite2.log)",
+      "Bash(python3 scripts/search.py \"dry cleaning laundry service premium modern elegant professional\" --design-system --persist -p \"Fab Clean\")"
+    ]
+  }
+}

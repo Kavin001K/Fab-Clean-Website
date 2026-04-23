@@ -2,7 +2,7 @@ export function getApiBaseUrl() {
   const configured = import.meta.env.VITE_API_URL?.trim();
 
   if (!configured) {
-    return import.meta.env.DEV ? "http://localhost:5001" : "";
+    return "";
   }
 
   if (!configured.startsWith("http://") && !configured.startsWith("https://")) {

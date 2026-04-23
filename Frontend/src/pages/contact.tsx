@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -7,7 +8,8 @@ import { AppLayout } from "@/components/layout";
 import { SEO } from "@/components/seo";
 import { Button, FadeIn, Input, SectionHeading, Textarea } from "@/components/ui";
 import { ActionList, SupportBand } from "@/components/site";
-import { BRAND, BRANCHES } from "@/lib/brand";
+import { BRAND } from "@/lib/brand";
+import { fetchStores, type Store } from "@/lib/public-api";
 import { useToast } from "@/hooks/use-toast";
 
 const contactSchema = z.object({
@@ -21,7 +23,17 @@ const contactSchema = z.object({
 type ContactForm = z.infer<typeof contactSchema>;
 
 export default function Contact() {
+  const [stores, setStores] = useState<Store[]>([]);
   const { toast } = useToast();
+
+  useEffect(() => {
+    void fetchStores()
+      .then((res) => {
+        if (res.success) setStores(res.data);
+      })
+      .catch(() => setStores([]));
+  }, []);
+
   const { mutate: submitForm, isPending } = useSubmitContact({
     mutation: {
       onSuccess: () => {
@@ -53,9 +65,9 @@ export default function Contact() {
 
       <div className="page-shell">
         <section className="container-wide section-padding">
-          <SectionHeading title="A contact page should feel direct, calm, and easy to act on." subtitle="Contact" />
+          <SectionHeading title="Get in touch with us." subtitle="Contact" />
           <p className="mx-auto mt-6 max-w-3xl text-center text-lg leading-8 text-muted-foreground">
-            Use the form for non-urgent questions. Use phone or WhatsApp when the customer needs pickup timing, branch availability, or order help right away.
+            Use the form for general inquiries. Use phone or WhatsApp for immediate assistance regarding pickups, branch availability, or orders.
           </p>
         </section>
 
@@ -65,7 +77,7 @@ export default function Contact() {
               <div className="visual-card p-7">
                 <h2 className="font-display text-4xl text-ink">Send a message</h2>
                 <p className="mt-4 text-base leading-8 text-muted-foreground">
-                  Keep it short, clear, and easy to route. The form layout is lighter, more structured, and faster to complete on mobile.
+                  Send us a message and our team will get back to you shortly.
                 </p>
 
                 <form
@@ -104,7 +116,7 @@ export default function Contact() {
                     {
                       icon: Phone,
                       title: "Call the team",
-                      body: `${BRAND.phoneMain} for Pollachi or ${BRAND.phoneSecondary} for Kinathukadavu.`,
+                      body: "Give us a call at our main branch for any immediate inquiries.",
                     },
                     {
                       icon: Mail,
@@ -124,9 +136,9 @@ export default function Contact() {
                 <div className="visual-card p-7">
                   <p className="eyebrow">Branch coverage</p>
                   <div className="mt-6 space-y-5">
-                    {BRANCHES.map((branch) => (
+                    {stores.map((branch) => (
                       <div key={branch.slug} className="rounded-[1.5rem] border border-line bg-background/70 px-5 py-5">
-                        <p className="font-medium text-ink">{branch.title}</p>
+                        <p className="font-medium text-ink">{branch.name}</p>
                         <p className="mt-2 text-sm leading-7 text-muted-foreground">{branch.address}</p>
                       </div>
                     ))}

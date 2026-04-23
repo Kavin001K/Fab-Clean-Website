@@ -2,7 +2,8 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Link, useLocation } from "wouter";
 import { AnimatePresence, motion } from "framer-motion";
 import { MapPin, Menu, X } from "lucide-react";
-import { BRAND, BRANCHES } from "@/lib/brand";
+import { BRAND } from "@/lib/brand";
+import { fetchStores, type Store } from "@/lib/public-api";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui";
 import { useAuth } from "@/hooks/use-auth";
@@ -132,6 +133,16 @@ export function Navbar() {
 }
 
 export function Footer() {
+  const [stores, setStores] = useState<Store[]>([]);
+
+  useEffect(() => {
+    void fetchStores()
+      .then((res) => {
+        if (res.success) setStores(res.data);
+      })
+      .catch(() => setStores([]));
+  }, []);
+
   return (
     <footer className="mt-24 border-t border-line bg-deep text-white">
       <div className="container-wide py-16">
@@ -163,11 +174,11 @@ export function Footer() {
           <div>
             <p className="text-sm uppercase tracking-[0.2em] text-white/45">Branches</p>
             <div className="mt-5 space-y-5">
-              {BRANCHES.map((branch) => (
+              {stores.map((branch) => (
                 <div key={branch.slug}>
                   <div className="flex items-center gap-2 text-white">
                     <MapPin className="h-4 w-4 text-primary-light" />
-                    <p className="font-medium">{branch.title}</p>
+                    <p className="font-medium">{branch.name}</p>
                   </div>
                   <p className="mt-2 text-sm leading-7 text-white/60">{branch.address}</p>
                 </div>

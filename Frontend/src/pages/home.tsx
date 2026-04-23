@@ -17,13 +17,12 @@ import {
 } from "@/components/site";
 import {
   BRAND,
-  BRANCHES,
   OPERATING_PILLARS,
   PROCESS_STEPS,
   SERVICE_HIGHLIGHTS,
   TRUST_STATS,
 } from "@/lib/brand";
-import { fetchHomepageReviews, type HomepageReview } from "@/lib/public-api";
+import { fetchHomepageReviews, fetchStores, type HomepageReview, type Store } from "@/lib/public-api";
 import { formatCurrency } from "@/lib/utils";
 
 type PricingCategory = {
@@ -74,6 +73,7 @@ function PricingPreview() {
 
 export default function Home() {
   const [reviews, setReviews] = useState<HomepageReview[]>([]);
+  const [stores, setStores] = useState<Store[]>([]);
   const { scrollYProgress } = useScroll();
   const visualY = useTransform(scrollYProgress, [0, 0.2], [0, 28]);
 
@@ -96,13 +96,19 @@ export default function Home() {
         );
       })
       .catch(() => setReviews([]));
+
+    void fetchStores()
+      .then((res) => {
+        if (res.success) setStores(res.data);
+      })
+      .catch(() => setStores([]));
   }, []);
 
   return (
     <AppLayout>
       <SEO
-        title="Fab Clean | Premium Garment Care in Pollachi"
-        description="Premium laundry and dry cleaning with free pickup, clear pricing, and polished garment care across Pollachi and Kinathukadavu."
+        title="Fab Clean | Premium Garment Care"
+        description="Premium laundry and dry cleaning with free pickup, clear pricing, and polished garment care."
         canonical="https://myfabclean.com/"
       />
 
@@ -110,7 +116,6 @@ export default function Home() {
         <section className="container-wide section-padding pb-8">
           <div className="hero-grid">
             <FadeIn className="max-w-3xl">
-              <Badge>Pollachi and Kinathukadavu</Badge>
               <h1 className="mt-6 font-display text-5xl leading-[1.02] text-ink sm:text-6xl lg:text-7xl">
                 {BRAND.heroTitle}
               </h1>
@@ -137,7 +142,7 @@ export default function Home() {
               <div className="hero-visual">
                 <div className="hero-float-card">
                   <p className="text-[11px] uppercase tracking-[0.18em] text-primary-light">Fab Clean standard</p>
-                  <p className="mt-3 font-display text-3xl">A cleaner digital experience for a premium local service.</p>
+                  <p className="mt-3 font-display text-3xl">Premium garment care.</p>
                   <p className="mt-3 text-sm leading-7 text-white/70">
                     Free pickup, transparent communication, and finishing that looks intentional.
                   </p>
@@ -167,10 +172,10 @@ export default function Home() {
               <SectionHeading
                 align="left"
                 subtitle="Service chapters"
-                title="Luxury in feel. Practical in how fast a customer can act."
+                title="Luxury in feel. Practical in everyday care."
               />
               <p className="mt-6 max-w-2xl text-base leading-8 text-muted-foreground">
-                The new site treats service clarity as part of the premium experience. Customers should understand what you clean, how pickup works, and what the next step is without hunting through decorative noise.
+                We treat garment care as a premium experience. Our customers understand exactly what we clean, how pickup works, and what the next step is, ensuring absolute peace of mind.
               </p>
               <div className="mt-8 grid gap-5 md:grid-cols-3">
                 {SERVICE_HIGHLIGHTS.map((item, index) => (
@@ -184,9 +189,9 @@ export default function Home() {
         </section>
 
         <section className="container-wide section-padding pt-4">
-          <SectionHeading title="A shorter path from first visit to booked pickup." subtitle="How it works" />
+          <SectionHeading title="A fast path from booking to delivery." subtitle="How it works" />
           <p className="mx-auto mt-6 max-w-3xl text-center text-lg leading-8 text-muted-foreground">
-            Motion supports the story, but the structure does the real work: fewer decisions, faster trust, cleaner calls to action.
+            A streamlined process designed for fewer decisions, faster service, and absolute trust.
           </p>
           <div className="mt-12 grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
             <ProcessRail steps={PROCESS_STEPS} />
@@ -204,9 +209,9 @@ export default function Home() {
         </section>
 
         <section className="container-wide section-padding pt-6">
-          <SectionHeading title="Pricing that feels clear before the order even starts." subtitle="Preview rates" />
+          <SectionHeading title="Clear pricing, no surprises." subtitle="Preview rates" />
           <p className="mx-auto mt-6 max-w-3xl text-center text-lg leading-8 text-muted-foreground">
-            These preview categories are enough to orient a customer quickly. Full pricing remains available when they want detail.
+            Upfront pricing categories to help you understand our rates instantly. Full details are available below.
           </p>
           <div className="mt-12">
             <PricingPreview />
@@ -219,7 +224,7 @@ export default function Home() {
         </section>
 
         <section className="container-wide section-padding pt-6">
-          <SectionHeading title="Trust is earned in the details customers actually notice." subtitle="Why customers stay" />
+          <SectionHeading title="Exceptional quality, every single time." subtitle="Why customers stay" />
           <div className="mt-12 grid gap-5 lg:grid-cols-3">
             {OPERATING_PILLARS.map((item, index) => (
               <FadeIn key={item.title} delay={index * 0.05} className="h-full">
@@ -230,7 +235,7 @@ export default function Home() {
         </section>
 
         <section className="container-wide section-padding pt-4">
-          <SectionHeading title="Customer sentiment, framed with more confidence." subtitle="Reviews" />
+          <SectionHeading title="Hear what our customers have to say." subtitle="Reviews" />
           <div className="mt-12 grid gap-5 lg:grid-cols-3">
             {reviews.length ? (
               reviews.map((review, index) => (
@@ -245,9 +250,9 @@ export default function Home() {
             ) : (
               <FadeIn>
                 <Card className="lux-card p-6 lg:col-span-3">
-                  <p className="font-display text-3xl text-ink">Fresh reviews will appear here once approved.</p>
+                  <p className="font-display text-3xl text-ink">Fresh reviews will appear here soon.</p>
                   <p className="mt-4 max-w-2xl text-base leading-8 text-muted-foreground">
-                    The redesigned wall is ready for live customer feedback without looking empty or unfinished in the meantime.
+                    Our customers' experiences speak for themselves.
                   </p>
                 </Card>
               </FadeIn>
@@ -256,22 +261,24 @@ export default function Home() {
         </section>
 
         <section className="container-wide section-padding pt-4">
-          <SectionHeading title="Branch information should feel grounded, not buried." subtitle="Coverage" />
+          <SectionHeading title="Our locations are always ready to serve you." subtitle="Coverage" />
           <div className="mt-12 grid gap-5 lg:grid-cols-2">
-            {BRANCHES.map((branch, index) => (
+            {stores.map((branch, index) => (
               <FadeIn key={branch.slug} delay={index * 0.05}>
                 <Card className="lux-card p-7">
-                  <Badge variant="outline">{branch.title}</Badge>
-                  <h3 className="mt-6 font-display text-3xl text-ink">{branch.title}</h3>
+                  <Badge variant="outline">{branch.name}</Badge>
+                  <h3 className="mt-6 font-display text-3xl text-ink">{branch.name}</h3>
                   <p className="mt-4 text-base leading-8 text-muted-foreground">{branch.address}</p>
                   <div className="mt-8 flex flex-wrap gap-3">
-                    <a href={branch.mapHref} target="_blank" rel="noreferrer">
-                      <Button variant="outline">
-                        <MapPin className="h-4 w-4" />
-                        Directions
-                      </Button>
-                    </a>
-                    <a href={BRAND.phoneHref}>
+                    {branch.mapHref && (
+                      <a href={branch.mapHref} target="_blank" rel="noreferrer">
+                        <Button variant="outline">
+                          <MapPin className="h-4 w-4" />
+                          Directions
+                        </Button>
+                      </a>
+                    )}
+                    <a href={`tel:${branch.phone}`}>
                       <Button variant="secondary">{branch.phone}</Button>
                     </a>
                   </div>

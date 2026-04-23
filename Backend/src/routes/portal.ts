@@ -13,7 +13,7 @@ import {
 
 const router: IRouter = Router();
 
-router.use(requireAuth);
+// requireAuth is applied to individual routes instead of globally to avoid hijacking non-matching routes
 
 function mapOrder(order: Awaited<ReturnType<typeof fetchOrdersByPhone>>[number]) {
   return {
@@ -30,7 +30,7 @@ function mapOrder(order: Awaited<ReturnType<typeof fetchOrdersByPhone>>[number])
   };
 }
 
-router.get("/orders", async (req, res) => {
+router.get("/orders", requireAuth, async (req, res) => {
   try {
     const orders = await fetchOrdersByPhone(req.authUser!.phone);
     res.json({
@@ -46,7 +46,7 @@ router.get("/orders", async (req, res) => {
   }
 });
 
-router.get("/orders/:id", async (req, res) => {
+router.get("/orders/:id", requireAuth, async (req, res) => {
   try {
     const order = await fetchOwnedOrderById(req.authUser!.phone, req.params.id);
     if (!order) {
@@ -70,7 +70,7 @@ router.get("/orders/:id", async (req, res) => {
   }
 });
 
-router.get("/users/profile", async (req, res) => {
+router.get("/users/profile", requireAuth, async (req, res) => {
   try {
     const [user, customer] = await Promise.all([
       db.query.usersTable.findFirst({
@@ -98,7 +98,7 @@ router.get("/users/profile", async (req, res) => {
   }
 });
 
-router.patch("/users/profile", async (req, res) => {
+router.patch("/users/profile", requireAuth, async (req, res) => {
   try {
     const name = typeof req.body?.name === "string" ? req.body.name.trim() : undefined;
     const email = typeof req.body?.email === "string" ? req.body.email.trim() : undefined;
@@ -142,7 +142,7 @@ router.patch("/users/profile", async (req, res) => {
   }
 });
 
-router.get("/wallet/summary", async (req, res) => {
+router.get("/wallet/summary", requireAuth, async (req, res) => {
   try {
     const customer = await fetchCustomerByPhone(req.authUser!.phone);
     res.json({
