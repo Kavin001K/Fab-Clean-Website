@@ -53,8 +53,8 @@ export function Navbar() {
           className={cn(
             "mx-auto flex max-w-[1160px] items-center justify-between rounded-full border px-4 py-3 transition-all sm:px-5",
             isScrolled
-              ? "border-border bg-white/92 shadow-[0_18px_48px_-30px_rgba(15,41,84,0.32)] backdrop-blur-xl"
-              : "border-white/70 bg-white/80 shadow-[0_14px_40px_-34px_rgba(15,41,84,0.2)] backdrop-blur-xl",
+              ? "border-white/50 bg-white/90 shadow-[0_20px_60px_-30px_rgba(8,145,178,0.2)] backdrop-blur-xl"
+              : "border-white/50 bg-white/80 shadow-[0_10px_40px_-20px_rgba(8,145,178,0.15)] backdrop-blur-xl",
           )}
         >
           <Link href="/" className="flex items-center gap-3">
@@ -96,7 +96,7 @@ export function Navbar() {
 
           <button
             type="button"
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-white text-foreground shadow-sm lg:hidden"
+            className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-primary/10 bg-white/80 text-foreground shadow-sm backdrop-blur-sm lg:hidden"
             aria-expanded={open}
             aria-label={open ? "Close menu" : "Open menu"}
             onClick={() => setOpen((value) => !value)}
@@ -154,7 +154,7 @@ export function Navbar() {
 
 export function Footer() {
   return (
-    <footer className="mt-16 border-t border-border/80 bg-white/70">
+    <footer className="mt-16 border-t border-white/50 bg-white/60 backdrop-blur-sm">
       <div className="container-wide py-12 sm:py-14">
         <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr_0.9fr_1fr]">
           <div className="space-y-5">
@@ -243,7 +243,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "auto" });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }, [location]);
 
   return (
@@ -251,14 +251,25 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       <div className="pointer-events-none fixed inset-0 -z-10 page-backdrop" />
       <div className="pointer-events-none fixed inset-0 -z-10 page-fabric opacity-30" />
       <Navbar />
-      <main className="relative z-10">{children}</main>
+      <AnimatePresence mode="wait">
+        <motion.main
+          key={location}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
+          className="relative z-10"
+        >
+          {children}
+        </motion.main>
+      </AnimatePresence>
       <Footer />
       <a
         href="https://wa.me/919363059595?text=Hi%2C%20I%27d%20like%20to%20book%20a%20Fab%20Clean%20pickup."
         target="_blank"
         rel="noreferrer"
         aria-label="Chat with Fab Clean on WhatsApp"
-        className="fixed bottom-5 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-[0_20px_40px_-22px_rgba(37,211,102,0.72)] transition-transform hover:scale-105 animate-whatsapp-pulse"
+        className="fixed bottom-5 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-[0_20px_40px_-22px_rgba(37,211,102,0.72)] transition-transform hover:scale-105 animate-whatsapp-pulse backdrop-blur-sm"
       >
         <MessageCircle className="h-6 w-6" />
       </a>

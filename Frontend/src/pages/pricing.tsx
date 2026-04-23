@@ -45,7 +45,7 @@ export default function Pricing() {
       />
 
       <div className="page-shell">
-        <section className="container-wide section-padding">
+        <section className="container-wide section-padding relative overflow-hidden bg-premium-mesh subtle-grid rounded-3xl">
           <SectionHeading title="Pricing that is easier to scan" subtitle="Clear rates" />
           <p className="mx-auto mt-6 max-w-3xl text-center text-lg leading-8 text-muted-foreground">
             Prices are grouped so customers can scan the right category faster. Final billing still depends on the actual item count, condition, and service selected at the store.
@@ -57,8 +57,8 @@ export default function Pricing() {
                 key={tab}
                 type="button"
                 onClick={() => setActiveTab(tab)}
-                className={`rounded-full px-5 py-2.5 text-sm font-bold transition-all ${
-                  activeTab === tab ? "bg-primary text-white shadow-md" : "border border-border bg-white text-foreground hover:border-primary/35 hover:text-primary"
+                className={`rounded-full px-5 py-2.5 text-sm font-bold transition-all duration-300 ${
+                  activeTab === tab ? "bg-primary text-white shadow-md scale-105" : "border border-border bg-white text-foreground hover:border-primary/35 hover:text-primary hover:shadow-lg hover:-translate-y-1"
                 }`}
               >
                 {tab}

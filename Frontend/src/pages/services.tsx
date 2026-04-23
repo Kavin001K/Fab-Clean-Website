@@ -1,9 +1,30 @@
 import { Link } from "wouter";
+import { motion } from "framer-motion";
 import { useListServices } from "@workspace/api-client-react";
 import { ArrowRight, BriefcaseBusiness, Loader2, Shirt, Sparkles, WashingMachine } from "lucide-react";
 import { AppLayout } from "@/components/layout";
 import { SEO } from "@/components/seo";
 import { Badge, Button, Card, FadeIn, SectionHeading } from "@/components/ui";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
+  },
+};
 
 const iconMap: Record<string, typeof Shirt> = {
   shirt: Shirt,
@@ -24,14 +45,41 @@ export default function Services() {
       />
 
       <div className="page-shell">
-        <section className="container-wide section-padding">
-          <SectionHeading
-            title="Garment care for every occasion"
-            subtitle="Our Services"
-          />
-          <p className="mx-auto mt-6 max-w-3xl text-center text-lg leading-8 text-muted-foreground">
-            Explore our professional laundry and dry cleaning options. Each service is tailored to provide the best care for your garments, ensuring they look and feel their best.
-          </p>
+        {/* Hero Section */}
+        <section className="container-wide section-padding relative overflow-hidden">
+          {/* Modern Background */}
+          <div className="absolute inset-0 -z-10 overflow-hidden bg-premium-mesh subtle-grid">
+            <div className="absolute -top-40 -right-40 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
+            <div className="absolute -bottom-40 -left-40 h-96 w-96 rounded-full bg-secondary/10 blur-3xl" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full bg-accent/5 blur-3xl" />
+          </div>
+
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={containerVariants}
+            className="text-center"
+          >
+            <motion.div variants={itemVariants}>
+              <Badge variant="accent" className="inline-flex items-center gap-2 mb-8 hover:scale-105 transition-transform duration-200">
+                <Sparkles className="h-3 w-3" />
+                Premium Garment Care
+              </Badge>
+            </motion.div>
+
+            <motion.div variants={itemVariants}>
+              <h1 className="mx-auto max-w-4xl text-5xl font-black leading-tight tracking-tight sm:text-6xl lg:text-7xl">
+                Garment care for
+                <span className="block text-gradient mt-3">every occasion</span>
+              </h1>
+            </motion.div>
+
+            <motion.div variants={itemVariants}>
+              <p className="mx-auto mt-8 max-w-3xl text-lg leading-8 text-muted-foreground sm:text-xl">
+                Explore our professional laundry and dry cleaning options. Each service is tailored to provide the best care for your garments, ensuring they look and feel their best.
+              </p>
+            </motion.div>
+          </motion.div>
         </section>
 
         <section className="container-wide pb-20">
@@ -48,7 +96,7 @@ export default function Services() {
 
                 return (
                   <FadeIn key={service.id} delay={index * 0.05}>
-                    <Card className="flex h-full flex-col p-6">
+                    <Card className="flex h-full flex-col p-6 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300">
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
                           <Icon className="h-7 w-7" />
@@ -101,7 +149,7 @@ export default function Services() {
 
         <section className="container-wide pb-20">
           <FadeIn>
-            <Card className="bg-brand-gradient p-7 text-white sm:p-8">
+            <Card className="bg-brand-gradient p-7 text-white sm:p-8 hover:scale-[1.02] transition-transform duration-300">
               <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-center">
                 <div>
                   <p className="text-sm font-black uppercase tracking-[0.18em] text-white/80">Still not sure?</p>

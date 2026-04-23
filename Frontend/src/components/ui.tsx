@@ -1,6 +1,6 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
-import { useFadeIn } from "@/hooks/use-fade-in";
+import { motion } from "framer-motion";
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "outline" | "ghost" | "destructive" | "premium";
@@ -11,15 +11,15 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "primary", size = "md", isLoading, children, ...props }, ref) => {
     const baseStyles =
-      "inline-flex items-center justify-center gap-2 rounded-full font-bold transition-all duration-200 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98] touch-action-manipulation";
+      "inline-flex items-center justify-center gap-2 rounded-2xl font-bold transition-all duration-300 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98] touch-action-manipulation";
 
     const variants = {
-      primary: "bg-brand-gradient text-white shadow-[0_18px_40px_-22px_rgba(38,119,219,0.65)] hover:-translate-y-0.5 hover:shadow-[0_24px_48px_-24px_rgba(38,119,219,0.7)]",
-      secondary: "bg-gold-gradient text-[#173a77] shadow-[0_18px_36px_-22px_rgba(245,171,60,0.45)] hover:-translate-y-0.5",
-      outline: "border border-border bg-white text-foreground hover:border-primary/40 hover:text-primary hover:shadow-[0_18px_40px_-28px_rgba(38,119,219,0.22)]",
+      primary: "bg-brand-gradient text-white shadow-[0_10px_30px_-10px_rgba(8,145,178,0.4)] hover:-translate-y-1 hover:shadow-[0_20px_40px_-15px_rgba(8,145,178,0.5)]",
+      secondary: "bg-accent-gradient text-white shadow-[0_10px_30px_-10px_rgba(34,197,94,0.4)] hover:-translate-y-1 hover:shadow-[0_20px_40px_-15px_rgba(34,197,94,0.5)]",
+      outline: "border-2 border-primary/20 bg-white/80 text-foreground backdrop-blur-sm hover:border-primary/40 hover:bg-white hover:shadow-[0_10px_30px_-15px_rgba(8,145,178,0.25)]",
       ghost: "bg-transparent text-foreground hover:bg-primary/10 hover:text-primary",
-      destructive: "bg-destructive text-destructive-foreground hover:brightness-95",
-      premium: "bg-[#173a77] text-white shadow-[0_22px_50px_-28px_rgba(15,41,84,0.55)] hover:bg-[#123469]",
+      destructive: "bg-destructive text-destructive-foreground shadow-[0_10px_30px_-10px_rgba(239,68,68,0.3)] hover:brightness-95",
+      premium: "bg-gradient-to-r from-primary to-secondary text-white shadow-[0_10px_30px_-10px_rgba(8,145,178,0.4)] hover:-translate-y-1 hover:shadow-[0_20px_40px_-15px_rgba(8,145,178,0.5)]",
     };
 
     const sizes = {
@@ -48,7 +48,7 @@ export function Card({ className, children, ...props }: React.HTMLAttributes<HTM
   return (
     <div
       className={cn(
-        "surface-card overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_26px_70px_-34px_rgba(18,54,112,0.28)]",
+        "rounded-3xl border border-white/50 bg-white/80 backdrop-blur-sm shadow-[0_20px_60px_-30px_rgba(8,145,178,0.15)] overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_30px_80px_-40px_rgba(8,145,178,0.25)]",
         className,
       )}
       {...props}
@@ -65,7 +65,7 @@ export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttribute
         ref={ref}
         type={type}
         className={cn(
-          "flex h-12 w-full rounded-2xl border border-border bg-white px-4 py-3 text-sm text-foreground shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/12 focus-visible:border-primary/50 disabled:cursor-not-allowed disabled:opacity-50 transition-all",
+          "flex h-12 w-full rounded-2xl border-2 border-primary/10 bg-white/80 backdrop-blur-sm px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20 focus-visible:border-primary/50 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-300",
           className,
         )}
         {...props}
@@ -81,9 +81,9 @@ export function Badge({
   ...props
 }: React.HTMLAttributes<HTMLDivElement> & { variant?: "default" | "outline" | "accent" }) {
   const variants = {
-    default: "border border-primary/12 bg-primary/10 text-primary",
-    outline: "border border-border bg-white text-foreground",
-    accent: "border border-amber-200 bg-amber-50 text-amber-700",
+    default: "border border-primary/20 bg-primary/10 text-primary backdrop-blur-sm",
+    outline: "border-2 border-primary/10 bg-white/80 text-foreground backdrop-blur-sm",
+    accent: "border border-accent/20 bg-accent/10 text-accent backdrop-blur-sm",
   };
 
   return (
@@ -130,16 +130,17 @@ export function FadeIn({
   style,
   ...props
 }: React.HTMLAttributes<HTMLDivElement> & { delay?: number }) {
-  const ref = useFadeIn();
-
   return (
-    <div
-      ref={ref}
-      className={cn("fade-in", className)}
-      style={{ ...style, transitionDelay: `${delay}s` }}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.6, delay, ease: [0.16, 1, 0.3, 1] }}
+      className={cn(className)}
+      style={style}
       {...props}
     >
       {children}
-    </div>
+    </motion.div>
   );
 }
