@@ -19,7 +19,6 @@
     "framer-motion": "^12.38.0"
   },
   "description": "pnpm workspace monorepo using TypeScript. Each package manages its own dependencies.",
-  "main": "index.js",
   "directories": {
     "lib": "lib"
   },
