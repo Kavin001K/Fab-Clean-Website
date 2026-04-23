@@ -8,10 +8,16 @@ import crypto from "crypto";
 const router: IRouter = Router();
 
 const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET && process.env.NODE_ENV === "production") {
-  throw new Error("JWT_SECRET environment variable is required in production");
+let ACTUAL_JWT_SECRET = JWT_SECRET;
+
+if (!ACTUAL_JWT_SECRET) {
+  if (process.env.NODE_ENV === "production") {
+    console.warn("⚠️ WARNING: JWT_SECRET environment variable is missing! Generating a random temporary secret. Note: Users will be logged out on every server restart until you set a persistent JWT_SECRET in your environment.");
+    ACTUAL_JWT_SECRET = crypto.randomBytes(32).toString("hex");
+  } else {
+    ACTUAL_JWT_SECRET = "fab-clean-dev-secret-2025";
+  }
 }
-const ACTUAL_JWT_SECRET = JWT_SECRET ?? "fab-clean-dev-secret-2025";
 
 const otpStore = new Map<string, { otp: string; expires: number; attempts: number }>();
 const lastOtpRequest = new Map<string, number>(); // Simple per-phone rate limit
