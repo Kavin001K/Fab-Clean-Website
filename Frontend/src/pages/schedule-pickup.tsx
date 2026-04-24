@@ -6,7 +6,9 @@ import * as z from "zod";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { fetchStores } from "@/lib/public-api";
-import { CheckCircle2, ChevronLeft, ChevronRight, Sparkles, Scale, Footprints, Briefcase, Home, Shirt } from "lucide-react";
+import { CheckCircle2, ChevronLeft, ChevronRight, Sparkles, Scale, Footprints, Briefcase, Home, Shirt, CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { useListServices, useSchedulePickup } from "@workspace/api-client-react";
 import { AppLayout } from "@/components/layout";
@@ -34,6 +36,66 @@ const steps = [
   { label: "Services", title: "Select the categories in the order." },
   { label: "Schedule", title: "Choose branch, slot, and date." },
 ];
+
+function CustomDatePicker({ value, onChange, minDate }: { value: string; onChange: (val: string) => void; minDate?: Date }) {
+  const [open, setOpen] = useState(false);
+  const ref = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className={cn(
+          "flex h-12 w-full items-center justify-between rounded-[1.1rem] border border-line bg-background/80 px-4 text-sm text-ink outline-none transition focus:border-primary/45 focus:ring-4 focus:ring-primary/10 hover:border-primary/30 hover:bg-background",
+          !value && "text-muted-foreground/80"
+        )}
+      >
+        {value ? format(new Date(value), "PPP") : <span>Pick a date</span>}
+        <CalendarIcon className="h-4 w-4 opacity-50" />
+      </button>
+      
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+            transition={{ duration: 0.15 }}
+            className="absolute z-50 mt-2 p-0"
+          >
+            <Calendar
+              mode="single"
+              selected={value ? new Date(value) : undefined}
+              onSelect={(date) => {
+                if (date) {
+                  // Keep timezone exact by using the date object and formatting it properly
+                  const d = new Date(date);
+                  // Adjust for timezone offset if necessary to avoid previous day bugs
+                  const tzOffset = d.getTimezoneOffset() * 60000; 
+                  const localDate = new Date(d.getTime() - tzOffset);
+                  onChange(localDate.toISOString().split("T")[0]);
+                  setOpen(false);
+                }
+              }}
+              disabled={minDate ? (date) => date < minDate : undefined}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 export default function SchedulePickup() {
   const [step, setStep] = useState(1);
@@ -277,7 +339,17 @@ export default function SchedulePickup() {
                     <div className="grid gap-4 sm:grid-cols-2">
                       <div>
                         <label className="mb-2 block text-sm font-medium text-ink">Preferred date</label>
-                        <Input type="date" min={new Date().toISOString().split("T")[0]} {...register("preferredDate")} />
+                        <Controller
+                          name="preferredDate"
+                          control={control}
+                          render={({ field }) => (
+                            <CustomDatePicker
+                              value={field.value}
+                              onChange={field.onChange}
+                              minDate={new Date(new Date().setHours(0, 0, 0, 0))}
+                            />
+                          )}
+                        />
                         {errors.preferredDate ? <p className="mt-2 text-sm text-red-700">{errors.preferredDate.message}</p> : null}
                       </div>
                       <div>
