@@ -23,23 +23,31 @@ app.get("/", (_req, res) => {
   });
 });
 
-// General API rate limiting — generous limit for normal browsing
+// General API rate limiting — very generous limit to prevent frontend blocks
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 500,
+  max: process.env.NODE_ENV === "development" ? 100000 : 2000, 
   standardHeaders: true,
   legacyHeaders: false,
+  keyGenerator: (req) => {
+    return req.ip || req.headers["x-forwarded-for"]?.toString() || "anonymous";
+  },
   message: { success: false, error: { code: "TOO_MANY_REQUESTS", message: "Too many requests. Please try again in a few minutes." } },
+  skip: () => process.env.NODE_ENV === "development",
 });
 app.use("/api", generalLimiter);
 
 // Strict rate limiting for auth endpoints only (OTP abuse prevention)
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 15,
+  max: process.env.NODE_ENV === "development" ? 100000 : 30,
   standardHeaders: true,
   legacyHeaders: false,
+  keyGenerator: (req) => {
+    return req.ip || req.headers["x-forwarded-for"]?.toString() || "anonymous";
+  },
   message: { success: false, error: { code: "TOO_MANY_REQUESTS", message: "Too many login attempts. Please wait a few minutes before trying again." } },
+  skip: () => process.env.NODE_ENV === "development",
 });
 app.use("/api/auth", authLimiter);
 
