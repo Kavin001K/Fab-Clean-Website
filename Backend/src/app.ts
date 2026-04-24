@@ -59,4 +59,18 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", router);
 
+// Global Error Handler to prevent stack trace leaks
+import { NextFunction, Request, Response } from "express";
+
+app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
+  req.log?.error(err, "Unhandled API Exception");
+  res.status(500).json({
+    success: false,
+    error: {
+      code: "INTERNAL_SERVER_ERROR",
+      message: "An unexpected error occurred while processing your request. Please try again later.",
+    },
+  });
+});
+
 export default app;

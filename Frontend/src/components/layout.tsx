@@ -1,12 +1,92 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Link, useLocation } from "wouter";
 import { AnimatePresence, motion } from "framer-motion";
-import { MapPin, Menu, X } from "lucide-react";
+import { MapPin, Menu, X, User, LogOut, ChevronDown, Loader2 } from "lucide-react";
 import { BRAND } from "@/lib/brand";
 import { fetchStores, type Store } from "@/lib/public-api";
+import { useGetProfile } from "@workspace/api-client-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui";
 import { useAuth } from "@/hooks/use-auth";
+
+function ProfileDropdown() {
+  const [open, setOpen] = useState(false);
+  const { logout, isAuthenticated } = useAuth();
+  const [, setLocation] = useLocation();
+  const { data: profile, isLoading } = useGetProfile({
+    query: {
+      enabled: isAuthenticated,
+      retry: false
+    } as any
+  });
+
+  return (
+    <div className="relative">
+      <Button 
+        variant="ghost" 
+        size="sm" 
+        className="gap-2 rounded-full border border-line bg-panel/50 pr-2"
+        onClick={() => setOpen(!open)}
+      >
+        {isLoading ? (
+          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+        ) : (
+          <User className="h-4 w-4 text-primary" />
+        )}
+        <span className="max-w-[100px] truncate text-sm font-medium">
+          {profile?.data?.name || "Account"}
+        </span>
+        <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", open && "rotate-180")} />
+      </Button>
+      
+      <AnimatePresence>
+        {open && (
+          <>
+            <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+            <motion.div
+              initial={{ opacity: 0, y: 8, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 8, scale: 0.95 }}
+              transition={{ duration: 0.15 }}
+              className="absolute right-0 top-full mt-2 z-50 w-48 overflow-hidden rounded-2xl border border-line bg-panel shadow-lg"
+            >
+              <div className="flex flex-col p-1">
+                <div className="px-3 py-2 border-b border-line mb-1">
+                  <p className="text-xs text-muted-foreground">Signed in as</p>
+                  <p className="truncate text-sm font-medium">{profile?.data?.phone || "Customer"}</p>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="w-full justify-start rounded-xl px-3 font-normal"
+                  onClick={() => {
+                    setOpen(false);
+                    setLocation("/dashboard/orders");
+                  }}
+                >
+                  <User className="mr-2 h-4 w-4" />
+                  Dashboard
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="w-full justify-start rounded-xl px-3 font-normal text-red-500 hover:text-red-600 hover:bg-red-50"
+                  onClick={() => {
+                    setOpen(false);
+                    logout();
+                  }}
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Sign out
+                </Button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 const NAV_LINKS = [
   { name: "Home", path: "/" },
@@ -74,9 +154,13 @@ export function Navbar() {
           </nav>
 
           <div className="hidden items-center gap-2 lg:flex">
-            <Link href={isAuthenticated ? "/dashboard/orders" : "/login"} data-cursor-label={isAuthenticated ? "Dashboard" : "Login"}>
-              <Button variant="ghost" size="sm">{isAuthenticated ? "Dashboard" : "Login"}</Button>
-            </Link>
+            {isAuthenticated ? (
+              <ProfileDropdown />
+            ) : (
+              <Link href="/login" data-cursor-label="Login">
+                <Button variant="ghost" size="sm">Login</Button>
+              </Link>
+            )}
             <Link href="/schedule-pickup" data-cursor-label="Book">
               <Button size="sm">Book Pickup</Button>
             </Link>
@@ -117,9 +201,30 @@ export function Navbar() {
                 ))}
               </div>
               <div className="mt-4 grid gap-2 sm:grid-cols-2">
-                <Link href={isAuthenticated ? "/dashboard/orders" : "/login"}>
-                  <Button variant="ghost" className="w-full">{isAuthenticated ? "Dashboard" : "Login"}</Button>
-                </Link>
+                {isAuthenticated ? (
+                  <div className="flex w-full flex-col gap-2">
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start text-left" 
+                      onClick={() => setLocation("/dashboard/orders")}
+                    >
+                      <User className="mr-2 h-4 w-4" />
+                      Dashboard
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      className="w-full justify-start text-left text-red-500 hover:text-red-600 hover:bg-red-50" 
+                      onClick={() => logout()}
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Sign out
+                    </Button>
+                  </div>
+                ) : (
+                  <Link href="/login">
+                    <Button variant="ghost" className="w-full">Login</Button>
+                  </Link>
+                )}
                 <Link href="/schedule-pickup">
                   <Button className="w-full">Book Pickup</Button>
                 </Link>

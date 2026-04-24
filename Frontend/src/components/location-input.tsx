@@ -5,6 +5,9 @@ import { UseFormRegister, UseFormSetValue, UseFormWatch, FieldError } from "reac
 import { Textarea } from "@/components/ui";
 import { useToast } from "@/hooks/use-toast";
 
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui";
+
 export function LocationInput({ 
   name, 
   placeholder,
@@ -28,6 +31,7 @@ export function LocationInput({
   const [suggestions, setSuggestions] = useState<Array<{ place_id: number; display_name: string; lat: string; lon: string }>>([]);
   const [isFetchingLocation, setIsFetchingLocation] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showPermissionModal, setShowPermissionModal] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   // Close suggestions when clicking outside
@@ -68,6 +72,15 @@ export function LocationInput({
       toast({ title: "Geolocation not supported", description: "Your browser does not support location features.", variant: "destructive" });
       return;
     }
+    // Show the custom modal instead of immediately requesting the browser permission
+    setShowPermissionModal(true);
+  };
+
+  const executeFetchLocation = () => {
+    if (!navigator.geolocation) {
+      toast({ title: "Geolocation not supported", description: "Your browser does not support location features.", variant: "destructive" });
+      return;
+    }
 
     setIsFetchingLocation(true);
     navigator.geolocation.getCurrentPosition(
@@ -88,10 +101,12 @@ export function LocationInput({
           toast({ title: "Error finding address", description: "Could not retrieve address from coordinates.", variant: "destructive" });
         } finally {
           setIsFetchingLocation(false);
+          setShowPermissionModal(false);
         }
       },
       (error) => {
         setIsFetchingLocation(false);
+        setShowPermissionModal(false);
         toast({ title: "Permission denied", description: "Please allow location access to use this feature.", variant: "destructive" });
       },
       { enableHighAccuracy: true }
@@ -100,6 +115,31 @@ export function LocationInput({
 
   return (
     <div className="relative" ref={wrapperRef}>
+      <Dialog open={showPermissionModal} onOpenChange={setShowPermissionModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                <MapPin className="h-5 w-5 text-primary" />
+              </div>
+              Allow Location Access
+            </DialogTitle>
+            <DialogDescription className="pt-4 text-base">
+              Fab Clean uses your location to quickly find your delivery address and locate the nearest store. 
+              <br/><br/>
+              Please click <strong>Allow</strong> when your browser asks for permission.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-6 flex gap-3 sm:justify-start">
+            <Button variant="outline" onClick={() => setShowPermissionModal(false)} className="w-full sm:w-auto">
+              Cancel
+            </Button>
+            <Button onClick={executeFetchLocation} isLoading={isFetchingLocation} className="w-full sm:w-auto">
+              {isFetchingLocation ? "Waiting..." : "Allow Access"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <div className="relative">
         <Textarea
           placeholder={placeholder}
