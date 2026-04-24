@@ -5,6 +5,7 @@ import { ArrowRight, MapPin } from "lucide-react";
 import { useListPricing } from "@workspace/api-client-react";
 import { AppLayout } from "@/components/layout";
 import { SEO } from "@/components/seo";
+import { useAuth } from "@/hooks/use-auth";
 import { Badge, Button, Card, FadeIn, SectionHeading } from "@/components/ui";
 import {
   HighlightBadgeRow,
@@ -72,6 +73,7 @@ function PricingPreview() {
 }
 
 export default function Home() {
+  const { isAuthenticated } = useAuth();
   const [reviews, setReviews] = useState<HomepageReview[]>([]);
   const [stores, setStores] = useState<Store[]>([]);
   const { scrollYProgress } = useScroll();
@@ -129,9 +131,15 @@ export default function Home() {
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href="/track-order" className="block w-full sm:w-auto" data-cursor-label="Track">
-                  <Button size="lg" variant="outline" className="w-full">Track order</Button>
-                </Link>
+                {isAuthenticated ? (
+                  <Link href="/dashboard" className="block w-full sm:w-auto" data-cursor-label="Dashboard">
+                    <Button size="lg" variant="outline" className="w-full">Open dashboard</Button>
+                  </Link>
+                ) : (
+                  <Link href="/track-order" className="block w-full sm:w-auto" data-cursor-label="Track">
+                    <Button size="lg" variant="outline" className="w-full">Track order</Button>
+                  </Link>
+                )}
               </div>
               <div className="mt-8">
                 <HighlightBadgeRow />

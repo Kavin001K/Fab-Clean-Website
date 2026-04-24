@@ -61,7 +61,7 @@ function ProfileDropdown() {
                   className="w-full justify-start rounded-xl px-3 font-normal"
                   onClick={() => {
                     setOpen(false);
-                    setLocation("/dashboard/orders");
+                    setLocation("/dashboard");
                   }}
                 >
                   <User className="mr-2 h-4 w-4" />
@@ -102,8 +102,8 @@ function isActivePath(location: string, path: string) {
 }
 
 export function Navbar() {
-  const [location] = useLocation();
-  const { isAuthenticated } = useAuth();
+  const [location, setLocation] = useLocation();
+  const { isAuthenticated, logout } = useAuth();
   const [open, setOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -208,7 +208,7 @@ export function Navbar() {
                     <Button 
                       variant="outline" 
                       className="w-full justify-start text-left" 
-                      onClick={() => setLocation("/dashboard/orders")}
+                      onClick={() => setLocation("/dashboard")}
                     >
                       <User className="mr-2 h-4 w-4" />
                       Dashboard
@@ -315,8 +315,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
     window.scrollTo({ top: 0, behavior: "auto" });
   }, [location]);
 
+  const showFAB = !location.startsWith("/schedule-pickup") && !location.startsWith("/dashboard");
+
   return (
-    <div className="site-frame min-h-screen">
+    <div className="site-frame min-h-screen relative pb-6">
       <Navbar />
       <AnimatePresence mode="wait">
         <motion.main
@@ -330,6 +332,24 @@ export function AppLayout({ children }: { children: ReactNode }) {
         </motion.main>
       </AnimatePresence>
       <Footer />
+
+      <AnimatePresence>
+        {showFAB && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.9 }}
+            transition={{ delay: 0.5, duration: 0.3 }}
+            className="fixed bottom-6 right-6 z-40 md:hidden"
+          >
+            <Link href="/schedule-pickup">
+              <Button className="h-14 rounded-full px-6 shadow-[0_12px_24px_rgba(181,138,68,0.3)] text-[15px] tracking-wide font-medium">
+                Book Pickup
+              </Button>
+            </Link>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

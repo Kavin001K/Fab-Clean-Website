@@ -43,27 +43,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setAuthTokenGetter(() => token);
   }, [token]);
 
-  // Auto-logout after 30 minutes of inactivity
+  // 4-month (120 days) inactivity expiry
   useEffect(() => {
     if (!token) return;
 
-    let timer: number;
-    const resetTimer = () => {
-      window.clearTimeout(timer);
-      timer = window.setTimeout(() => {
-        logout();
-      }, 30 * 60 * 1000);
+    const FOUR_MONTHS_MS = 120 * 24 * 60 * 60 * 1000;
+    
+    const checkExpiry = () => {
+      const lastAccessRaw = localStorage.getItem("fabclean_last_access");
+      const now = Date.now();
+      
+      if (lastAccessRaw) {
+        const lastAccess = parseInt(lastAccessRaw, 10);
+        if (now - lastAccess > FOUR_MONTHS_MS) {
+          logout();
+          return;
+        }
+      }
+      localStorage.setItem("fabclean_last_access", now.toString());
     };
 
-    resetTimer();
-    const events = ["mousemove", "mousedown", "keypress", "touchstart", "scroll"];
-    
-    const handleActivity = () => resetTimer();
-    
+    // Check on mount/token change
+    checkExpiry();
+
+    // Update last access timestamp on key interactions
+    let throttleTimer: number | null = null;
+    const handleActivity = () => {
+      if (!throttleTimer) {
+        throttleTimer = window.setTimeout(() => {
+          localStorage.setItem("fabclean_last_access", Date.now().toString());
+          throttleTimer = null;
+        }, 10000); // Throttle to max once every 10 seconds
+      }
+    };
+
+    const events = ["mousedown", "keydown", "touchstart", "scroll"];
     events.forEach(event => document.addEventListener(event, handleActivity, { passive: true }));
     
     return () => {
-      window.clearTimeout(timer);
+      if (throttleTimer) window.clearTimeout(throttleTimer);
       events.forEach(event => document.removeEventListener(event, handleActivity));
     };
   }, [token]);

@@ -118,14 +118,27 @@ function DashboardHome() {
         </Card>
       </div>
 
-      {/* Quick Actions */}
+      {/* Smart Quick Actions based on visitor intent */}
       <div className="grid gap-3 sm:grid-cols-3">
-        <Link href="/schedule-pickup" className="block">
-          <Button className="w-full h-14 text-base shadow-sm">Book Pickup</Button>
-        </Link>
-        <Link href="/dashboard/orders" className="block">
-          <Button variant="outline" className="w-full h-14 text-base bg-panel">View Orders</Button>
-        </Link>
+        {activeOrdersCount > 0 ? (
+          <>
+            <Link href="/dashboard/orders" className="block">
+              <Button className="w-full h-14 text-base shadow-sm ring-2 ring-primary/20">Track Active Order</Button>
+            </Link>
+            <Link href="/schedule-pickup" className="block">
+              <Button variant="outline" className="w-full h-14 text-base bg-panel">New Pickup</Button>
+            </Link>
+          </>
+        ) : (
+          <>
+            <Link href="/schedule-pickup" className="block">
+              <Button className="w-full h-14 text-base shadow-sm ring-2 ring-primary/20">Book Pickup</Button>
+            </Link>
+            <Link href="/dashboard/orders" className="block">
+              <Button variant="outline" className="w-full h-14 text-base bg-panel">Order History</Button>
+            </Link>
+          </>
+        )}
         <Link href="/dashboard/profile" className="block">
           <Button variant="outline" className="w-full h-14 text-base bg-panel">Profile & Settings</Button>
         </Link>
@@ -384,8 +397,12 @@ export default function Dashboard() {
   const [location] = useLocation();
 
   const greeting = useMemo(() => {
-    if (!profile?.name) return "Customer";
-    return profile.name.split(" ")[0];
+    const name = profile?.name ? profile.name.split(" ")[0] : "Customer";
+    const hour = new Date().getHours();
+    let timeGreeting = "Good evening";
+    if (hour < 12) timeGreeting = "Good morning";
+    else if (hour < 17) timeGreeting = "Good afternoon";
+    return `${timeGreeting}, ${name}`;
   }, [profile?.name]);
 
   if (isLoading || !profile) return null;
@@ -397,7 +414,7 @@ export default function Dashboard() {
           {location === "/dashboard" && (
             <SectionHeading 
               align="left" 
-              title={`Hello, ${greeting}`} 
+              title={greeting} 
               subtitle="Welcome back" 
             />
           )}

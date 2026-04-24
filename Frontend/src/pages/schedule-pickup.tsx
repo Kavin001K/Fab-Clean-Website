@@ -103,6 +103,13 @@ export default function SchedulePickup() {
   const { data: servicesData } = useListServices();
   const { toast } = useToast();
 
+  const getSmartTimeSlot = () => {
+    const hour = new Date().getHours();
+    if (hour < 11) return "afternoon";
+    if (hour < 15) return "evening";
+    return "morning"; // Usually next day
+  };
+
   const {
     control,
     register,
@@ -117,7 +124,7 @@ export default function SchedulePickup() {
     defaultValues: {
       services: [],
       branch: "",
-      timeSlot: "morning",
+      timeSlot: getSmartTimeSlot(),
     },
   });
 
@@ -229,7 +236,7 @@ export default function SchedulePickup() {
                 <p className="eyebrow">Schedule pickup</p>
                 <h1 className="mt-4 font-display text-3xl text-ink">Book your service</h1>
               </div>
-            <form onSubmit={handleSubmit((formValues) => schedule({ data: formValues }))}>
+            <form onSubmit={handleSubmit((formValues) => schedule({ data: formValues as any }))}>
               <AnimatePresence mode="wait">
                 {step === 1 ? (
                   <motion.div key="pickup-step-1" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} className="space-y-4">
@@ -417,20 +424,20 @@ export default function SchedulePickup() {
                   <p className="mt-1">Selected services: {values.services?.length || 0}</p>
                 </div>
 
-                <div className="flex flex-col gap-3 sm:flex-row">
+                <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
                   {step > 1 ? (
-                    <Button type="button" variant="outline" onClick={() => setStep((value) => Math.max(1, value - 1))}>
-                      <ChevronLeft className="h-4 w-4" />
+                    <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={() => setStep((value) => Math.max(1, value - 1))}>
+                      <ChevronLeft className="mr-2 h-4 w-4" />
                       Back
                     </Button>
                   ) : null}
                   {step < 3 ? (
-                    <Button type="button" onClick={() => void nextStep()}>
-                      Next
-                      <ChevronRight className="h-4 w-4" />
+                    <Button type="button" className="w-full sm:w-auto" onClick={() => void nextStep()}>
+                      Next step
+                      <ChevronRight className="ml-2 h-4 w-4" />
                     </Button>
                   ) : (
-                    <Button type="submit" isLoading={isPending} disabled={!isValid}>
+                    <Button type="submit" className="w-full sm:w-auto shadow-lg shadow-primary/20 ring-2 ring-primary/20" isLoading={isPending} disabled={!isValid}>
                       Confirm pickup
                     </Button>
                   )}

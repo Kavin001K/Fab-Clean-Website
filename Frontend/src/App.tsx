@@ -76,15 +76,15 @@ function App() {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} forcedTheme="light">
-          <AuthProvider>
-            <TooltipProvider>
-              <PointerFeedbackProvider />
-              <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+          <TooltipProvider>
+            <PointerFeedbackProvider />
+            <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+              <AuthProvider>
                 <Router />
-              </WouterRouter>
-              <Toaster />
-            </TooltipProvider>
-          </AuthProvider>
+              </AuthProvider>
+            </WouterRouter>
+            <Toaster />
+          </TooltipProvider>
         </ThemeProvider>
       </QueryClientProvider>
     </ErrorBoundary>
