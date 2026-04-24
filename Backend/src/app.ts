@@ -23,15 +23,25 @@ app.get("/", (_req, res) => {
   });
 });
 
-// Rate limiting (max 100 requests per 15 minutes per IP)
-const limiter = rateLimit({
+// General API rate limiting — generous limit for normal browsing
+const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
-  message: "Too many requests from this IP, please try again after 15 minutes",
+  max: 500,
   standardHeaders: true,
   legacyHeaders: false,
+  message: { success: false, error: { code: "TOO_MANY_REQUESTS", message: "Too many requests. Please try again in a few minutes." } },
 });
-app.use("/api", limiter);
+app.use("/api", generalLimiter);
+
+// Strict rate limiting for auth endpoints only (OTP abuse prevention)
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 15,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: { code: "TOO_MANY_REQUESTS", message: "Too many login attempts. Please wait a few minutes before trying again." } },
+});
+app.use("/api/auth", authLimiter);
 
 app.use(
   pinoHttp({
