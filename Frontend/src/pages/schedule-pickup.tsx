@@ -228,16 +228,44 @@ export default function SchedulePickup() {
             title="Book your service."
             description="Complete the form below to schedule a pickup. We will confirm your request shortly."
             sideNote={
-              <div className="space-y-3">
-                {steps.map((item, index) => (
-                  <div
-                    key={item.label}
-                    className={`rounded-[1.4rem] border px-4 py-4 text-sm ${step === index + 1 ? "border-primary/20 bg-primary/10 text-primary" : "border-line bg-background/70 text-muted-foreground"}`}
-                  >
-                    <p className="font-semibold uppercase tracking-[0.16em]">{item.label}</p>
-                    <p className="mt-2 text-sm leading-7">{item.title}</p>
-                  </div>
-                ))}
+              <div className="flex flex-row flex-wrap items-center gap-3 sm:flex-col sm:items-start sm:gap-6">
+                {steps.map((item, index) => {
+                  const isCompleted = step > index + 1;
+                  const isActive = step === index + 1;
+                  
+                  return (
+                    <div key={item.label} className="flex items-center gap-4">
+                      <div
+                        className={cn(
+                          "flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[13px] font-bold transition-all duration-300",
+                          isActive
+                            ? "bg-primary text-background shadow-md shadow-primary/20 scale-110"
+                            : isCompleted
+                              ? "bg-primary/15 text-primary"
+                              : "bg-background border border-line text-muted-foreground"
+                        )}
+                      >
+                        {isCompleted ? <CheckCircle2 className="h-4 w-4" /> : index + 1}
+                      </div>
+                      <div className="hidden sm:block">
+                        <p className={cn("text-[13px] uppercase tracking-[0.16em] transition-colors", isActive ? "text-primary font-bold" : "text-muted-foreground font-semibold")}>
+                          {item.label}
+                        </p>
+                        {isActive && (
+                          <motion.p initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="mt-1 text-[13px] leading-6 text-muted-foreground">
+                            {item.title}
+                          </motion.p>
+                        )}
+                      </div>
+                      {/* Mobile active label */}
+                      {isActive && (
+                        <span className="sm:hidden text-sm font-semibold text-ink">
+                          {item.label}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             }
           >

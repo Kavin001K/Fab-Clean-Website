@@ -27,12 +27,12 @@ function Calendar({
         nav_button_previous: "absolute left-1",
         nav_button_next: "absolute right-1",
         table: "w-full border-collapse space-y-1",
-        head_row: "flex w-full",
-        head_cell: "text-muted-foreground w-9 font-medium text-[0.8rem] text-center",
+        head_row: "flex w-full mb-2",
+        head_cell: "text-muted-foreground w-11 font-medium text-[0.85rem] text-center",
         row: "flex w-full mt-2",
-        cell: "h-9 w-9 text-center text-sm p-0 relative focus-within:relative focus-within:z-20",
+        cell: "h-11 w-11 text-center text-sm p-0 relative focus-within:relative focus-within:z-20",
         day: cn(
-          "h-9 w-9 p-0 font-normal hover:bg-primary/10 hover:text-primary transition-colors rounded-full text-ink flex items-center justify-center aria-selected:opacity-100"
+          "h-11 w-11 p-0 text-base hover:bg-primary/10 hover:text-primary transition-colors rounded-full text-ink flex items-center justify-center aria-selected:opacity-100"
         ),
         day_selected:
           "bg-primary text-background hover:bg-primary hover:text-background focus:bg-primary focus:text-background font-semibold shadow-[0_4px_12px_rgba(181,138,68,0.25)]",
