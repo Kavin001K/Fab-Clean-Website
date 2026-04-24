@@ -10,6 +10,9 @@ import rateLimit from "express-rate-limit";
 
 const app: Express = express();
 
+// Trust the first proxy (Render load balancer) so rate limiting works per user IP
+app.set("trust proxy", 1);
+
 // Security middleware
 app.use(helmet());
 
