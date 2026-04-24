@@ -114,13 +114,6 @@ function DashboardOverview() {
 
   return (
     <div className="space-y-6">
-      <Card className="lux-card p-7">
-        <Badge>Signed in customer</Badge>
-        <h2 className="mt-5 font-display text-4xl text-ink">Welcome, {profile?.name || "Fab Clean Customer"}</h2>
-        <p className="mt-4 max-w-3xl text-base leading-8 text-muted-foreground">
-          The dashboard redesign keeps the backend behavior intact while making the portal less noisy and easier to scan.
-        </p>
-      </Card>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {stats.map((stat, index) => (
@@ -419,12 +412,6 @@ function WalletPanel() {
         </FadeIn>
       ))}
 
-      <Card className="lux-card p-6 md:col-span-2 xl:col-span-4">
-        <p className="font-display text-3xl text-ink">Wallet history can expand later.</p>
-        <p className="mt-3 max-w-3xl text-sm leading-7 text-muted-foreground">
-          This release focuses on a clearer wallet snapshot while leaving deeper wallet history and credits detail for a later backend expansion.
-        </p>
-      </Card>
     </div>
   );
 }
@@ -442,9 +429,6 @@ export default function Dashboard() {
       <div className="page-shell">
         <section className="container-wide section-padding">
           <SectionHeading align="left" title={`Hello, ${greeting}`} subtitle="Customer dashboard" />
-          <p className="mt-5 max-w-3xl text-lg leading-8 text-muted-foreground">
-            Orders, profile, and wallet status now sit inside a more composed portal shell without changing the backend contract.
-          </p>
         </section>
 
         <section className="container-wide pb-24">

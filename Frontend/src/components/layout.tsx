@@ -120,10 +120,12 @@ export function Navbar() {
     <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4">
       <div
         className={cn(
-          "mx-auto max-w-[1320px] rounded-full border px-4 py-3 transition-all sm:px-6",
-          isScrolled
-            ? "border-line bg-panel/88 shadow-[0_18px_45px_rgba(23,20,18,0.08)] backdrop-blur-xl"
-            : "border-transparent bg-transparent",
+          "mx-auto max-w-[1320px] border px-4 py-3 transition-all sm:px-6",
+          open
+            ? "rounded-[2rem] border-line bg-panel shadow-2xl"
+            : isScrolled
+              ? "rounded-full border-line bg-panel/88 shadow-[0_18px_45px_rgba(23,20,18,0.08)] backdrop-blur-xl"
+              : "rounded-full border-transparent bg-transparent",
         )}
       >
         <div className="flex items-center justify-between gap-4">

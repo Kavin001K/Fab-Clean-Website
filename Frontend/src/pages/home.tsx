@@ -122,15 +122,15 @@ export default function Home() {
               <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
                 {BRAND.heroLead}
               </p>
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <Link href="/schedule-pickup" data-cursor-label="Book">
-                  <Button size="lg">
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+                <Link href="/schedule-pickup" className="block w-full sm:w-auto" data-cursor-label="Book">
+                  <Button size="lg" className="w-full">
                     Book pickup
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href="/track-order" data-cursor-label="Track">
-                  <Button size="lg" variant="outline">Track order</Button>
+                <Link href="/track-order" className="block w-full sm:w-auto" data-cursor-label="Track">
+                  <Button size="lg" variant="outline" className="w-full">Track order</Button>
                 </Link>
               </div>
               <div className="mt-8">
