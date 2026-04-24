@@ -83,34 +83,66 @@ export function LocationInput({
     }
 
     setIsFetchingLocation(true);
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        try {
-          const { latitude, longitude } = position.coords;
-          const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
-          if (response.ok) {
-            const data = await response.json();
-            setValue(name, data.display_name, { shouldValidate: true });
-            if (onLocationDetected) {
-              onLocationDetected(latitude, longitude);
+
+    const fetchPosition = (highAccuracy: boolean) => {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            const { latitude, longitude } = position.coords;
+            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+            if (response.ok) {
+              const data = await response.json();
+              setValue(name, data.display_name, { shouldValidate: true });
+              if (onLocationDetected) {
+                onLocationDetected(latitude, longitude);
+              }
+              setShowSuggestions(false);
+              toast({ title: "Location found", description: "Your address has been updated successfully." });
+            } else {
+              throw new Error("Failed to fetch address from coordinates.");
             }
-            setShowSuggestions(false);
-            toast({ title: "Location found", description: "Your address has been updated successfully." });
+          } catch (error) {
+            toast({ title: "Error finding address", description: "Could not retrieve address from coordinates.", variant: "destructive" });
+          } finally {
+            setIsFetchingLocation(false);
+            setShowPermissionModal(false);
           }
-        } catch (error) {
-          toast({ title: "Error finding address", description: "Could not retrieve address from coordinates.", variant: "destructive" });
-        } finally {
+        },
+        (error) => {
+          if (highAccuracy && error.code === error.POSITION_UNAVAILABLE) {
+            console.warn("High accuracy location failed, retrying with standard accuracy.");
+            fetchPosition(false);
+            return;
+          }
+
           setIsFetchingLocation(false);
           setShowPermissionModal(false);
-        }
-      },
-      (error) => {
-        setIsFetchingLocation(false);
-        setShowPermissionModal(false);
-        toast({ title: "Permission denied", description: "Please allow location access to use this feature.", variant: "destructive" });
-      },
-      { enableHighAccuracy: true }
-    );
+          
+          let title = "Location Error";
+          let description = error.message || "Unable to fetch location.";
+          
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              title = "Permission denied";
+              description = "Please allow location access in your browser settings to use this feature.";
+              break;
+            case error.POSITION_UNAVAILABLE:
+              title = "Position unavailable";
+              description = "Your device's location could not be determined. Please enter your address manually.";
+              break;
+            case error.TIMEOUT:
+              title = "Request timed out";
+              description = "The location request timed out. Please try again or enter manually.";
+              break;
+          }
+          
+          toast({ title, description, variant: "destructive" });
+        },
+        { enableHighAccuracy: highAccuracy, timeout: 10000, maximumAge: 0 }
+      );
+    };
+
+    fetchPosition(true);
   };
 
   return (
