@@ -79,51 +79,35 @@ export default function TrackOrder() {
       />
 
       <div className="page-shell">
-        <section className="container-wide section-padding">
-          <SectionHeading title="Tracking should feel credible in one glance." subtitle="Track order" />
-          <p className="mx-auto mt-6 max-w-3xl text-center text-lg leading-8 text-muted-foreground">
-            The new page puts the identifier, status, stage progression, and next actions in a cleaner reading order.
-          </p>
-
-          <FadeIn className="mx-auto mt-10 max-w-6xl">
-            <Card className="lux-card p-7">
-              <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-                <div>
-                  <form
-                    onSubmit={(event) => {
-                      event.preventDefault();
-                      if (!identifier.trim()) {
-                        toast({ title: "Enter an order ID", description: "Use your receipt order number or ERP order ID.", variant: "destructive" });
-                        return;
-                      }
-                      void lookupOrder(identifier, { syncUrl: true, showErrors: true });
-                    }}
-                    className="flex flex-col gap-4 sm:flex-row"
-                  >
-                    <div className="relative flex-1">
-                      <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      <Input value={identifier} onChange={(event) => setIdentifier(event.target.value)} className="pl-11" placeholder="Enter order ID or order number" />
-                    </div>
-                    <Button type="submit" size="lg" isLoading={isLoading}>
-                      Track order
-                      <ArrowRight className="h-4 w-4" />
-                    </Button>
-                  </form>
-
-                  <div className="mt-6 flex flex-wrap gap-3">
-                    <span className="info-chip">Real-time order updates</span>
-                    <span className="info-chip">Invoice access when available</span>
-                  </div>
-                </div>
-
-                <ActionList
-                  items={[
-                    { icon: Truck, title: "Status visibility", body: "See where the order sits in the cleaning and delivery cycle." },
-                    { icon: FileText, title: "Invoice access", body: "Open the invoice directly when it is attached to the tracked order." },
-                  ]}
-                />
+        <section className="container-tight section-padding flex flex-col items-center justify-center min-h-[50vh]">
+          <FadeIn className="w-full max-w-xl">
+            <div className="visual-card p-8 lg:p-10">
+              <div className="text-center mb-10">
+                <p className="eyebrow">Track order</p>
+                <h1 className="mt-4 font-display text-3xl text-ink">Find your service</h1>
               </div>
-            </Card>
+
+              <form
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  if (!identifier.trim()) {
+                    toast({ title: "Enter an order ID", description: "Use your receipt order number or ERP order ID.", variant: "destructive" });
+                    return;
+                  }
+                  void lookupOrder(identifier, { syncUrl: true, showErrors: true });
+                }}
+                className="flex flex-col gap-5"
+              >
+                <div className="relative">
+                  <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input value={identifier} onChange={(event) => setIdentifier(event.target.value)} className="pl-11 text-center" placeholder="Enter order ID or order number" />
+                </div>
+                <Button type="submit" size="lg" className="w-full" isLoading={isLoading}>
+                  Track order
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </form>
+            </div>
           </FadeIn>
         </section>
 

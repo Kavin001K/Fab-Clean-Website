@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -39,9 +39,9 @@ const steps = [
 
 function CustomDatePicker({ value, onChange, minDate }: { value: string; onChange: (val: string) => void; minDate?: Date }) {
   const [open, setOpen] = useState(false);
-  const ref = React.useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (ref.current && !ref.current.contains(event.target as Node)) {
         setOpen(false);
@@ -222,53 +222,13 @@ export default function SchedulePickup() {
       />
 
       <div className="page-shell">
-        <section className="container-wide section-padding">
-          <FormPanel
-            eyebrow="Schedule pickup"
-            title="Book your service."
-            description="Complete the form below to schedule a pickup. We will confirm your request shortly."
-            sideNote={
-              <div className="flex flex-row flex-wrap items-center gap-3 sm:flex-col sm:items-start sm:gap-6">
-                {steps.map((item, index) => {
-                  const isCompleted = step > index + 1;
-                  const isActive = step === index + 1;
-                  
-                  return (
-                    <div key={item.label} className="flex items-center gap-4">
-                      <div
-                        className={cn(
-                          "flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[13px] font-bold transition-all duration-300",
-                          isActive
-                            ? "bg-primary text-background shadow-md shadow-primary/20 scale-110"
-                            : isCompleted
-                              ? "bg-primary/15 text-primary"
-                              : "bg-background border border-line text-muted-foreground"
-                        )}
-                      >
-                        {isCompleted ? <CheckCircle2 className="h-4 w-4" /> : index + 1}
-                      </div>
-                      <div className="hidden sm:block">
-                        <p className={cn("text-[13px] uppercase tracking-[0.16em] transition-colors", isActive ? "text-primary font-bold" : "text-muted-foreground font-semibold")}>
-                          {item.label}
-                        </p>
-                        {isActive && (
-                          <motion.p initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="mt-1 text-[13px] leading-6 text-muted-foreground">
-                            {item.title}
-                          </motion.p>
-                        )}
-                      </div>
-                      {/* Mobile active label */}
-                      {isActive && (
-                        <span className="sm:hidden text-sm font-semibold text-ink">
-                          {item.label}
-                        </span>
-                      )}
-                    </div>
-                  );
-                })}
+        <section className="container-tight section-padding flex flex-col items-center justify-center min-h-[50vh]">
+          <div className="w-full max-w-2xl">
+            <div className="visual-card p-8 lg:p-10">
+              <div className="text-center mb-10">
+                <p className="eyebrow">Schedule pickup</p>
+                <h1 className="mt-4 font-display text-3xl text-ink">Book your service</h1>
               </div>
-            }
-          >
             <form onSubmit={handleSubmit((formValues) => schedule({ data: formValues }))}>
               <AnimatePresence mode="wait">
                 {step === 1 ? (
@@ -392,7 +352,12 @@ export default function SchedulePickup() {
                                   key={store.slug}
                                   type="button"
                                   onClick={() => field.onChange(store.slug)}
-                                  className={`rounded-[1.2rem] border px-4 py-3 text-sm capitalize ${field.value === store.slug ? "border-primary/20 bg-primary/10 text-primary" : "border-line bg-background/70 text-ink"}`}
+                                  className={cn(
+                                    "relative flex items-center justify-center rounded-[1.2rem] border px-4 py-3 text-sm capitalize transition-all duration-200",
+                                    field.value === store.slug
+                                      ? "border-primary bg-primary/10 text-primary shadow-sm ring-1 ring-primary/20 font-semibold"
+                                      : "border-line bg-background/70 text-ink hover:border-primary/40"
+                                  )}
                                 >
                                   {store.name}
                                 </button>
@@ -419,10 +384,20 @@ export default function SchedulePickup() {
                                 key={slot.id}
                                 type="button"
                                 onClick={() => field.onChange(slot.id)}
-                                className={`rounded-[1.4rem] border px-4 py-4 text-left ${field.value === slot.id ? "border-primary/20 bg-primary/10" : "border-line bg-background/70"}`}
+                                className={cn(
+                                  "relative rounded-[1.4rem] border px-4 py-4 text-left transition-all duration-200",
+                                  field.value === slot.id
+                                    ? "border-primary bg-primary/10 shadow-sm ring-1 ring-primary/20"
+                                    : "border-line bg-background/70 hover:border-primary/40"
+                                )}
                               >
-                                <p className="font-medium text-ink">{slot.label}</p>
-                                <p className="mt-2 text-sm text-muted-foreground">{slot.meta}</p>
+                                <div className="flex items-start justify-between gap-2">
+                                  <div>
+                                    <p className={cn("font-medium transition-colors", field.value === slot.id ? "text-primary font-semibold" : "text-ink")}>{slot.label}</p>
+                                    <p className="mt-2 text-sm text-muted-foreground">{slot.meta}</p>
+                                  </div>
+                                  {field.value === slot.id && <CheckCircle2 className="h-5 w-5 fill-primary text-background" />}
+                                </div>
                               </button>
                             ))}
                           </div>
@@ -462,7 +437,8 @@ export default function SchedulePickup() {
                 </div>
               </div>
             </form>
-          </FormPanel>
+            </div>
+          </div>
         </section>
       </div>
     </AppLayout>
