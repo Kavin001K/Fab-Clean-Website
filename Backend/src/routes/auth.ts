@@ -41,12 +41,12 @@ router.post("/auth/send-otp", async (req, res) => {
     return;
   }
 
-  // Per-phone rate limit: 1 minute between OTP requests
+  // Per-phone rate limit: 30 seconds between OTP requests (Frontend handles the progressive 30s, 60s, 90s)
   const lastRequest = lastOtpRequest.get(phone);
-  if (lastRequest && Date.now() - lastRequest < 60 * 1000) {
+  if (lastRequest && Date.now() - lastRequest < 30 * 1000) {
     res.status(429).json({
       success: false,
-      error: { code: "TOO_MANY_REQUESTS", message: "Please wait 60 seconds before requesting another OTP" },
+      error: { code: "TOO_MANY_REQUESTS", message: "Please wait 30 seconds before requesting another OTP" },
     });
     return;
   }
@@ -66,7 +66,7 @@ router.post("/auth/send-otp", async (req, res) => {
 
     // Generate our own OTP
     const otp = generateOtp();
-    otpStore.set(phone, { otp, expires: Date.now() + 5 * 60 * 1000, attempts: 0 }); // 5 minutes expiry
+    otpStore.set(phone, { otp, expires: Date.now() + 10 * 60 * 1000, attempts: 0 }); // 10 minutes expiry
 
     // Send via Direct WhatsApp Template API
     const whatsappIntegratedNumber = process.env.MSG91_WHATSAPP_NUMBER || "15559458542";
@@ -133,7 +133,7 @@ router.post("/auth/send-otp", async (req, res) => {
       success: true,
       data: {
         message: `OTP sent successfully.`,
-        expiresIn: 300,
+        expiresIn: 600,
       },
     });
   } catch (error) {

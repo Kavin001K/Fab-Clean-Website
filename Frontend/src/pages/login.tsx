@@ -17,6 +17,18 @@ export default function Login() {
   const [otp, setOtp] = useState("");
   const [resendTimer, setResendTimer] = useState(0);
 
+  // Helper to get OTP state from storage
+  const getOtpState = (phoneNum: string) => {
+    const saved = localStorage.getItem(`otp_state_${phoneNum}`);
+    if (!saved) return { attempts: 0, lastSentAt: 0, lockedUntil: 0 };
+    return JSON.parse(saved);
+  };
+
+  // Helper to save OTP state
+  const saveOtpState = (phoneNum: string, state: any) => {
+    localStorage.setItem(`otp_state_${phoneNum}`, JSON.stringify(state));
+  };
+
   const redirectTarget = useMemo(() => {
     const params = new URLSearchParams(location.split("?")[1] || "");
     return params.get("redirect") || "/dashboard/orders";
@@ -26,13 +38,36 @@ export default function Login() {
     mutation: {
       onSuccess: () => {
         setStep("otp");
-        setResendTimer(60);
-        toast({ title: "Code sent", description: "Check your messages for the 4-digit OTP." });
+        const state = getOtpState(phone);
+        const newAttempts = state.attempts + 1;
+        
+        // Calculate cooldown: 30s, 60s, 90s...
+        let cooldown = newAttempts * 30;
+        let lockedUntil = 0;
+
+        if (newAttempts >= 5) {
+          cooldown = 600; // 10 minutes wait after 5 attempts
+          lockedUntil = Date.now() + 600 * 1000;
+        }
+
+        const newState = {
+          attempts: newAttempts,
+          lastSentAt: Date.now(),
+          lockedUntil
+        };
+
+        saveOtpState(phone, newState);
+        setResendTimer(cooldown);
+        
+        toast({ 
+          title: "WhatsApp Code Sent", 
+          description: "Please check your WhatsApp for the 4-digit code." 
+        });
       },
       onError: (error: any) => {
         toast({
           title: "Unable to send code",
-          description: error.response?.data?.message || "Please try again.",
+          description: error.response?.data?.error?.message || "Please try again.",
           variant: "destructive",
         });
       },
@@ -42,18 +77,42 @@ export default function Login() {
   const verifyOtp = useVerifyOtp({
     mutation: {
       onSuccess: (result) => {
+        // Clear OTP state on success
+        localStorage.removeItem(`otp_state_${phone}`);
         setToken(result.data.accessToken);
         toast({ title: "Signed in", description: "You are now logged in." });
       },
       onError: (error: any) => {
         toast({
           title: "Verification failed",
-          description: error.response?.data?.message || "Please check the OTP and try again.",
+          description: error.response?.data?.error?.message || "Please check the OTP and try again.",
           variant: "destructive",
         });
       },
     },
   });
+
+  // Restore timer on refresh or phone change
+  useEffect(() => {
+    if (!phone || phone.length !== 10) return;
+    
+    const state = getOtpState(phone);
+    if (!state.lastSentAt) return;
+
+    const newAttempts = state.attempts;
+    let cooldown = newAttempts * 30;
+    if (newAttempts >= 5) cooldown = 600;
+
+    const elapsed = Math.floor((Date.now() - state.lastSentAt) / 1000);
+    const remaining = Math.max(0, cooldown - elapsed);
+    
+    if (remaining > 0) {
+      setResendTimer(remaining);
+      if (step === "phone" && state.attempts > 0) {
+        setStep("otp"); // Resume to OTP step if recently sent
+      }
+    }
+  }, [phone]);
 
   useEffect(() => {
     if (isAuthenticated) setLocation(redirectTarget);
@@ -70,6 +129,18 @@ export default function Login() {
       toast({ title: "Enter a valid phone number", description: "Use a 10-digit mobile number.", variant: "destructive" });
       return;
     }
+
+    const state = getOtpState(phone);
+    if (state.lockedUntil && Date.now() < state.lockedUntil) {
+      const waitMins = Math.ceil((state.lockedUntil - Date.now()) / 60000);
+      toast({ 
+        title: "Account temporarily locked", 
+        description: `Too many resend attempts. Please wait ${waitMins} minutes.`, 
+        variant: "destructive" 
+      });
+      return;
+    }
+
     sendOtp.mutate({ data: { phone } });
   };
 
@@ -77,7 +148,7 @@ export default function Login() {
     <>
       <SEO
         title="Login | Fab Clean"
-        description="Sign in to the Fab Clean customer portal with OTP."
+        description="Sign in to the Fab Clean customer portal with WhatsApp OTP."
         canonical="https://myfabclean.com/login"
       />
       <div className="site-frame min-h-screen px-4 py-6 sm:px-6">
@@ -96,7 +167,7 @@ export default function Login() {
                   <motion.div key="phone" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} className="text-center">
                     <h2 className="mt-4 font-display text-3xl text-ink">Sign in</h2>
                     <p className="mt-3 text-sm leading-7 text-muted-foreground">
-                      We will send a one-time code to your mobile number.
+                      We will send a one-time code to your <span className="font-medium text-primary">WhatsApp</span>.
                     </p>
                     <form
                       onSubmit={(event) => {
@@ -127,7 +198,7 @@ export default function Login() {
                     </button>
                     <h2 className="mt-4 font-display text-3xl text-ink">Enter code</h2>
                     <p className="mt-3 text-sm leading-7 text-muted-foreground">
-                      We sent a 4-digit code to <span className="font-medium text-ink">+91 {phone}</span>.
+                      We sent a 4-digit code to your <span className="font-medium text-ink">WhatsApp</span> at <span className="font-medium text-ink">+91 {phone}</span>.
                     </p>
                     <form
                       onSubmit={(event) => {
@@ -150,7 +221,9 @@ export default function Login() {
                     </form>
                     <div className="mt-6 flex flex-col items-center gap-3">
                       <p className="text-sm text-muted-foreground">
-                        {resendTimer ? `Resend available in ${resendTimer}s` : "Need a new code?"}
+                        {resendTimer 
+                          ? `Resend available in ${Math.floor(resendTimer / 60)}m ${resendTimer % 60}s` 
+                          : "Need a new code?"}
                       </p>
                       <Button type="button" variant="ghost" size="sm" disabled={resendTimer > 0 || sendOtp.isPending} onClick={requestOtp}>
                         <RefreshCw className="h-4 w-4" />

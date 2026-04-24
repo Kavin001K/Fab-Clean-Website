@@ -48,7 +48,7 @@ router.get("/orders", requireAuth, async (req, res) => {
 
 router.get("/orders/:id", requireAuth, async (req, res) => {
   try {
-    const order = await fetchOwnedOrderById(req.authUser!.phone, req.params.id);
+    const order = await fetchOwnedOrderById(req.authUser!.phone, req.params.id as string);
     if (!order) {
       res.status(404).json({
         success: false,
