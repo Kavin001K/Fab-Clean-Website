@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, Route, Switch, useLocation } from "wouter";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -6,6 +6,8 @@ import { useForm } from "react-hook-form";
 import { useGetOrder, useListOrders, useUpdateProfile } from "@workspace/api-client-react";
 import {
   ArrowLeft,
+  Bell,
+  CalendarDays,
   ChevronRight,
   Loader2,
   LogOut,
@@ -17,7 +19,7 @@ import { AppLayout } from "@/components/layout";
 import { useAuth, useRequireAuth } from "@/hooks/use-auth";
 import { Badge, Button, Card, FadeIn, Input, SectionHeading } from "@/components/ui";
 import { StatusTimeline } from "@/components/site";
-import { fetchWalletSummary } from "@/lib/portal-api";
+import { fetchPortalPickups, fetchWalletSummary, type PortalPickup } from "@/lib/portal-api";
 
 type ProfileFormValues = {
   name: string;
@@ -81,23 +83,112 @@ function OrderCard({ order, index = 0 }: { order: any, index?: number }) {
   );
 }
 
+function PickupStatusBadge({ status }: { status: string }) {
+  return (
+    <Badge variant="outline" className="capitalize">
+      {status.replace(/_/g, " ")}
+    </Badge>
+  );
+}
+
+function BookingsPanel({ pickups, title = "Pickup bookings" }: { pickups: PortalPickup[]; title?: string }) {
+  return (
+    <Card className="lux-card p-6">
+      <div className="flex items-center justify-between">
+        <h3 className="font-display text-2xl text-ink">{title}</h3>
+        <Link href="/schedule-pickup">
+          <Button size="sm">New pickup</Button>
+        </Link>
+      </div>
+      {!pickups.length ? (
+        <p className="mt-4 text-sm text-muted-foreground">No pickup bookings yet.</p>
+      ) : (
+        <div className="mt-4 grid gap-3">
+          {pickups.map((pickup) => (
+            <div key={pickup.id} className="rounded-2xl border border-line bg-panel/30 p-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="font-semibold text-ink">{pickup.bookingReference}</p>
+                <PickupStatusBadge status={pickup.status} />
+              </div>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {pickup.branch} • {pickup.preferredDate} • {pickup.timeSlot}
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">{pickup.address}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </Card>
+  );
+}
+
 function DashboardHome() {
   const { token, logout } = useAuth();
+  const [showBookingPopup, setShowBookingPopup] = useState(false);
   const ordersQuery = useListOrders();
   const walletQuery = useQuery({
     queryKey: ["wallet-summary"],
     queryFn: () => fetchWalletSummary(token!),
     enabled: Boolean(token),
   });
+  const pickupsQuery = useQuery({
+    queryKey: ["portal-pickups"],
+    queryFn: () => fetchPortalPickups(token!),
+    enabled: Boolean(token),
+  });
 
   const orders = ordersQuery.data?.data ?? [];
   const activeOrdersCount = orders.filter((o) => o.status !== "delivered").length;
   const recentOrders = orders.slice(0, 3);
+  const pickups = pickupsQuery.data?.data ?? [];
+  const newPickupsCount = useMemo(() => {
+    if (!pickups.length) return 0;
+    const key = `fab_dashboard_pickup_seen_at`;
+    const lastSeen = localStorage.getItem(key);
+    const lastSeenDate = lastSeen ? new Date(lastSeen) : null;
+    if (!lastSeenDate || Number.isNaN(lastSeenDate.getTime())) return pickups.length;
+    return pickups.filter((row) => row.createdAt && new Date(row.createdAt) > lastSeenDate).length;
+  }, [pickups]);
   
   const wallet = walletQuery.data?.data;
 
+  useEffect(() => {
+    if (newPickupsCount > 0) {
+      setShowBookingPopup(true);
+    }
+  }, [newPickupsCount]);
+
+  const markBookingsSeen = () => {
+    localStorage.setItem("fab_dashboard_pickup_seen_at", new Date().toISOString());
+    setShowBookingPopup(false);
+  };
+
   return (
     <div className="space-y-10">
+      {showBookingPopup && pickups.length > 0 ? (
+        <Card className="lux-card border-primary/20 bg-primary/[0.04] p-5">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-sm font-semibold text-primary">New pickup booking updates</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {newPickupsCount} new booking{newPickupsCount === 1 ? "" : "s"} since your last login.
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Link href="/dashboard/bookings">
+                <Button size="sm">
+                  <CalendarDays className="mr-2 h-4 w-4" />
+                  Open bookings
+                </Button>
+              </Link>
+              <Button size="sm" variant="outline" onClick={markBookingsSeen}>
+                Dismiss
+              </Button>
+            </div>
+          </div>
+        </Card>
+      ) : null}
+
       {/* Quick Stats Grid */}
       <div className="grid gap-3 grid-cols-2 md:grid-cols-4">
         <Card className="lux-card p-5 bg-gradient-to-br from-panel to-panel/50">
@@ -115,6 +206,10 @@ function DashboardHome() {
         <Card className="lux-card p-5 bg-gradient-to-br from-panel to-panel/50">
           <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Total Spent</p>
           <p className="mt-2 text-3xl font-display text-ink">{wallet ? formatMoney(wallet.totalSpent) : "..."}</p>
+        </Card>
+        <Card className="lux-card p-5 bg-gradient-to-br from-panel to-panel/50">
+          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Pickup Bookings</p>
+          <p className="mt-2 text-3xl font-display text-ink">{pickupsQuery.isLoading ? "..." : pickups.length}</p>
         </Card>
       </div>
 
@@ -141,6 +236,12 @@ function DashboardHome() {
         )}
         <Link href="/dashboard/profile" className="block">
           <Button variant="outline" className="w-full h-14 text-base bg-panel">Profile & Settings</Button>
+        </Link>
+        <Link href="/dashboard/bookings" className="block">
+          <Button variant="outline" className="w-full h-14 text-base bg-panel">
+            <Bell className="mr-2 h-4 w-4" />
+            Booking Updates
+          </Button>
         </Link>
       </div>
 
@@ -178,6 +279,30 @@ function DashboardHome() {
           Sign out safely
         </Button>
       </div>
+    </div>
+  );
+}
+
+function BookingsPage() {
+  const { token } = useAuth();
+  const pickupsQuery = useQuery({
+    queryKey: ["portal-pickups"],
+    queryFn: () => fetchPortalPickups(token!),
+    enabled: Boolean(token),
+  });
+
+  const pickups = pickupsQuery.data?.data ?? [];
+
+  return (
+    <div className="max-w-4xl space-y-6">
+      <BackToDashboard />
+      {pickupsQuery.isLoading ? (
+        <div className="flex justify-center p-12">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      ) : (
+        <BookingsPanel pickups={pickups} title="All Pickup Bookings" />
+      )}
     </div>
   );
 }
@@ -425,6 +550,7 @@ export default function Dashboard() {
             <Route path="/dashboard" component={DashboardHome} />
             <Route path="/dashboard/orders" component={OrdersList} />
             <Route path="/dashboard/track/:id">{(params) => <OrderTrack id={params.id} />}</Route>
+            <Route path="/dashboard/bookings" component={BookingsPage} />
             <Route path="/dashboard/profile" component={ProfilePanel} />
             {/* Redirect any old links */}
             <Route path="/dashboard/wallet">

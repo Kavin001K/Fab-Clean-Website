@@ -1,4 +1,4 @@
-create table if not exists stores (
+create table if not exists website_stores (
   id uuid primary key default gen_random_uuid(),
   slug text not null unique,
   name text not null,
@@ -15,7 +15,7 @@ create table if not exists stores (
   updated_at timestamptz not null default now()
 );
 
-insert into stores (
+insert into website_stores (
   slug,
   name,
   address,
@@ -81,11 +81,11 @@ begin
   ) then
     alter table pickups
       add constraint pickups_branch_stores_slug_fk
-      foreign key (branch) references stores(slug)
+      foreign key (branch) references website_stores(slug)
       on update cascade
       on delete restrict;
   end if;
 end $$;
 
-create index if not exists stores_active_sort_idx on stores (is_active, sort_order, name);
+create index if not exists website_stores_active_sort_idx on website_stores (is_active, sort_order, name);
 create index if not exists pickups_branch_idx on pickups (branch);

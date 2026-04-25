@@ -1,7 +1,7 @@
 import { Router, type IRouter } from "express";
 import { db } from "@workspace/db";
-import { usersTable } from "@workspace/db";
-import { eq } from "drizzle-orm";
+import { pickupsTable, usersTable } from "@workspace/db";
+import { desc, eq, inArray } from "drizzle-orm";
 import { requireAuth } from "../lib/auth.js";
 import {
   fetchCustomerByPhone,
@@ -28,6 +28,21 @@ function mapOrder(order: Awaited<ReturnType<typeof fetchOrdersByPhone>>[number])
     createdAt: order.created_at,
     totalAmount: Number(order.total_amount ?? 0),
   };
+}
+
+function phoneCandidates(phone: string): string[] {
+  const digits = String(phone || "").replace(/\D/g, "");
+  const last10 = digits.slice(-10);
+  return Array.from(
+    new Set([
+      phone,
+      digits,
+      last10,
+      `+${digits}`,
+      `91${last10}`,
+      `+91${last10}`,
+    ]),
+  ).filter(Boolean);
 }
 
 router.get("/orders", requireAuth, async (req, res) => {
@@ -158,6 +173,55 @@ router.get("/wallet/summary", requireAuth, async (req, res) => {
     res.status(500).json({
       success: false,
       error: { code: "INTERNAL_ERROR", message: "Failed to load wallet summary" },
+    });
+  }
+});
+
+router.get("/pickups", requireAuth, async (req, res) => {
+  try {
+    const candidates = phoneCandidates(req.authUser!.phone);
+    if (candidates.length === 0) {
+      res.json({ success: true, data: [], meta: { total: 0 } });
+      return;
+    }
+    const since = typeof req.query?.since === "string" ? req.query.since : undefined;
+    const sinceDate = since ? new Date(since) : null;
+
+    const pickups = await db.query.pickupsTable.findMany({
+      where: inArray(pickupsTable.customerPhone, candidates),
+      orderBy: [desc(pickupsTable.createdAt)],
+      limit: 100,
+    });
+
+    const filtered = sinceDate && !Number.isNaN(sinceDate.getTime())
+      ? pickups.filter((row) => row.createdAt && row.createdAt > sinceDate)
+      : pickups;
+
+    res.json({
+      success: true,
+      data: filtered.map((row) => ({
+        id: row.id,
+        bookingReference: row.bookingReference,
+        customerName: row.customerName,
+        customerPhone: row.customerPhone,
+        status: row.status,
+        preferredDate: row.preferredDate,
+        timeSlot: row.timeSlot,
+        branch: row.branch,
+        services: row.services,
+        address: row.address,
+        createdAt: row.createdAt?.toISOString?.() || null,
+        updatedAt: row.updatedAt?.toISOString?.() || null,
+      })),
+      meta: {
+        total: filtered.length,
+      },
+    });
+  } catch (err) {
+    req.log.error(err, "Failed to load portal pickups");
+    res.status(500).json({
+      success: false,
+      error: { code: "INTERNAL_ERROR", message: "Failed to load pickups" },
     });
   }
 });

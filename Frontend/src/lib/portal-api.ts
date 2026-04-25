@@ -29,6 +29,26 @@ export type WalletSummary = {
   available: boolean;
 };
 
+export type PortalPickup = {
+  id: string;
+  bookingReference: string;
+  customerName: string;
+  customerPhone: string;
+  status: string;
+  preferredDate: string;
+  timeSlot: string;
+  branch: string;
+  services: string[];
+  address: string;
+  createdAt: string | null;
+  updatedAt: string | null;
+};
+
 export async function fetchWalletSummary(token: string) {
   return request<{ success: boolean; data: WalletSummary }>("/api/wallet/summary", token);
+}
+
+export async function fetchPortalPickups(token: string, since?: string) {
+  const suffix = since ? `?since=${encodeURIComponent(since)}` : "";
+  return request<{ success: boolean; data: PortalPickup[]; meta: { total: number } }>(`/api/pickups${suffix}`, token);
 }

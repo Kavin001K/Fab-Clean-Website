@@ -113,6 +113,20 @@ export type WalletSummary = {
   totalSpent: number;
 };
 
+export type AppStoreRecord = {
+  code: string;
+  slug: string;
+  name: string;
+  address: string | null;
+  phone: string | null;
+  email: string | null;
+  latitude: number | string | null;
+  longitude: number | string | null;
+  map_href: string | null;
+  is_active: boolean | null;
+  sort_order: number | string | null;
+};
+
 function encodeIdentifier(value: string): string {
   return encodeURIComponent(value.trim());
 }
@@ -131,6 +145,19 @@ function normalizeOrderNumber(value: string): string {
 
 function normalizePhone(value: string): string {
   return value.replace(/\D/g, "").slice(-10);
+}
+
+function phoneCandidates(value: string): string[] {
+  const digits = value.replace(/\D/g, "");
+  const last10 = digits.slice(-10);
+  return Array.from(new Set([
+    value,
+    digits,
+    last10,
+    `91${last10}`,
+    `+91${last10}`,
+    `+${digits}`,
+  ])).filter(Boolean);
 }
 
 export async function fetchOrderByIdentifier(identifier: string): Promise<PublicOrderRecord | null> {
@@ -169,12 +196,17 @@ export async function fetchCustomerByPhone(phone: string): Promise<CustomerRecor
   const cleanPhone = normalizePhone(phone);
   if (!cleanPhone) return null;
 
-  const rows = await request<CustomerRecord[]>(
-    `/rest/v1/customers?select=id,name,email,phone,address,wallet_balance_cache,credit_balance,total_orders,total_spent,created_at&phone=eq.${encodeIdentifier(cleanPhone)}&limit=1`,
-    "GET",
-  );
+  const candidates = phoneCandidates(phone);
 
-  return rows[0] ?? null;
+  for (const candidate of candidates) {
+    const rows = await request<CustomerRecord[]>(
+      `/rest/v1/customers?select=id,name,email,phone,address,wallet_balance_cache,credit_balance,total_orders,total_spent,created_at&or=(phone.eq.${encodeIdentifier(candidate)},secondary_phone.eq.${encodeIdentifier(candidate)})&limit=1`,
+      "GET",
+    );
+    if (rows[0]) return rows[0];
+  }
+
+  return null;
 }
 
 export async function updateCustomerById(customerId: string, payload: Record<string, unknown>): Promise<CustomerRecord | null> {
@@ -202,9 +234,10 @@ export async function fetchOrdersByPhone(phone: string): Promise<PublicOrderReco
       "GET",
     );
   }
-
+  const candidates = phoneCandidates(phone);
+  const ors = candidates.map((candidate) => `customer_phone.eq.${encodeIdentifier(candidate)}`).join(",");
   return request<PublicOrderRecord[]>(
-    `/rest/v1/orders?select=${select}&customer_phone=eq.${encodeIdentifier(cleanPhone)}&order=created_at.desc`,
+    `/rest/v1/orders?select=${select}&or=(${ors})&order=created_at.desc`,
     "GET",
   );
 }
@@ -259,6 +292,17 @@ export async function updateOrder(orderId: string, payload: Record<string, unkno
 
 export async function callRpc<T>(name: string, payload?: Record<string, unknown>): Promise<T> {
   return request<T>(`/rest/v1/rpc/${name}`, "POST", payload ?? {});
+}
+
+export async function fetchAppStores(): Promise<AppStoreRecord[]> {
+  try {
+    return await request<AppStoreRecord[]>(
+      "/rest/v1/mapp_store_registry?select=code,slug,name,address,phone,email,latitude,longitude,map_href,is_active,sort_order&is_active=eq.true&order=sort_order.asc,name.asc",
+      "GET",
+    );
+  } catch {
+    return [];
+  }
 }
 
 export async function fetchHomepageReviews() {

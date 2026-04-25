@@ -1,12 +1,14 @@
 import { Router, type IRouter } from "express";
 import { asc, eq } from "drizzle-orm";
 import { db, storesTable } from "@workspace/db";
+import { fetchAppStores } from "../lib/supabase-admin.js";
 
 const router: IRouter = Router();
 
 router.get("/stores", async (req, res) => {
   try {
-    const stores = await db
+    const [stores, appStores] = await Promise.all([
+      db
       .select({
         id: storesTable.id,
         slug: storesTable.slug,
@@ -21,11 +23,34 @@ router.get("/stores", async (req, res) => {
       })
       .from(storesTable)
       .where(eq(storesTable.isActive, true))
-      .orderBy(asc(storesTable.sortOrder), asc(storesTable.name));
+      .orderBy(asc(storesTable.sortOrder), asc(storesTable.name)),
+      fetchAppStores(),
+    ]);
+
+    const mergedBySlug = new Map<string, any>();
+    for (const store of stores) {
+      mergedBySlug.set(store.slug, store);
+    }
+    for (const appStore of appStores) {
+      if (!appStore.slug) continue;
+      if (mergedBySlug.has(appStore.slug)) continue;
+      mergedBySlug.set(appStore.slug, {
+        id: appStore.code || appStore.slug,
+        slug: appStore.slug,
+        name: appStore.name,
+        address: appStore.address || "",
+        phone: appStore.phone || "",
+        email: appStore.email || "",
+        latitude: Number(appStore.latitude ?? 0),
+        longitude: Number(appStore.longitude ?? 0),
+        coverageRadiusKm: 10,
+        mapHref: appStore.map_href || "",
+      });
+    }
 
     res.json({
       success: true,
-      data: stores,
+      data: Array.from(mergedBySlug.values()),
     });
   } catch (err) {
     req.log.error(err, "Failed to load stores");

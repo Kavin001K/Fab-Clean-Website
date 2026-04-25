@@ -2,6 +2,7 @@ import { Router, type IRouter } from "express";
 import { db } from "@workspace/db";
 import { pickupsTable, storesTable } from "@workspace/db";
 import { and, eq } from "drizzle-orm";
+import { fetchAppStores } from "../lib/supabase-admin.js";
 
 const router: IRouter = Router();
 
@@ -38,7 +39,10 @@ router.post("/pickups", async (req, res) => {
       where: and(eq(storesTable.slug, String(branch)), eq(storesTable.isActive, true)),
     });
 
-    if (!store) {
+    const appStores = store ? [] : await fetchAppStores();
+    const sharedStore = store ?? appStores.find((item) => item.slug === String(branch) && item.is_active !== false);
+
+    if (!sharedStore) {
       res.status(400).json({
         success: false,
         error: { code: "VALIDATION_ERROR", message: "Select a valid store" },
@@ -59,7 +63,7 @@ router.post("/pickups", async (req, res) => {
       specialInstructions: specialInstructions ?? null,
       preferredDate,
       timeSlot,
-      branch: store.slug,
+      branch: sharedStore.slug,
     });
 
     res.status(201).json({
