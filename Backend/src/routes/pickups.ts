@@ -12,6 +12,36 @@ function generateBookingRef(): string {
   return `FC-PU-${year}-${rand}`;
 }
 
+const ERP_PUBLIC_BOOKING_URL = process.env.ERP_PUBLIC_BOOKING_URL || "";
+
+async function createErpBooking(payload: Record<string, unknown>) {
+  const url = ERP_PUBLIC_BOOKING_URL.trim();
+  if (!url) return null;
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const failurePayload = await response.text().catch(() => "");
+    throw new Error(`ERP booking intake failed (${response.status}): ${failurePayload || response.statusText}`);
+  }
+
+  const body = await response.json().catch(() => ({}));
+  const booking = body?.data?.booking || body?.booking || body?.data || null;
+  if (!booking) return null;
+
+  return {
+    id: booking.id ?? null,
+    bookingId: booking.bookingId ?? booking.booking_id ?? booking.requestNumber ?? booking.request_number ?? null,
+    status: booking.status ?? "new",
+  };
+}
+
 router.post("/pickups", async (req, res) => {
   try {
     const {
@@ -50,7 +80,34 @@ router.post("/pickups", async (req, res) => {
       return;
     }
 
-    const bookingReference = generateBookingRef();
+    let erpBooking: { id: string | null; bookingId: string | null; status: string } | null = null;
+    try {
+      erpBooking = await createErpBooking({
+        customerName: String(name),
+        customerPhone: String(phone),
+        source: "website",
+        channel: "web",
+        storeCode: String(sharedStore.code || "").toUpperCase() || null,
+        preferredDate: String(preferredDate),
+        preferredSlot: String(timeSlot),
+        notes: specialInstructions ?? null,
+        pickupAddress: {
+          line1: String(address),
+          latitude: addressLat ?? null,
+          longitude: addressLng ?? null,
+        },
+        items: Array.isArray(services)
+          ? services.map((serviceName: string) => ({
+              serviceName: String(serviceName),
+              quantity: 1,
+            }))
+          : [],
+      });
+    } catch (erpError) {
+      req.log.error(erpError, "ERP booking creation failed, proceeding with local pickup record");
+    }
+
+    const bookingReference = erpBooking?.bookingId || generateBookingRef();
 
     await db.insert(pickupsTable).values({
       bookingReference,
@@ -70,6 +127,9 @@ router.post("/pickups", async (req, res) => {
       success: true,
       data: {
         bookingReference,
+        erpBookingId: erpBooking?.bookingId ?? null,
+        erpBookingInternalId: erpBooking?.id ?? null,
+        erpStatus: erpBooking?.status ?? null,
         message: `Your pickup has been scheduled! Reference: ${bookingReference}. We'll contact you at ${phone} to confirm.`,
       },
     });
