@@ -70,6 +70,28 @@ function ProfileDropdown() {
                 <Button 
                   variant="ghost" 
                   size="sm" 
+                  className="w-full justify-start rounded-xl px-3 font-normal"
+                  onClick={() => {
+                    setOpen(false);
+                    setLocation("/dashboard/orders");
+                  }}
+                >
+                  Order History
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="w-full justify-start rounded-xl px-3 font-normal"
+                  onClick={() => {
+                    setOpen(false);
+                    setLocation("/dashboard/bookings");
+                  }}
+                >
+                  Booking History
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
                   className="w-full justify-start rounded-xl px-3 font-normal text-red-500 hover:text-red-600 hover:bg-red-50"
                   onClick={() => {
                     setOpen(false);

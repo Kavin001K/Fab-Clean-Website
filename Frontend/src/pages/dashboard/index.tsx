@@ -12,8 +12,11 @@ import {
   Loader2,
   LogOut,
   Mail,
+  MapPin,
   Phone,
+  Plus,
   User,
+  X,
 } from "lucide-react";
 import { AppLayout } from "@/components/layout";
 import { useAuth, useRequireAuth } from "@/hooks/use-auth";
@@ -24,6 +27,7 @@ import { fetchPortalPickups, fetchWalletSummary, type PortalPickup } from "@/lib
 type ProfileFormValues = {
   name: string;
   email: string;
+  addresses: string[];
 };
 
 const ORDER_STAGES = ["pending", "processing", "ready_for_pickup", "out_for_delivery", "delivered"] as const;
@@ -240,7 +244,7 @@ function DashboardHome() {
         <Link href="/dashboard/bookings" className="block">
           <Button variant="outline" className="w-full h-14 text-base bg-panel">
             <Bell className="mr-2 h-4 w-4" />
-            Booking Updates
+            Booking History
           </Button>
         </Link>
       </div>
@@ -452,19 +456,25 @@ function OrderTrack({ id }: { id: string }) {
 function ProfilePanel() {
   const queryClient = useQueryClient();
   const { profile } = useRequireAuth();
+  
   const form = useForm<ProfileFormValues>({
     defaultValues: {
       name: profile?.name || "",
       email: profile?.email || "",
+      addresses: (profile as any)?.addresses || [],
     },
   });
+
+  const [newAddress, setNewAddress] = useState("");
+  const addresses = form.watch("addresses") || [];
 
   useEffect(() => {
     form.reset({
       name: profile?.name || "",
       email: profile?.email || "",
+      addresses: (profile as any)?.addresses || [],
     });
-  }, [form, profile?.email, profile?.name]);
+  }, [form, profile?.email, profile?.name, (profile as any)?.addresses]);
 
   const updateProfile = useUpdateProfile({
     mutation: {
@@ -473,6 +483,17 @@ function ProfilePanel() {
       },
     } as never,
   });
+
+  const addAddress = () => {
+    if (newAddress.trim()) {
+      form.setValue("addresses", [...addresses, newAddress.trim()]);
+      setNewAddress("");
+    }
+  };
+
+  const removeAddress = (index: number) => {
+    form.setValue("addresses", addresses.filter((_, i) => i !== index));
+  };
 
   return (
     <div className="max-w-2xl">
@@ -505,6 +526,45 @@ function ProfilePanel() {
             <div className="relative">
               <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input {...form.register("email")} type="email" className="pl-11" placeholder="you@example.com" />
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-ink">Saved Addresses</label>
+            <div className="space-y-3">
+              {addresses.map((addr, index) => (
+                <div key={index} className="flex items-center justify-between gap-3 rounded-xl border border-line bg-background/50 p-3">
+                  <div className="flex items-start gap-3 overflow-hidden">
+                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                    <p className="text-sm text-ink line-clamp-2">{addr}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeAddress(index)}
+                    className="shrink-0 rounded-full p-1.5 text-muted-foreground hover:bg-red-50 hover:text-red-600 transition-colors"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              ))}
+              
+              <div className="flex gap-2 items-start mt-2">
+                <Input
+                  value={newAddress}
+                  onChange={(e) => setNewAddress(e.target.value)}
+                  placeholder="Add a new address (e.g., Home, Office)"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      addAddress();
+                    }
+                  }}
+                />
+                <Button type="button" variant="outline" onClick={addAddress} className="shrink-0">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add
+                </Button>
+              </div>
             </div>
           </div>
 

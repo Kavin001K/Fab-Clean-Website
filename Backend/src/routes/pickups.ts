@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { db } from "@workspace/db";
-import { pickupsTable, storesTable } from "@workspace/db";
+import { pickupsTable, storesTable, usersTable } from "@workspace/db";
 import { and, eq } from "drizzle-orm";
 import { fetchAppStores } from "../lib/supabase-admin.js";
 
@@ -123,6 +123,27 @@ router.post("/pickups", async (req, res) => {
       branch: sharedStore.slug,
     });
 
+    try {
+      const existingUser = await db.query.usersTable.findFirst({
+        where: eq(usersTable.phone, String(phone)),
+      });
+      if (!existingUser) {
+        await db.insert(usersTable).values({
+          phone: String(phone),
+          name: String(name),
+          addresses: [String(address)],
+        });
+      } else {
+        const updatedAddresses = new Set(existingUser.addresses || []);
+        updatedAddresses.add(String(address));
+        await db.update(usersTable)
+          .set({ name: String(name), addresses: Array.from(updatedAddresses) })
+          .where(eq(usersTable.phone, String(phone)));
+      }
+    } catch (e) {
+      req.log.error(e, "Failed to sync user profile during pickup booking");
+    }
+
     res.status(201).json({
       success: true,
       data: {
@@ -139,6 +160,44 @@ router.post("/pickups", async (req, res) => {
       success: false,
       error: { code: "INTERNAL_ERROR", message: "Failed to schedule pickup" },
     });
+  }
+});
+
+router.get("/customer-lookup", async (req, res) => {
+  try {
+    const phone = req.query.phone;
+    if (typeof phone !== "string" || phone.length !== 10) {
+      res.status(400).json({ success: false, error: { code: "VALIDATION_ERROR", message: "Invalid phone number" } });
+      return;
+    }
+
+    const user = await db.query.usersTable.findFirst({
+      where: eq(usersTable.phone, phone),
+    });
+
+    if (user) {
+      res.json({
+        success: true,
+        data: { name: user.name, addresses: user.addresses || [] },
+      });
+      return;
+    }
+
+    const { fetchCustomerByPhone } = await import("../lib/supabase-admin.js");
+    const erpCustomer = await fetchCustomerByPhone(phone);
+
+    if (erpCustomer) {
+      res.json({
+        success: true,
+        data: { name: erpCustomer.name, addresses: [] },
+      });
+      return;
+    }
+
+    res.json({ success: true, data: null });
+  } catch (err) {
+    req.log.error(err, "Customer lookup failed");
+    res.status(500).json({ success: false, error: { code: "INTERNAL_ERROR", message: "Lookup failed" } });
   }
 });
 

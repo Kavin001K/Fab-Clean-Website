@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { Link, useLocation, useRoute } from "wouter";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useLocation, useRoute } from "wouter";
 import { CheckCircle2, MessageSquareText, Search, Star } from "lucide-react";
 import { AppLayout } from "@/components/layout";
 import { SEO } from "@/components/seo";
@@ -41,7 +41,9 @@ export default function FeedbackPage() {
   const [isLookingUp, setIsLookingUp] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
-  const routeIdentifier = matchesIdentifierRoute ? decodeURIComponent(routeParams.identifier || "") : "";
+  const lastFetchedId = useRef("");
+
+  const routeIdentifier = matchesIdentifierRoute ? decodeURIComponent(routeParams?.identifier || "") : "";
   const resolvedIdentifier = orderData?.orderNumber || identifier.trim();
 
   const sentimentTone = useMemo(() => {
@@ -52,7 +54,7 @@ export default function FeedbackPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const initialIdentifier = routeIdentifier || params.get("orderId") || "";
-    if (!initialIdentifier.trim()) return;
+    if (!initialIdentifier.trim() || initialIdentifier === lastFetchedId.current) return;
     setIdentifier(initialIdentifier);
     void loadOrder(initialIdentifier, { syncUrl: true, showErrors: true });
   }, [routeIdentifier]);
@@ -61,10 +63,12 @@ export default function FeedbackPage() {
     const cleanIdentifier = rawIdentifier.trim();
     if (!cleanIdentifier) return;
 
+    lastFetchedId.current = cleanIdentifier;
     setIsLookingUp(true);
     setSubmitted(null);
     try {
       const result = await lookupFeedbackOrder(cleanIdentifier);
+      lastFetchedId.current = result.data.orderNumber || cleanIdentifier;
       setOrderData(result.data);
       setIdentifier(result.data.orderNumber);
       if (result.data.existingReview) {

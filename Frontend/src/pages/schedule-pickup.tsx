@@ -110,6 +110,8 @@ export default function SchedulePickup() {
     return "morning"; // Usually next day
   };
 
+  const [savedAddresses, setSavedAddresses] = useState<string[]>([]);
+
   const {
     control,
     register,
@@ -163,6 +165,28 @@ export default function SchedulePickup() {
   };
 
   const values = watch();
+  const phoneVal = watch("phone");
+
+  useEffect(() => {
+    if (phoneVal?.length === 10) {
+      fetch(`/api/pickups/customer-lookup?phone=${phoneVal}`)
+        .then((res) => res.json())
+        .then((result) => {
+          if (result.success && result.data) {
+            if (result.data.name) setValue("name", result.data.name, { shouldValidate: true });
+            if (result.data.addresses?.length) {
+              setSavedAddresses(result.data.addresses);
+              if (!values.address) {
+                setValue("address", result.data.addresses[0], { shouldValidate: true });
+              }
+            } else {
+              setSavedAddresses([]);
+            }
+          }
+        })
+        .catch((err) => console.error("Customer lookup failed:", err));
+    }
+  }, [phoneVal, setValue]);
 
   const { mutate: schedule, isPending } = useSchedulePickup({
     mutation: {
@@ -268,6 +292,23 @@ export default function SchedulePickup() {
                         error={errors.address}
                         onLocationDetected={handleLocationDetected}
                       />
+                      {savedAddresses.length > 0 && (
+                        <div className="mt-2 space-y-2">
+                          <p className="text-xs text-muted-foreground">Saved addresses:</p>
+                          <div className="flex flex-wrap gap-2">
+                            {savedAddresses.map((addr, idx) => (
+                              <button
+                                key={idx}
+                                type="button"
+                                onClick={() => setValue("address", addr, { shouldValidate: true })}
+                                className="rounded-xl border border-line bg-background/50 px-3 py-1.5 text-xs text-ink hover:border-primary/40 transition-colors"
+                              >
+                                {addr.slice(0, 30)}{addr.length > 30 ? "..." : ""}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </motion.div>
                 ) : null}
